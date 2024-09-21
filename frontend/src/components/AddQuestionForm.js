@@ -10,6 +10,12 @@ const AddQuestionForm = ({ onAdd }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onAdd({ title, description, category, complexity });
+
+    // Clear the form
+    setTitle('');
+    setDescription('');
+    setCategory('');
+    setComplexity('');
   };
 
   return (

@@ -5,7 +5,7 @@ const { v4: uuid } = require('uuid');
 const questionSchema = new mongoose.Schema({
     id: {
         type: String,
-        defualt: uuid(),
+        default: uuid(),
     },
     title: {
         type: String,

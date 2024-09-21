@@ -6,12 +6,15 @@ const mongoose = require('mongoose');
 
 const PORT = process.env.PORT || 8080;
 
+// Enable CORS for all routes
+const cors = require('cors');
+app.use(cors());
+
 //Database connection to mongo
 databaseConn();
 
 app.use(express.json());
-app.use('/question', require('./routes/questions'));
-
+app.use('/questions', require('./routes/questions'));
 
 // mongodb connection log
 mongoose.connection.once('open', () => {

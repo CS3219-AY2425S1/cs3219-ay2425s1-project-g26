@@ -2,7 +2,7 @@
 import React from "react";
 import "./QuestionTable.css"; // Import the CSS file
 
-const QuestionTable = ({ questions }) => {
+const QuestionTable = ({ questions, onDeleteQuestion, onEdit }) => {
   return (
     <div>
       <h1></h1>
@@ -19,14 +19,14 @@ const QuestionTable = ({ questions }) => {
         </thead>
         <tbody>
           {questions.map((question) => (
-            <tr key={question.id}>
+            <tr key={question._id}>
               <td>{question.title}</td>
               <td>{question.category}</td>
               <td>{question.complexity}</td>
               <td>
-                <button>Edit</button>
+                <button onClick={() => onEdit(question)}>Edit</button>
                 <button>View</button>
-                <button>Delete</button>
+                <button onClick={() => onDeleteQuestion(question._id)}>Delete</button>
               </td>
             </tr>
           ))}

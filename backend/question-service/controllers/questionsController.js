@@ -26,13 +26,16 @@ const createQuestion = async (req, res) => {
 }
 
 const updateQuestion = async (req, res) => {
-    if (!req?.body?.id) {
+
+    const questionId = req.params.id; // Get ID from URL parameters
+
+    if (!questionId) {
         return res.status(400).json({ 'message': 'Question ID is required.' });
     }
 
-    const question = await QuestionSchema.findOne({ _id: req.body.id }).exec();
+    const question = await QuestionSchema.findOne({ questionId }).exec();
     if (!question) {
-        return res.status(204).json({ "message": `No question matches ID ${req.body.id}.` });
+        return res.status(204).json({ "message": `No question matches ID ${ questionId }.` });
     }
 
     if (req.body?.title) question.title = req.body.title;
@@ -45,11 +48,14 @@ const updateQuestion = async (req, res) => {
 }
 
 const deleteQuestion = async (req, res) => {
-    if (!req?.body?.id) return res.status(400).json({ 'message': 'Question ID is required.' });
 
-    const question = await QuestionSchema.findOne({ _id: req.body.id }).exec();
+    const questionId = req.params.id; // Get ID from URL parameters
+
+    if (!questionId) return res.status(400).json({ 'message': 'Question ID is required.' });
+
+    const question = await QuestionSchema.findOne({ questionId }).exec();
     if (!question) {
-        return res.status(204).json({ "message": `No question matches ID ${req.body.id}.` });
+        return res.status(204).json({ "message": `No question matches ID ${ questionId }.` });
     }
     const result = await question.deleteOne();
     res.json(result);
