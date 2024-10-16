@@ -9,40 +9,40 @@ dialog {
     border-radius: 0.25rem;
 }
 
-form {
+.question-dialog form {
     display: grid;
     gap: 1rem;
     font-size: 1.5rem;
 }
 
-form > label {
+.question-dialog form > label {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
 }
 
-form > button {
+.question-dialog form > button {
     height: 2rem;
     font-size: 100%;
 }
 
-form textarea {
+.question-dialog form textarea {
     resize: none;
 }
 
-dialog button {
+.question-dialog dialog button {
     font-weight: bold;
 }
 
-.complexity-group {
+.question-dialog .complexity-group {
     display: flex;
 }
 
-input[type='radio'] {
+.question-dialog input[type='radio'] {
     display: none;
 }
 
-.radio-label {
+.question-dialog .radio-label {
     cursor: pointer;
     border: 3px solid var(--radio-intial);
     color: var(--radio-intial);
@@ -52,7 +52,7 @@ input[type='radio'] {
     padding: 0.5rem 1rem;
 }
 
-input[type='radio']:checked + label {
+.question-dialog input[type='radio']:checked + label {
     background-color: var(--radio-selected);
     border: 3px solid var(--radio-selected);
     color: #f5f5f5;

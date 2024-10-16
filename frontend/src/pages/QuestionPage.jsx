@@ -1,24 +1,36 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import "../components/question/DialogForm.css";
+import { useAuth } from "../AuthContext";
+import withAuth from "../hoc/withAuth"; 
 import AddQuestionButton from "../components/question/AddQuestionButton";
 import AddQuestionForm from "../components/question/AddQuestionForm";
 import Dialog from "../components/question/Dialog";
 import EditQuestionForm from "../components/question/EditQuestionForm";
 import QuestionDetail from "../components/question/QuestionDetail";
 import QuestionTable from "../components/question/QuestionTable";
-import withAuth from "../hoc/withAuth"; 
+import "../components/question/DialogForm.css";
 
 const QuestionPage = () => {
+  const { accessToken } = useAuth();
   const navigate = useNavigate(); // Initialize useNavigate
   const [questions, setQuestions] = useState([]);
   const [dialogForm, setDialogForm] = useState(null);
   const dialogRef = useRef(null);
 
+  const getHeaders = () => {
+    return {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${accessToken}`
+    };
+  };
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch("http://localhost:8080/questions");
+        const response = await fetch("http://localhost:8080/questions", {
+          method: "GET",
+          headers: getHeaders()
+        });
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -48,9 +60,7 @@ const QuestionPage = () => {
     try {
       const response = await fetch("http://localhost:8080/questions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getHeaders(),
         body: JSON.stringify(newQuestion),
       });
 
@@ -98,9 +108,7 @@ const QuestionPage = () => {
         `http://localhost:8080/questions/${updatedQuestion._id}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: getHeaders(),
           body: JSON.stringify(updatedQuestion),
         }
       );
@@ -142,9 +150,7 @@ const QuestionPage = () => {
         `http://localhost:8080/questions/${deletedQuestion._id}`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: getHeaders(),
           body: JSON.stringify(deletedQuestion),
         }
       );

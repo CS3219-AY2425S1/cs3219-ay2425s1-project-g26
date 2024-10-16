@@ -16,7 +16,6 @@
     overflow: auto;
     width: 95%;
     margin: 0 auto;
-    /* Center the table */
     border-radius: 12px;
 }
 
@@ -28,6 +27,33 @@
     overflow-x: hidden;
 }
 
+.table-custom th:first-child,
+.table-custom td:first-child {
+    max-width: 600px;
+    width: 600px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:nth-child(2),
+.table-custom td:nth-child(2) {
+    max-width: 400px;
+    width: 400px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:nth-child(3),
+.table-custom td:nth-child(3) {
+    max-width: 170px;
+    width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .table-custom th,
 .table-custom td {
     padding: 12px;
@@ -37,7 +63,6 @@
 
 .table-custom th {
     background-color: #ffb3d9;
-    /* Slightly darker pink for the header */
     color: white;
     position: sticky;
     top: 0;

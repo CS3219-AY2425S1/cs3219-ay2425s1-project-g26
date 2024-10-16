@@ -1,0 +1,99 @@
+.session-container {
+    --white: #f5f5f5;
+    --secondary: #1a3042;
+    --btn-initial: #dcdfdd;
+    --btn-accent: #0097a7;
+}
+
+.back-btn {
+    cursor: pointer;
+    background-color: var(--white);
+    font-weight: bold;
+    font-size: 1.25rem;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    margin: 2rem 5%;
+}
+
+.session-selection {
+    background-color: white;
+    margin: 2rem 20%;
+    border-radius: 1rem;
+}
+
+.session-selection > p {
+    font-size: 1.5rem;
+    padding: 1rem;
+    font-weight: bold;
+}
+
+.difficulty-selection > p, .topic-selection > p {
+    background-color: var(--secondary);
+    font-weight: bold;
+    font-size: 1.25rem;
+    padding: 0.75rem 1rem;
+    color: var(--white);
+}
+
+.session-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.session-form input[type='radio'] {
+    display: none;
+}
+
+.session-form .options {
+    padding: 1rem;
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    max-height: 30svh;
+    overflow-y: scroll;
+}
+
+.options img {
+    height: 4rem;
+    margin: auto;
+}
+
+.session-form .radio-label {
+    cursor: pointer;
+    background-color: var(--btn-initial);
+    text-align: center;
+    padding: 1rem 2.5rem;
+    border-radius: 1rem;
+    transition: all 0.3s ease, transform 0.3s ease;
+}
+
+.session-form input[type='radio']:checked + label {
+    background-color: var(--btn-accent);
+    color: var(--white);
+    transform: scale(1.07);
+}
+
+.session-form input[type='radio']:not(:checked) + label:hover {
+    filter: brightness(90%);
+}
+
+.session-form .start-btn {
+    cursor: pointer;
+    background-color: var(--secondary);
+    color: var(--white);
+    align-self: center;
+    margin: 1rem 0 2rem 0;
+    padding: 1.5rem 3rem;
+    width: 40%;
+    border: none;
+    border-radius: 1rem;
+    font-weight: bold;
+    font-size: 1.25rem;
+    transition: all 0.3s ease, transform 0.3s ease;
+}
+
+.session-form .start-btn:hover {
+    filter: brightness(125%);
+    transform: scale(1.02);
+}
