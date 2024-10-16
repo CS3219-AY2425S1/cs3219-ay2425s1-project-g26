@@ -1,17 +1,18 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useAuth } from '../AuthContext'; // Import the AuthContext
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons for showing/hiding password
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login } = useAuth(); // Access the login function from AuthContext
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,16 +42,11 @@ const Login = () => {
 
       const data = await response.json();
       
-      if (data && data.data && data.data.accessToken && data.data.id) {
-        const userId = data.data.id; 
-        const accessToken = data.data.accessToken; 
+      // Use the login function from AuthContext to store the token in context
+      login(data.data.accessToken);
 
-        login(accessToken, userId);
-        navigate('/dashboard'); 
-      } else {
-        throw new Error('Invalid response data');
-      }
-
+      // Navigate to the dashboard after successful login
+      navigate('/dashboard');
     } catch (error) {
       setErrorMessage(error.message);
     } finally {
@@ -63,6 +59,7 @@ const Login = () => {
       <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1> 
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Welcome back! Let’s get back on track.</p> 
       
+      {notificationMessage && <p style={{ color: '#8BC34A' }}>{notificationMessage}</p>} {/* notification message color */}
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -151,5 +148,18 @@ const Login = () => {
     </div>
   );
 };
+
+// Same styles applied for placeholders
+const styles = `
+  input::placeholder {
+    color: white; 
+    opacity: 0.8; 
+  }
+`;
+
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 export default Login;

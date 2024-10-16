@@ -1,27 +1,22 @@
-// src/pages/DashboardPage.js
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import Calendar from "../components/dashboard/Calendar"; 
 import SessionBox from "../components/dashboard/SessionBox"; 
 import ConfirmationModal from "../components/dashboard/ConfirmationModal"; 
 import withAuth from "../hoc/withAuth"; 
 import { useAuth } from "../AuthContext"; 
-import DropdownMenu from "../components/dashboard/DropdownMenu"; 
-
 const DashboardPage = () => {
   const navigate = useNavigate(); 
-  const { logout, userId, accessToken } = useAuth();
+  const { logout } = useAuth(); // Get the logout function from AuthContext
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [username, setUsername] = useState(''); 
+  
   const hasActiveSession = false; 
 
-  // Logout handler
   const handleLogout = () => {
-    logout(); 
-    navigate('/login'); 
+    logout(); // Use the logout function from AuthContext
+    navigate('/login'); // Redirect to login after logout
   };
 
   const confirmLogout = () => {
@@ -35,39 +30,8 @@ const DashboardPage = () => {
     setShowLogoutConfirm(false); 
   };
 
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
-  };
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`http://localhost:8081/users/${userId}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data.");
-        }
-
-        const data = await response.json();
-        setUsername(data.data.username); 
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    if (userId && accessToken) {
-      fetchUserData();
-    }
-  }, [userId, accessToken]); 
-
   return (
-    <div style={{ paddingTop: "30px", display: "flex", justifyContent: "center", position: 'relative' }}>
+    <div style={{ paddingTop: "100px", display: "flex", justifyContent: "center", position: 'relative' }}>
       <div style={{ 
           display: "flex", 
           flexDirection: "column", 
@@ -75,20 +39,16 @@ const DashboardPage = () => {
           maxWidth: "600px", 
           marginRight: "20px" 
         }}>
-        {/* Welcome Message */}
-        <div style={{ 
-            color: '#fff', 
-            marginBottom: '20px',
-            fontSize: '24px' 
-        }}>
-            Welcome back, @{username}!
-        </div>
+        
+        {/* Current Active Session Component */}
         <SessionBox
           headerText="Current Active Session"
           sessionText={hasActiveSession ? "Current active session with ____" : "No active session. Ready for more?"}
           buttonText={hasActiveSession ? "Rejoin Session" : "New Question"}
-          buttonLink={hasActiveSession ? "/rejoin" : "/new-session"}
+          buttonLink={hasActiveSession ? "/rejoin" : "/new-question"}
         />
+
+        {/* Go to Question Page Box */}
         <SessionBox
           headerText="Go to Question Page"
           sessionText="Navigate to the question page to view, add, edit or delete questions."
@@ -97,7 +57,8 @@ const DashboardPage = () => {
         />
       </div>
 
-      <div style={{ marginLeft: "20px", marginTop: "70px"}}>  
+      {/* right: calendar */}
+      <div style={{ marginLeft: "20px" }}>  
         <Calendar
           currentMonth={currentMonth}
           currentYear={currentYear}
@@ -106,13 +67,26 @@ const DashboardPage = () => {
         />
       </div>
 
-      <DropdownMenu 
-        dropdownVisible={dropdownVisible}
-        toggleDropdown={toggleDropdown}
-        navigate={navigate}
-        confirmLogout={confirmLogout}
-      />
+      {/* Logout Button  */}
+      <div style={{ position: 'absolute', top: '30px', right: '30px' }}>
+        <button
+          onClick={confirmLogout}
+          style={{
+            padding: "15px 30px", 
+            backgroundColor: "#fff", 
+            color: "#000",
+            border: "none",
+            borderRadius: "15px",
+            cursor: "pointer",
+            fontSize: '16px',
+            fontFamily: 'Figtree',
+          }}
+        >
+          Logout
+        </button>
+      </div>
 
+      {/* Confirmation Modal */}
       <ConfirmationModal 
         show={showLogoutConfirm} 
         onConfirm={() => handleConfirmLogout(true)} 

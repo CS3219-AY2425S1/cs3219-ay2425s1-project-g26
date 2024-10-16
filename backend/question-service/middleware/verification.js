@@ -7,17 +7,17 @@ const verifyAdmin = async (req, res, next) => {
       return res.status(401).json({ message: "Authentication failed" });
     }
     const accessToken = authHeader.split(" ")[1];
-
+    
     try {
         // Make a GET request to user-service with the token
-        const response = await axios.get('http://user-service:8081/auth/verify-token', {
+        const response = await axios.get('http://localhost:8081/auth/verify-token', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
 
         if (!response) {
-            return res.status(error.status).json({ error: `${error.response}` });
+            return res.status(error.status).json({ error: `${error.response.data.message}` });
         } 
 
         if (response.data.data.isAdmin) {
@@ -28,7 +28,7 @@ const verifyAdmin = async (req, res, next) => {
 
     } catch (error) {
         console.log(`${error.status}: ${error.response.data.message}`);
-        return res.status(error.status).json({ error: `${error.response}` });
+        return res.status(error.status).json({ error: `${error.response.data.message}` });
     }
 }
 
@@ -42,20 +42,20 @@ const verifyUser = async (req, res, next) => {
     
     try {
         // Make a GET request to user-service with the token
-        const response = await axios.get('http://user-service:8081/auth/verify-token', {
+        const response = await axios.get('http://localhost:8081/auth/verify-token', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
         });
 
         if (!response) {
-            return res.status(error.status).json({ error: `${error.response}` });
+            return res.status(error.status).json({ error: `${error.response.data.message}` });
         } 
         next();
 
     } catch (error) {
-        console.log(`${error.status}: ${error.response}`);
-        return res.status(error.status).json({ error: `${error.response}` });
+        console.log(`${error.status}: ${error.response.data.message}`);
+        return res.status(error.status).json({ error: `${error.response.data.message}` });
     }
 }
 
