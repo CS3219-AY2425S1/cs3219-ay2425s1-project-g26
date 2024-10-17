@@ -1,0 +1,90 @@
+/* src/components/QuestionTable.css */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.parent-container {
+    /* Add a class to the parent element of .table-container */
+    padding-top: 20px;
+}
+
+.table-wrapper {
+    max-height: 80svh;
+    overflow: auto;
+    width: 95%;
+    margin: 0 auto;
+    border-radius: 12px;
+}
+
+.table-custom {
+    background-color: #ffe6f2;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.table-custom th:first-child,
+.table-custom td:first-child {
+    max-width: 600px;
+    width: 600px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:nth-child(2),
+.table-custom td:nth-child(2) {
+    max-width: 400px;
+    width: 400px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:nth-child(3),
+.table-custom td:nth-child(3) {
+    max-width: 170px;
+    width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th,
+.table-custom td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.table-custom th {
+    background-color: #ffb3d9;
+    color: white;
+    position: sticky;
+    top: 0;
+}
+
+/* Add styles for buttons */
+.table-custom button {
+    background-color: #ffb3d9;
+    /* Button color */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 4px;
+    /* Space between buttons */
+    border-radius: 12px;
+    /* Curved corners */
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+    /* Use Figtree font */
+}
+
+.table-custom button:hover {
+    background-color: #ff80bf;
+    /* Darker shade on hover */
+}
