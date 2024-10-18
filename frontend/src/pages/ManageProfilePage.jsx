@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext"; 
 import { useNavigate } from "react-router-dom"; 
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 
 const ManageProfilePage = () => {
   const { userId, accessToken, logout } = useAuth();
@@ -104,7 +104,6 @@ const ManageProfilePage = () => {
     }
   };
 
-
   const handleBack = () => {
     navigate("/dashboard"); 
   };
@@ -172,6 +171,7 @@ const ManageProfilePage = () => {
                 backgroundColor: "transparent",
                 color: "white",
                 fontSize: "18px",
+                fontFamily: 'Figtree', // Ensure Figtree font
                 marginTop: "5px",
                 width: "100%",
                 padding: "5px 0",
@@ -200,6 +200,7 @@ const ManageProfilePage = () => {
                 backgroundColor: "transparent",
                 color: "white",
                 fontSize: "18px",
+                fontFamily: 'Figtree', 
                 marginTop: "5px",
                 width: "100%",
                 padding: "5px 0",
@@ -228,6 +229,7 @@ const ManageProfilePage = () => {
                 backgroundColor: "transparent",
                 color: "white",
                 fontSize: "18px",
+                fontFamily: 'Figtree', // Ensure Figtree font
                 marginTop: "5px",
                 width: "100%",
                 padding: "5px 0",

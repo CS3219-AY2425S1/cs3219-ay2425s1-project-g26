@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import withAuth from "../hoc/withAuth"; 
 import loading from "../assets/loading.svg";
+import Cookies from 'js-cookie'; 
 import "./styles/NewSessionPage.css";
 
 const NewSessionPage = () => {
@@ -93,7 +94,7 @@ const NewSessionPage = () => {
     setSelectedTopic(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const form = e.target;
@@ -101,11 +102,42 @@ const NewSessionPage = () => {
     const formObj = Object.fromEntries(formData.entries());
 
     if (formObj.hasOwnProperty('difficulty') && formObj.hasOwnProperty('topic')) {
-      navigate('/waiting', { state: { userPref: formObj } });
+        const userId = Cookies.get('userId'); 
+        const { difficulty, topic } = formObj;
+
+        const payload = {
+            id: userId, // user ID from cookies
+            difficulty: difficulty, // selected difficulty
+            category: topic // selected topic
+        };
+
+        const apiUrl = 'http://localhost:8082/matches/'; // maybe this is wrong
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}` // remove if don't need bearer access token in header 
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add to queue');
+            }
+
+            // if successful, navigate to the waiting page
+            navigate('/waiting', { state: { userPref: formObj } });
+        } catch (error) {
+            console.error('Error submitting data:', error);
+            alert(`I just tried to send a POST API call to ${apiUrl}, with this JSON raw values ${JSON.stringify(payload)}, and I failed.`);
+        }
     } else {
-      alert("Select a difficulty/topic");
+        alert('Select a difficulty/topic');
     }
   };
+
 
   return (
     <div className="session-container">

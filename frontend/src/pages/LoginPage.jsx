@@ -66,13 +66,30 @@ const Login = () => {
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <div style={{ 
+      textAlign: 'center', 
+      padding: '50px', 
+      color: '#fff', 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      justifyContent: 'center', 
+      fontFamily: 'Figtree, sans-serif'  
+    }}>
       <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1> 
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Welcome back! Let’s get back on track.</p> 
       
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <form 
+        onSubmit={handleSubmit} 
+        style={{ 
+          marginBottom: '20px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          fontFamily: 'Figtree, sans-serif' 
+        }}>
         <input
           type="email"
           placeholder="Email"
@@ -91,6 +108,7 @@ const Login = () => {
             backgroundColor: 'transparent',
             color: '#fff',
             fontSize: '16px',
+            fontFamily: 'Figtree, sans-serif' 
           }}
         />
         <div style={{ position: 'relative', width: '300px' }}>
@@ -111,6 +129,7 @@ const Login = () => {
               backgroundColor: 'transparent',
               color: '#fff',
               fontSize: '16px',
+              fontFamily: 'Figtree, sans-serif' 
             }}
           />
           <div
@@ -127,8 +146,8 @@ const Login = () => {
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </div>
         </div>
-        <p style={{ margin: '0', color: 'white', fontSize: '0.9rem', textAlign: 'right', width: '300px' }}>
-          <a href="/forget-password" style={{ color: 'white' }}>Forgot your password?</a> 
+        <p style={{ margin: '0', color: 'white', fontSize: '0.9rem', textAlign: 'right', width: '300px', fontFamily: 'Figtree, sans-serif' }}>
+          <a href="/forget-password" style={{ color: 'white', fontFamily: 'Figtree, sans-serif' }}>Forgot your password?</a> 
         </p>
         <button
           type="submit"
@@ -141,6 +160,7 @@ const Login = () => {
             borderRadius: '20px',
             cursor: 'pointer',
             fontSize: '16px',
+            fontFamily: 'Figtree, sans-serif', 
             marginTop: '20px',
             marginBottom: '40px',
             transition: 'background-color 0.3s', 
@@ -152,8 +172,8 @@ const Login = () => {
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      <p style={{ fontSize: '1rem' }}> 
-        Don't have an account? <a href="/signup" style={{ color: 'white' }}>Sign Up</a>
+      <p style={{ fontSize: '1rem', fontFamily: 'Figtree, sans-serif' }}> 
+        Don't have an account? <a href="/signup" style={{ color: 'white', fontFamily: 'Figtree, sans-serif' }}>Sign Up</a>
       </p>
     </div>
   );
