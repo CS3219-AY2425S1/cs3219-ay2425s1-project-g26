@@ -33,7 +33,8 @@ const createMatch = async (matchResult, user1Name, user2Name) => {
             user2Id: matchResult.user2,
             user2Name: user2Name,
             category: matchResult.category,
-            complexity: matchResult.complexity
+            complexity: matchResult.complexity,
+            sessionId: matchResult.sessionId
         });
         console.log(`Matching data saved for ${matchResult.user1} and ${matchResult.user2}.`);
         return result

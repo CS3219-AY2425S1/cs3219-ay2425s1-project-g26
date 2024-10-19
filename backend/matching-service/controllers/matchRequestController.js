@@ -26,7 +26,8 @@ const createMatchRequest = async (req, res) => {
             matchedUserId: "",
             matchedUserName: "",
             category: matchedResult.category,
-            complexity: matchedResult.complexity
+            complexity: matchedResult.complexity,
+            sessionId: matchedResult.sessionId
         };
 
         if (matchedResult.matched) {
@@ -89,5 +90,5 @@ const cancelMatchRequest = async (req, res) => {
         return res.status(400).json({ 'message': 'Matched users not found!' });
     }
  }
- 
+
 module.exports = { createMatchRequest, cancelMatchRequest };

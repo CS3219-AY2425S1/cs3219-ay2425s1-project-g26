@@ -1,4 +1,5 @@
 const amqp = require('amqplib');
+const { v4: uuid } = require('uuid');
 
 const reqCh = process.env.RABBITMQ_REQ_CH;
 const resCh = process.env.RABBITMQ_RES_CH;
@@ -51,7 +52,8 @@ const matchUsers = async () => {
                 user1: newRequest.id,
                 user2: matchedRequest.id,
                 category: newRequest.category,
-                complexity: newRequest.complexity
+                complexity: newRequest.complexity,
+                sessionId: uuid()
             };
             console.log(`Matched ${result.user1} and ${result.user2}`)
             channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); // B to D
@@ -65,7 +67,8 @@ const matchUsers = async () => {
                     user1: newRequest.id,
                     user2: "",
                     category: [],
-                    complexity: ""
+                    complexity: "",
+                    sessionId: ""
                 };
                 channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); //B to D
                 console.log(`${newRequest.id} timed out.`);
