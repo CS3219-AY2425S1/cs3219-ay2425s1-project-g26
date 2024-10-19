@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import withAuth from "../hoc/withAuth";
 import axios from 'axios';
@@ -16,19 +16,22 @@ const WaitingPage = () => {
   const [matchData, setMatchData] = useState(null);
   
   let intervalId, timeoutId;
+  const hasRequestedRef = useRef(false); 
 
   useEffect(() => {
-    console.log("User preferences changed:", userPref);
     if (!userPref || Object.keys(userPref).length === 0) {
       navigate('/new-session');
     } else {
-      createMatchRequest(userPref);
+      if (loading && !hasRequestedRef.current) {
+        hasRequestedRef.current = true; 
+        createMatchRequest(userPref);
+      }
     }
-  }, [navigate, userPref]);
+  }, [navigate, userPref, loading]); 
 
   const createMatchRequest = async (userPref) => {
     console.log("MATCHINGG");
-    if (requestInProgress) return;
+    if (requestInProgress) return; 
     setRequestInProgress(true); 
 
     try {
@@ -74,6 +77,7 @@ const WaitingPage = () => {
     setMatchFound(false);
     setTimeoutReached(false);
     setSeconds(0);
+    setRequestInProgress(false);
     createMatchRequest(userPref);
   };
 
