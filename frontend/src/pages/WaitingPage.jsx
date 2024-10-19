@@ -28,19 +28,23 @@ const WaitingPage = () => {
   const [matchFound, setMatchFound] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [timeoutReached, setTimeoutReached] = useState(false);
+  
+  let intervalId, timeoutId;
 
   const createMatchRequest = async (userPref) => {
     try {
-
-      console.log(userPref)
+      console.log(userPref);
       const response = await axios.post('http://localhost:8082/matches', userPref);
 
-      // Check if the response status is 200 or 201 (success)
       if (response.status === 200 || response.status === 201) {
-        // Check if the match was successful based on response data
         if (response.data.matched) {
+          // Immediately handle match found state and clear timers
           setMatchFound(true);
           console.log('Match found:', response.data);
+          
+          clearInterval(intervalId);  // Stop the interval for updating seconds
+          clearTimeout(timeoutId);    // Clear the 30s timeout
+          setLoading(false);          // Ensure the loading stops immediately
         } else {
           console.log('No match found:', response.data);
         }
@@ -48,37 +52,36 @@ const WaitingPage = () => {
         console.error('Unexpected response status:', response.status);
       }
     } catch (error) {
-        console.error('Error', error.message);
+      console.error('Error', error.message);
     }
   };
 
   useEffect(() => {
-    if (loading) {
-      const interval = setInterval(() => {
+    if (loading && !matchFound) {
+      intervalId = setInterval(() => {
         setSeconds((prevSeconds) => prevSeconds + 1);
       }, 1000);
 
-      const timer = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setLoading(false);
         setTimeoutReached(true); // Set timeoutReached after 30 seconds
       }, 30000);  // 30 seconds max waiting time
 
       return () => {
-        clearInterval(interval);
-        clearTimeout(timer);
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
       };
     }
-  }, [loading]);
+  }, [loading, matchFound]);
 
-   useEffect(() => {
-      if (!loading && !matchFound) {
-        // If loading has finished and no match found, update the state
-        setTimeoutReached(true);
-      }
-   }, [loading, matchFound]);
+  useEffect(() => {
+    if (!loading && !matchFound && !timeoutReached) {
+      // Ensure timeout state is updated if no match was found and loading stopped
+      setTimeoutReached(true);
+    }
+  }, [loading, matchFound]);
 
   const handleRetry = () => {
-    // re-add user into queue using the same choices here
     createMatchRequest(userPref);
     setLoading(true);
     setMatchFound(false);
@@ -90,24 +93,22 @@ const WaitingPage = () => {
     try {
       navigate('/dashboard');
       const response = await fetch(
-              `http://localhost:8082/matches/${userPref.id}`,
-              {
-                method: "DELETE",
-                headers: getHeaders(),
-                body: JSON.stringify(userPref),
-              }
-            );
-      console.log('Response:', response.data); // Log the response for debugging
+        `http://localhost:8082/matches/${userPref.id}`,
+        {
+          method: "DELETE",
+          headers: getHeaders(),
+          body: JSON.stringify(userPref),
+        }
+      );
+      console.log('Response:', response.data);
       if (response.status === 200) {
         setMatchFound(false);
       }
-
     } catch (error) {
       console.error('Error deleting match request:', error);
       navigate('/dashboard');
     }
   };
-
 
   const buttonStyle = {
     padding: "15px 30px",
@@ -147,17 +148,10 @@ const WaitingPage = () => {
       {loading ? (
         <>
           <p style={messageStyle}>Searching for a match... <span className="spinner"></span></p>
-          {/* Conditionally show the timer below the message */}
           {!timeoutReached && (
             <>
               <p style={timerStyle}>Time Elapsed: {seconds} seconds</p>
-              {/* Cancel Button */}
-              <button
-                onClick={handleGoHome}
-                style={buttonStyle}
-              >
-                Cancel
-              </button>
+              <button onClick={handleGoHome} style={buttonStyle}>Cancel</button>
             </>
           )}
         </>
@@ -167,22 +161,8 @@ const WaitingPage = () => {
         ) : timeoutReached ? (
           <div>
             <p style={messageStyle}>Sorry, no match was found.</p>
-
-            {/* Retry Button */}
-            <button
-              onClick={handleRetry}
-              style={buttonStyle}
-            >
-              Retry
-            </button>
-
-            {/* Go Back to Home Button */}
-            <button
-              onClick={handleGoHome}
-              style={buttonStyle}
-            >
-              Go Back to Home
-            </button>
+            <button onClick={handleRetry} style={buttonStyle}>Retry</button>
+            <button onClick={handleGoHome} style={buttonStyle}>Go Back to Home</button>
           </div>
         ) : null
       )}
