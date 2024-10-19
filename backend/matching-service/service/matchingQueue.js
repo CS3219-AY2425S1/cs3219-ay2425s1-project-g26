@@ -121,6 +121,8 @@ const handleMatchRequest = async (request) => {
             console.log(`User ${request.id} ~ Result: ${msg.content.toString()}`);
             result = JSON.parse(msg.content.toString());
             connection.close();
+            received = true;
+            resolve(result); 
         }, { noAck: true });
 
         // Timeout after 45 seconds if no response is received (failsafe).
