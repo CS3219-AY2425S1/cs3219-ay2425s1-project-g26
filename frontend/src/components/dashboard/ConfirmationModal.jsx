@@ -6,12 +6,12 @@ const ConfirmationModal = ({ show, onConfirm, onCancel }) => {
   return (
     <div style={styles.modalOverlay}>
       <div style={styles.modal}>
-        <h3>Are you sure you want to log out?</h3>
+        <h3 style={styles.modalTitle}>Are you sure you want to log out?</h3>
         <div style={styles.modalButtons}>
-          <button onClick={onConfirm} style={styles.confirmButton}>
+          <button onClick={onConfirm} style={{ ...styles.button, ...styles.confirmButton }}>
             Yes
           </button>
-          <button onClick={onCancel} style={styles.cancelButton}>
+          <button onClick={onCancel} style={{ ...styles.button, ...styles.cancelButton }}>
             No
           </button>
         </div>
@@ -20,7 +20,6 @@ const ConfirmationModal = ({ show, onConfirm, onCancel }) => {
   );
 };
 
-
 const styles = {
   modalOverlay: {
     position: 'fixed',
@@ -28,39 +27,49 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
   },
   modal: {
-    backgroundColor: 'white',
-    padding: '20px',
+    backgroundColor: '#fff',
+    padding: '30px',
     borderRadius: '10px',
     textAlign: 'center',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    width: '90%', 
+    maxWidth: '400px', 
+    fontFamily: 'Figtree, sans-serif', 
+  },
+  modalTitle: {
+    marginBottom: '20px',
+    fontSize: '20px',
+    color: '#333',
   },
   modalButtons: {
     display: 'flex',
     justifyContent: 'space-around',
-    marginTop: '15px',
+    marginTop: '20px',
+  },
+  button: {
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontFamily: 'Figtree, sans-serif',
+    fontSize: '16px',
+    transition: 'background-color 0.3s',
+    width: '45%',
   },
   confirmButton: {
-    padding: '10px 20px',
     backgroundColor: '#1a3042',
     color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
   },
   cancelButton: {
-    padding: '10px 20px',
     backgroundColor: '#ccc',
     color: '#000',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
   },
 };
 
