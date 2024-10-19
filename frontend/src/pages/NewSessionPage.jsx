@@ -98,7 +98,18 @@ const NewSessionPage = () => {
 
     const form = e.target;
     const formData = new FormData(form);
-    const formObj = Object.fromEntries(formData.entries());
+    const formObj = {};
+
+    formData.forEach((value, key) => {
+      if (key === 'category') {
+          if (!formObj[key]) {
+              formObj[key] = [];
+          }
+          formObj[key].push(value);
+      } else {
+          formObj[key] = value;
+      }
+  });
 
     const userPref = {
       id: userId,
@@ -106,7 +117,7 @@ const NewSessionPage = () => {
       category: formObj.category
     };
 
-    if (formObj.hasOwnProperty('complexity') && formObj.hasOwnProperty('category')) {
+    if (userPref.hasOwnProperty('complexity') && userPref.hasOwnProperty('category')) {
       navigate('/waiting', { state: { userPref } });
     } else {
         alert('Select a difficulty/topic');
@@ -141,13 +152,13 @@ const NewSessionPage = () => {
                           targetTopicsArray.map((topic) => (
                             <React.Fragment key={topic.name}>
                               <input
-                                type="radio"
+                                type="checkbox"
                                 id={topic.name}
                                 name="category"
                                 value={topic.name}
                                 onChange={handleTopicChange}
                               />
-                              <label className="radio-label" htmlFor={topic.name}>
+                              <label className="check-label" htmlFor={topic.name}>
                                 {`${topic.name} (${topic.count})`}
                               </label>
                             </React.Fragment>
