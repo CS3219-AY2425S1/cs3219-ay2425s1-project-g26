@@ -54,6 +54,9 @@ const Login = () => {
         const onlineDate = data.data.onlineDate;
         localStorage.setItem('onlineDate', onlineDate)
 
+        const isAdmin = data.data.isAdmin;
+        localStorage.setItem('isAdmin', isAdmin)
+
         login(accessToken, userId);
         navigate('/dashboard'); 
       } else {
