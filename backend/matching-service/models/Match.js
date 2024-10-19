@@ -10,7 +10,15 @@ const matchSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    user1Name: {
+        type: String,
+        required: true
+    },
     user2Id: {
+        type: String,
+        required: true
+    },
+    user2Name: {
         type: String,
         required: true
     },
