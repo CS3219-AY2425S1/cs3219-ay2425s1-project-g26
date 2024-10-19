@@ -51,6 +51,8 @@ const Login = () => {
       if (data && data.data && data.data.accessToken && data.data.id) {
         const userId = data.data.id; 
         const accessToken = data.data.accessToken; 
+        const onlineDate = data.data.onlineDate;
+        localStorage.setItem('onlineDate', onlineDate)
 
         login(accessToken, userId);
         navigate('/dashboard'); 
