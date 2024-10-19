@@ -1,6 +1,5 @@
-// src/components/QuestionTable.js
 import React, { useState } from "react";
-import "./QuestionTable.css"; // Import the CSS file
+import "./QuestionTable.css"; 
 
 const complexityOrder = {
   Easy: 1,
@@ -8,7 +7,7 @@ const complexityOrder = {
   Hard: 3,
 };
 
-const QuestionTable = ({ questions, onEdit, onView, onDelete }) => {
+const QuestionTable = ({ questions, onEdit, onView, onDelete, isAdmin }) => {
   const [sortOrder, setSortOrder] = useState("asc");
 
   const sortedQuestions = [...questions].sort((a, b) =>
@@ -41,7 +40,7 @@ const QuestionTable = ({ questions, onEdit, onView, onDelete }) => {
             <th>Title</th>
             <th>Category</th>
             <th>
-              Complexity
+              Complexity&nbsp;&nbsp;
               <button className="sort-button" onClick={handleSortClick}>
                 {sortOrder === "asc" ? "↑" : "↓"}
               </button>
@@ -53,12 +52,13 @@ const QuestionTable = ({ questions, onEdit, onView, onDelete }) => {
           {displayedQuestions.map((question) => (
             <tr key={question._id}>
               <td>{question.title}</td>
-              <td>{question.category.join(', ')}</td>
+              <td>{question.category.join(", ")}</td>
               <td>{question.complexity}</td>
               <td>
-                <button onClick={() => onEdit(question)}>Edit</button>
+                {/* Conditionally render Edit and Delete buttons based on isAdmin */}
+                {isAdmin && <button onClick={() => onEdit(question)}>Edit</button>}
                 <button onClick={() => onView(question)}>View</button>
-                <button onClick={() => onDelete(question)}>Delete</button>
+                {isAdmin && <button onClick={() => onDelete(question)}>Delete</button>}
               </td>
             </tr>
           ))}

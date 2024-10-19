@@ -10,29 +10,16 @@ const Calendar = ({
   const [activeDays, setActiveDays] = useState(new Set());
 
   useEffect(() => {
-    const localhostCheck = window.location.hostname === "localhost";
-    if (localhostCheck) {
-      const today = new Date().toDateString();
-      setActiveDays((prev) => {
-        const newActiveDays = new Set(prev);
-        newActiveDays.add(today);
-        return newActiveDays;
-      });
-
-      const storedDays = localStorage.getItem("activeDays");
-      const activeDaysArray = storedDays ? JSON.parse(storedDays) : [];
-      if (!activeDaysArray.includes(today)) {
-        activeDaysArray.push(today);
-        localStorage.setItem("activeDays", JSON.stringify(activeDaysArray));
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    const storedDays = localStorage.getItem("activeDays");
-    const activeDaysArray = storedDays ? JSON.parse(storedDays) : [];
-    setActiveDays(new Set(activeDaysArray));
+    const storedDays = localStorage.getItem("onlineDate");
+    const activeDaysArray = storedDays ? storedDays.split(",") : []; 
+    setActiveDays(new Set(activeDaysArray)); 
   }, [currentMonth, currentYear]);
+
+  const formatDate = (year, month, day) => {
+    const paddedMonth = String(month + 1).padStart(2, "0");
+    const paddedDay = String(day).padStart(2, "0");
+    return `${year}-${paddedMonth}-${paddedDay}`;
+  };
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -63,12 +50,8 @@ const Calendar = ({
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateString = new Date(
-        currentYear,
-        currentMonth,
-        day
-      ).toDateString();
-      const isActive = activeDays.has(dateString);
+      const formattedDate = formatDate(currentYear, currentMonth, day); 
+      const isActive = activeDays.has(formattedDate); 
       calendarDays.push(
         <div key={day} className={`calendar-day ${isActive ? "active" : ""}`}>
           {day}
@@ -106,7 +89,6 @@ const Calendar = ({
       <div className="calendar">{renderCalendar()}</div>
     </div>
   );
-
 };
 
 export default Calendar;

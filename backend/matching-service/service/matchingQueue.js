@@ -20,45 +20,55 @@ const matchUsers = async () => {
     //Waiting for user details to come in
     channel.consume(q.queue, msg => {
 
-        //Matching logic is designed inefficiently for now to facilitate upgrades
         const newRequest = JSON.parse(msg.content.toString());
 
-        // Check if user is already in requests
-        if (requests.find(req => req.id === newRequest.id)) {
-            console.log(`User ${newRequest.id} is already in the request queue.`);
-            return; // Skip adding this request
-        }
-
-        let perfectMatches = requests.filter(function (req) {
-            return calculateMatchScore(newRequest, req) >= 4
-        });
-        let closeMatches = requests.filter(function (req) {
-            return calculateMatchScore(newRequest, req) >= 3
-        });
-        var matchedRequest = false
-
-        if (perfectMatches.length == 0 && closeMatches.length == 0) {
-            requests.push(newRequest);
-        } else if (perfectMatches.length > 0) {
-            matchedRequest = perfectMatches.pop()
-        } else {
-            matchedRequest = closeMatches.pop()
-        }
-
-        if (matchedRequest) {
-            requests.splice(requests.indexOf(matchedRequest), 1)
-            result = {
-                matched: true,
-                user1: newRequest.id,
-                user2: matchedRequest.id,
-                category: newRequest.category,
-                complexity: newRequest.complexity,
-                sessionId: uuid()
+        const findMatching = (goalScore) => {
+            // Check if user is already in requests
+            let inRequests = requests.some(req => req.id === newRequest.id)
+            if (!inRequests && goalScore != 4) {
+                console.log(`User ${newRequest.id} has already been matched or has cancelled queue. Terminating checks.`);
+                return; // Skip adding this request
             };
-            console.log(`Matched ${result.user1} and ${result.user2}`)
-            channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); // B to D
-            channel.publish(resCh, matchedRequest.id, Buffer.from(JSON.stringify(result)));
-        };
+            let matchScores = requests.slice().map((req) => calculateMatchScore(newRequest, req));
+            matchScores.sort((a, b) => a.score - b.score); // Ascending order
+
+            let viableMatches = matchScores.filter((req) => {
+                console.log(JSON.stringify(req))
+                return (req.score >= goalScore) && (req.otherId != newRequest.id)
+            });
+            let matchedRequest = false;
+
+            if (viableMatches.length == 0 && !inRequests) {
+                requests.push(newRequest);
+            } else if (viableMatches.length > 0) {
+                matchedRequest = viableMatches.pop()
+            };
+
+            if (matchedRequest) {
+                requests.splice(requests.indexOf(matchedRequest), 1)
+                result = {
+                    matched: true,
+                    user1: newRequest.id,
+                    user2: matchedRequest.otherId,
+                    category: matchedRequest.category,
+                    complexity: matchedRequest.complexity,
+                    sessionId: uuid()
+                };
+                console.log(`Matched ${result.user1} and ${result.user2}`);
+                channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); // B to D
+                channel.publish(resCh, matchedRequest.otherId, Buffer.from(JSON.stringify(result)));
+            };
+
+            
+            setTimeout(() => {
+                if (goalScore > 2.5 && !matchedRequest) {
+                    findMatching(goalScore - 0.5)
+                }
+            }, timeout / 5);
+
+        }
+
+        findMatching(4)
 
         setTimeout(() => {
             if (handleDeleteRequest(newRequest)) {
@@ -80,26 +90,58 @@ const matchUsers = async () => {
 }
 
 // Prototype function for possible implementation
-const calculateMatchScore = (request1, request2) => {
-    matchScore = 0;
-    if (request1.category == request2.category) {
-        matchScore += 2
+const calculateMatchScore = (newRequest, otherRequest) => {
+    let matchScore = 0;
+
+    // Look for at least one matching category
+    matchingCategories = newRequest.category.filter(category => otherRequest.category.includes(category));
+    if (matchingCategories.length != 0) {
+        matchScore += 2;
     };
-    const difficultyLevels = {
+
+    // Look for close complexity levels
+    const complexityLevels = {
         "Easy": 1,
         "Medium": 2,
         "Hard": 3
     };
-    const difficultyLevel1 = difficultyLevels[request1.complexity];
-    const difficultyLevel2 = difficultyLevels[request2.complexity];
-    if (Math.abs(difficultyLevel1 - difficultyLevel2) <= 1) {
+    const complexityNumbers = {
+        1: "Easy",
+        2: "Medium",
+        3: "Hard"
+    };
+    const complexityLevel1 = complexityLevels[newRequest.complexity];
+    const complexityLevel2 = complexityLevels[otherRequest.complexity];
+    matchedComplexity = "Easy"
+
+    // Close match
+    if (Math.abs(complexityLevel1 - complexityLevel2) <= 1) {
         matchScore += 1
-    }
-    if (difficultyLevel1 == difficultyLevel2) {
-        matchScore += 1
+        if (complexityLevel1 < complexityLevel2) {
+            matchedComplexity = complexityNumbers[complexityLevel1];
+        } else {
+            matchedComplexity = complexityNumbers[complexityLevel2];
+        };
     }
 
-    return matchScore
+    // Exact match
+    if (complexityLevel1 === complexityLevel2) {
+        matchScore += 1;
+    }
+
+    if (newRequest.id === otherRequest.id) {
+        matchScore = -10
+    }
+
+    result = { 
+        score: matchScore, 
+        category: matchingCategories[0], 
+        complexity: matchedComplexity,
+        otherId: otherRequest.id 
+    };
+    // console.log(`Comparison results = ${JSON.stringify(result)}`)
+
+    return result 
 }
 
 

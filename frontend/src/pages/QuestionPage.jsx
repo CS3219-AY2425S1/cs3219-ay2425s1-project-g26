@@ -12,24 +12,30 @@ import "../components/question/DialogForm.css";
 
 const QuestionPage = () => {
   const { accessToken } = useAuth();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
   const [questions, setQuestions] = useState([]);
   const [dialogForm, setDialogForm] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const dialogRef = useRef(null);
 
   const getHeaders = () => {
     return {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${accessToken}`
+      "Authorization": `Bearer ${accessToken}`,
     };
   };
+
+  useEffect(() => {
+    const adminStatus = localStorage.getItem("isAdmin");
+    setIsAdmin(adminStatus === "true");
+  }, []);
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch("http://localhost:8080/questions", {
           method: "GET",
-          headers: getHeaders()
+          headers: getHeaders(),
         });
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -56,7 +62,6 @@ const QuestionPage = () => {
 
   // Add questions
   const handleAddQuestion = async (newQuestion) => {
-
     try {
       const response = await fetch("http://localhost:8080/questions", {
         method: "POST",
@@ -66,15 +71,12 @@ const QuestionPage = () => {
 
       if (response.ok) {
         const savedQuestion = await response.json();
-        console.log("savedQuestion:", savedQuestion);
         setQuestions((prevQuestions) => [...prevQuestions, savedQuestion]);
         toggleDialog();
       } else {
         console.error("Failed to add question");
-        var responseMessage = await response.json()
-        const errorWindow = window.alert(
-          responseMessage.message
-        );
+        const responseMessage = await response.json();
+        window.alert(responseMessage.message);
       }
     } catch (error) {
       console.error("Error adding question:", error);
@@ -125,10 +127,8 @@ const QuestionPage = () => {
         console.error(
           `Failed to edit question: ${response.status} ${response.statusText}`
         );
-        var responseMessage = await response.json()
-        const errorWindow = window.alert(
-          responseMessage.message
-        );
+        const responseMessage = await response.json();
+        window.alert(responseMessage.message);
       }
     } catch (error) {
       console.error("Error editing question:", error);
@@ -170,8 +170,6 @@ const QuestionPage = () => {
     }
   };
 
-
-
   const handleBack = () => {
     navigate(-1); // Navigate back to the previous page
   };
@@ -183,32 +181,35 @@ const QuestionPage = () => {
         style={{
           position: "absolute",
           top: "40px",
-          left: "35px", 
+          left: "35px",
         }}
-        className="button-custom" // using the AddQuestionButton.js 
+        className="button-custom"
         onClick={handleBack}
       >
         <i className="fas fa-arrow-left"></i> Back
       </button>
-      <AddQuestionButton
-        onClick={() => {
-          setDialogForm(<AddQuestionForm onAdd={handleAddQuestion} />);
-          toggleDialog();
-        }}
-      />
+
+      {isAdmin && (
+        <AddQuestionButton
+          onClick={() => {
+            setDialogForm(<AddQuestionForm onAdd={handleAddQuestion} />);
+            toggleDialog();
+          }}
+        />
+      )}
+
       <QuestionTable
         questions={questions}
         onEdit={handleEditQuestion}
         onView={handleViewQuestion}
         onDelete={handleDeleteQuestion}
+        isAdmin={isAdmin} 
       />
       <Dialog toggleDialog={toggleDialog} ref={dialogRef}>
         {dialogForm}
       </Dialog>
     </div>
   );
-
-
 };
 
 const WrappedQuestionPage = withAuth(QuestionPage);
