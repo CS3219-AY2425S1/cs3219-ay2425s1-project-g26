@@ -16,7 +16,6 @@ const SignUp = () => {
     setIsLoading(true);
     setErrorMessage('');
 
-    // Simple email validation
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setErrorMessage('Please enter a valid email address.');
@@ -42,31 +41,44 @@ const SignUp = () => {
         throw new Error(errorData.message || 'An error occurred, please try again');
       }
 
-      // Handle successful response
       const data = await response.json(); 
       console.log(data);
-      
-      // Store the notification message in localStorage
       localStorage.setItem('signupNotification', `You have successfully created an account @${username}`);
-
       navigate('/login');
       
     } catch (error) {
-      setErrorMessage(error.message); // Set the error message to display
+      setErrorMessage(error.message); 
     } finally {
       setIsLoading(false); 
     }
   };
 
   return (
-    <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <div style={{ 
+      textAlign: 'center', 
+      padding: '50px', 
+      color: '#fff', 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      justifyContent: 'center',
+      fontFamily: 'Figtree, sans-serif'
+    }}>
       <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1> 
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Create an account to get started.</p> 
       
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Error message */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+      <form 
+        onSubmit={handleSubmit} 
+        style={{ 
+          marginBottom: '20px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center',
+          fontFamily: 'Figtree, sans-serif'
+        }}>
         <input
-          type="text" // Username field
+          type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -83,6 +95,7 @@ const SignUp = () => {
             backgroundColor: 'transparent',
             color: '#fff',
             fontSize: '16px',
+            fontFamily: 'Figtree, sans-serif'
           }}
         />
         <input
@@ -91,6 +104,7 @@ const SignUp = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          autoComplete="off"  
           style={{
             display: 'block',
             margin: '10px 0',
@@ -102,6 +116,7 @@ const SignUp = () => {
             backgroundColor: 'transparent',
             color: '#fff',
             fontSize: '16px',
+            fontFamily: 'Figtree, sans-serif'
           }}
         />
         <div style={{ position: 'relative', width: '300px' }}>
@@ -122,6 +137,7 @@ const SignUp = () => {
               backgroundColor: 'transparent',
               color: '#fff',
               fontSize: '16px',
+              fontFamily: 'Figtree, sans-serif'
             }}
           />
           <div
@@ -149,6 +165,7 @@ const SignUp = () => {
             borderRadius: '20px',
             cursor: 'pointer',
             fontSize: '16px',
+            fontFamily: 'Figtree, sans-serif',
             marginTop: '20px',
             marginBottom: '40px',
             transition: 'background-color 0.3s',
@@ -160,14 +177,13 @@ const SignUp = () => {
           {isLoading ? 'Signing Up...' : 'Sign Up'}
         </button>
       </form>
-      <p style={{ fontSize: '1rem' }}> 
-        Already have an account? <a href="/login" style={{ color: 'white' }}>Login</a>
+      <p style={{ fontSize: '1rem', fontFamily: 'Figtree, sans-serif' }}> 
+        Already have an account? <a href="/login" style={{ color: 'white', fontFamily: 'Figtree, sans-serif' }}>Login</a>
       </p>
     </div>
   );
 };
 
-// CSS for spinner animation
 const styles = `
   input::placeholder {
     color: white; 
@@ -175,7 +191,6 @@ const styles = `
   }
 `;
 
-// Append styles to the head
 const styleSheet = document.createElement("style");
 styleSheet.type = "text/css";
 styleSheet.innerText = styles;

@@ -31,6 +31,8 @@ const WaitingPage = () => {
 
   const createMatchRequest = async (userPref) => {
     try {
+
+      console.log(userPref)
       const response = await axios.post('http://localhost:8082/matches', userPref);
 
       // Check if the response status is 200 or 201 (success)
