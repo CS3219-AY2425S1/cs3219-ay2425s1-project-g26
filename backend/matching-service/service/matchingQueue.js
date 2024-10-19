@@ -149,7 +149,7 @@ const handleMatchRequest = async (request) => {
 const handleDeleteRequest = (user) => {
     if (requests.filter(request => request.id == user.id).length != 0) {
         requests = requests.filter(request => request.id !== user.id);
-        console.log(`Match request for user ${user.id} deleted.`)
+        console.log(`Deleted match request for user ${user.id}.`)
         return true;
     }
     return false;

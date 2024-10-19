@@ -163,7 +163,6 @@ export async function updateOnlineTime(user) {
   if (foundDate == 0) {
     onlineDate.push(parsedDate);
     await _updateOnlineTimeById(user.id, onlineDate);
-    console.log("New login date updated");
   }
 }
 

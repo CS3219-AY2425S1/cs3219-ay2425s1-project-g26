@@ -86,7 +86,6 @@ const cancelMatchRequest = async (req, res) => {
 
     } catch (error) {
         console.log("ERROR", error);
-        console.log(`${error.status}: ${error.response}`);
         return res.status(400).json({ 'message': 'Matched users not found!' });
     }
  }
