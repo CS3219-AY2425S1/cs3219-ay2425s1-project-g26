@@ -43,7 +43,6 @@ const SignUp = () => {
 
       const data = await response.json(); 
       console.log(data);
-      localStorage.setItem('signupNotification', `You have successfully created an account @${username}`);
       navigate('/login');
       
     } catch (error) {
