@@ -25,11 +25,13 @@ const createMatch = async (req, res) => {
 };*/
 
 // Create a new match to be stored in the database
-const createMatch = async (matchResult) => {
+const createMatch = async (matchResult, user1Name, user2Name) => {
     try {
         const result = await Match.create({
             user1Id: matchResult.user1,
+            user1Name: user1Name,
             user2Id: matchResult.user2,
+            user2Name: user2Name,
             category: matchResult.category,
             complexity: matchResult.complexity
         });
