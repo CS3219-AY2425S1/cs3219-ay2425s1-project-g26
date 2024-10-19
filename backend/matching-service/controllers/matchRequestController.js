@@ -55,23 +55,14 @@ const createMatchRequest = async (req, res) => {
 }
 
 const cancelMatchRequest = async (req, res) => {
-    console.log('cancel match request:', req.body);
-    if (!(req.body.id && req.body.complexity && req.body.category)) {
-        return res.status(400).json({ 'message': 'At least one field is missing!' })
-    }
+    const id = req.params.id;
 
     // Format required fields appropriately
-    request = {
-        id: req.body.id,
-        complexity: req.body.complexity,
-        category: req.body.category
-    }
-
-    deleteResult = MatchingQueue.handleDeleteRequest(request)
-    if (deleteResult) {
-        return res.status(200)
+    deleteResult = MatchingQueue.handleDeleteRequest({id: req.params.id});
+    if (deleteResult) {        
+        return res.status(200).json({'message': "Successfully cancelled matching request."});
     } else {
-        return res.status(404)
+        return res.status(404).json({'message': "No matching reuqests found!"});
     }
 }
 
