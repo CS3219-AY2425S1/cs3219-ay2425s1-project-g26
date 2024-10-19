@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading
-  const [errorMessage, setErrorMessage] = useState(''); // State for error messages
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -12,13 +13,20 @@ const ForgetPassword = () => {
     setIsLoading(true);
 
     try {
-      // Call API to handle password reset logic
-      // Assume password reset is always successful for now
-      navigate('/login'); // Navigate to the login page after successful reset
+      const response = await axios.post('http://localhost:8081/users/forgot-password', { email });
+
+      if (response.status === 200) {
+        alert("Check your email for the password reset link."); 
+        navigate('/login'); 
+      }
     } catch (error) {
-      setErrorMessage('An error occurred, please try again'); // Handle error
+      if (error.response && error.response.data) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage('An error occurred, please try again');
+      }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 

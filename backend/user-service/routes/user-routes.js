@@ -10,6 +10,9 @@ import {
   updateUserPrivilege,
   addQuestionToUser,
   getQuestionDetails,
+  sendPasswordResetEmail,
+  renderResetPasswordPage,
+  updatePassword,
 } from "../controller/user-controller.js";
 import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
 
@@ -41,7 +44,14 @@ router.get("/questions/:id", verifyAccessToken, verifyIsOwnerOrAdmin, getQuestio
 //Save completed questions by id
 router.patch("/questions/:id", verifyAccessToken, verifyIsOwnerOrAdmin, addQuestionToUser);
 
+// Route to send password reset email
+router.post("/forgot-password", sendPasswordResetEmail);
 
+// Route to render the reset password page
+router.get("/reset-password", renderResetPasswordPage);
+
+// Route to handle password update
+router.post("/reset-password", updatePassword);
 
 
 export default router;

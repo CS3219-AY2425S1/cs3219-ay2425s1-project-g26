@@ -1,5 +1,10 @@
 import axios from 'axios';
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+import User from "../model/user-model.js";
+import { body, validationResult } from "express-validator";
+
+
 import { isValidObjectId } from "mongoose";
 import {
   createUser as _createUser,
@@ -16,6 +21,73 @@ import {
   updateOnlineTimeById as _updateOnlineTimeById,
   updateQuestionDoneById as _updateQuestionDoneById,
 } from "../model/repository.js";
+
+export const sendPasswordResetEmail = async (req, res) => {
+  body("email").isEmail().withMessage("Please provide a valid email address");
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const resetLink = `http://localhost:8081/reset-password?email=${email}`; 
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset",
+      text: `To reset your password, please click the following link: ${resetLink}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res
+      .status(200)
+      .json({ message: "Password reset email sent. Please check your inbox." });
+  } catch (error) {
+    console.error("Error in sendPasswordResetEmail:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const renderResetPasswordPage = (req, res) => {
+  const { email } = req.query;
+  res.render("reset-password", { email });
+};
+
+export const updatePassword = async (req, res) => {
+  const { email, newPassword } = req.body; 
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.status(200).json({ message: "Password has been reset" });
+  } catch (error) {
+    console.error("Error in updatePassword:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 export async function createUser(req, res) {
   try {
