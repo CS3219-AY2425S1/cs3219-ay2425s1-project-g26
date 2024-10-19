@@ -68,9 +68,9 @@ const matchUsers = async () => {
                     complexity: ""
                 };
                 channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); //B to D
-                console.log(`${newRequest.id} timed out.`)
+                console.log(`${newRequest.id} timed out.`);
             }
-        }, timeout)
+        }, timeout);
     }, { noAck: true });
 
     console.log("Matching queues initalized.");
@@ -125,7 +125,7 @@ const handleMatchRequest = async (request) => {
             resolve(result); 
         }, { noAck: true });
 
-        // Timeout after 45 seconds if no response is received (failsafe).
+        // Timeout after 35 seconds if no response is received (failsafe).
         setTimeout(() => {
             if (!received) {
                 console.log(`45 seconds timeout for matching user ${request.id}`);
@@ -138,7 +138,7 @@ const handleMatchRequest = async (request) => {
                     complexity: request.complexity
                 });
             }
-        }, 45000);
+        }, 35000);
     });
 
 }

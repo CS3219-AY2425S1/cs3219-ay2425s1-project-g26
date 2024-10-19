@@ -44,7 +44,6 @@ const createMatchRequest = async (req, res) => {
             }
         }
         // Return the result as 201 even if not matched.
-        //MatchController.createMatch({user1: "1", user2: "2", category: ["HI"], complexity: "Easy"});
         return res.status(201).json(result);
 
     }).catch(error => {
@@ -55,8 +54,8 @@ const createMatchRequest = async (req, res) => {
 }
 
 const cancelMatchRequest = async (req, res) => {
-    const id = req.params.id;
 
+    console.log(`Recieved cancel request for ${req.params.id}`);
     // Format required fields appropriately
     deleteResult = MatchingQueue.handleDeleteRequest({id: req.params.id});
     if (deleteResult) {        
