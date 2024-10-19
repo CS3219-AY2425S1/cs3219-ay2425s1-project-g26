@@ -33,6 +33,7 @@
     font-size: 1.2rem;
     padding: 0.75rem 1.25rem;
     color: var(--white);
+    max-width: 100%;
 }
 
 .topic-selection {
