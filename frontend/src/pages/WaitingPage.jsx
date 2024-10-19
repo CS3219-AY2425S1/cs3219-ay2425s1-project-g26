@@ -8,7 +8,17 @@ const WaitingPage = () => {
   const { userPref } = location.state || { userPref: {} };
   const navigate = useNavigate();
 
+  const [requestInProgress, setRequestInProgress] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [matchFound, setMatchFound] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const [timeoutReached, setTimeoutReached] = useState(false);
+  const [matchData, setMatchData] = useState(null);
+  
+  let intervalId, timeoutId;
+
   useEffect(() => {
+    console.log("User preferences changed:", userPref);
     if (!userPref || Object.keys(userPref).length === 0) {
       navigate('/new-session');
     } else {
@@ -16,22 +26,18 @@ const WaitingPage = () => {
     }
   }, [navigate, userPref]);
 
-  const [loading, setLoading] = useState(true);
-  const [matchFound, setMatchFound] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const [timeoutReached, setTimeoutReached] = useState(false);
-  const [matchData, setMatchData] = useState(null); 
-  
-  let intervalId, timeoutId;
-
   const createMatchRequest = async (userPref) => {
+    console.log("MATCHINGG");
+    if (requestInProgress) return;
+    setRequestInProgress(true); 
+
     try {
       const response = await axios.post('http://localhost:8082/matches', userPref);
 
       if (response.status === 200 || response.status === 201) {
         if (response.data.matched) {
           setMatchFound(true);
-          setMatchData(response.data); 
+          setMatchData(response.data);
           
           clearInterval(intervalId);
           clearTimeout(timeoutId);
@@ -40,6 +46,8 @@ const WaitingPage = () => {
       }
     } catch (error) {
       console.error('Error', error.message);
+    } finally {
+      setRequestInProgress(false); 
     }
   };
 
@@ -62,14 +70,15 @@ const WaitingPage = () => {
   }, [loading, matchFound]);
 
   const handleRetry = () => {
-    createMatchRequest(userPref);
     setLoading(true);
     setMatchFound(false);
     setTimeoutReached(false);
     setSeconds(0);
+    createMatchRequest(userPref);
   };
 
-  const handleGoHome = async () => {
+  const handleGoHome = async (event) => {
+    event.stopPropagation(); 
     try {
       navigate('/dashboard');
       const response = await fetch(
@@ -88,7 +97,6 @@ const WaitingPage = () => {
     }
   };
 
-  // Styles
   const buttonStyle = (isHovered) => ({
     padding: "15px 30px",
     backgroundColor: isHovered ? "#2a4b5e" : "#1a3042", 
@@ -149,7 +157,6 @@ const WaitingPage = () => {
     color: '#1a3042', 
   };
 
-  // Hover state for buttons
   const [hoveredButton, setHoveredButton] = useState(null);
 
   return (
