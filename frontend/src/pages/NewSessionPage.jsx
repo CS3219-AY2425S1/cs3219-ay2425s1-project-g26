@@ -109,37 +109,6 @@ const NewSessionPage = () => {
     };
 
     if (formObj.hasOwnProperty('difficulty') && formObj.hasOwnProperty('topic')) {
-        // const userId = Cookies.get('userId'); 
-        // const { difficulty, topic } = formObj;
-
-        // const payload = {
-        //     id: userId, // user ID from cookies
-        //     difficulty: difficulty, // selected difficulty
-        //     category: topic // selected topic
-        // };
-
-        // const apiUrl = 'http://localhost:8082/matches/'; // maybe this is wrong
-
-        // try {
-        //     const response = await fetch(apiUrl, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Authorization': `Bearer ${accessToken}` // remove if don't need bearer access token in header 
-        //         },
-        //         body: JSON.stringify(payload),
-        //     });
-
-        //     if (!response.ok) {
-        //         throw new Error('Failed to add to queue');
-        //     }
-
-        //     // if successful, navigate to the waiting page
-        //     navigate('/waiting', { state: { userPref: formObj } });
-        // } catch (error) {
-        //     console.error('Error submitting data:', error);
-        //     alert(`I just tried to send a POST API call to ${apiUrl}, with this JSON raw values ${JSON.stringify(payload)}, and I failed.`);
-        // }
       navigate('/waiting', { state: { userPref } });
     } else {
         alert('Select a difficulty/topic');
