@@ -54,7 +54,6 @@ const matchUsers = async () => {
                 complexity: newRequest.complexity
             };
             console.log(`Matched ${result.user1} and ${result.user2}`)
-            result = JSON.stringify(result)
             channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); // B to D
             channel.publish(resCh, matchedRequest.id, Buffer.from(JSON.stringify(result)));
         };
@@ -65,7 +64,7 @@ const matchUsers = async () => {
                     matched: false,
                     user1: newRequest.id,
                     user2: "",
-                    category: "",
+                    category: [],
                     complexity: ""
                 };
                 channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); //B to D
@@ -122,8 +121,6 @@ const handleMatchRequest = async (request) => {
             console.log(`User ${request.id} ~ Result: ${msg.content.toString()}`);
             result = JSON.parse(msg.content.toString());
             connection.close();
-            received = true;
-            resolve(result);  // Resolve with result once received
         }, { noAck: true });
 
         // Timeout after 45 seconds if no response is received (failsafe).
