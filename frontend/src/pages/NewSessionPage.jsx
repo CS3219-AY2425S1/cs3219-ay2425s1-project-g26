@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import withAuth from "../hoc/withAuth"; 
 import loading from "../assets/loading.svg";
-import Cookies from 'js-cookie'; 
 import "./styles/NewSessionPage.css";
 
 const NewSessionPage = () => {
@@ -80,9 +79,9 @@ const NewSessionPage = () => {
     hardTopics.sort((a, b) => a.name.localeCompare(b.name));
 
     setTopicsArray({
-        easy: easyTopics,
-        medium: medTopics,
-        hard: hardTopics
+        Easy: easyTopics,
+        Medium: medTopics,
+        Hard: hardTopics
     });
   };
 
@@ -99,16 +98,26 @@ const NewSessionPage = () => {
 
     const form = e.target;
     const formData = new FormData(form);
-    const formObj = Object.fromEntries(formData.entries());
+    const formObj = {};
 
-    // Add userId to formObj, rename topic to category to match backend
+    formData.forEach((value, key) => {
+      if (key === 'category') {
+          if (!formObj[key]) {
+              formObj[key] = [];
+          }
+          formObj[key].push(value);
+      } else {
+          formObj[key] = value;
+      }
+  });
+
     const userPref = {
       id: userId,
-      complexity: formObj.difficulty,
-      category: formObj.topic
+      complexity: formObj.complexity,
+      category: formObj.category
     };
 
-    if (formObj.hasOwnProperty('difficulty') && formObj.hasOwnProperty('topic')) {
+    if (userPref.hasOwnProperty('complexity') && userPref.hasOwnProperty('category')) {
       navigate('/waiting', { state: { userPref } });
     } else {
         alert('Select a difficulty/topic');
@@ -125,12 +134,12 @@ const NewSessionPage = () => {
                 <div className="difficulty-selection">
                     <p>Select a Difficulty Level:</p>
                     <div className="options">
-                      <input type="radio" id="easy" name="difficulty" value="easy" onChange={handleDifficultyChange} />
-                      <label className="radio-label" htmlFor="easy">Easy</label>
-                      <input type="radio" id="medium" name="difficulty" value="medium" onChange={handleDifficultyChange} />
-                      <label className="radio-label" htmlFor="medium">Medium</label>
-                      <input type="radio" id="hard" name="difficulty" value="hard" onChange={handleDifficultyChange} />
-                      <label className="radio-label" htmlFor="hard">Hard</label>
+                      <input type="radio" id="Easy" name="complexity" value="Easy" onChange={handleDifficultyChange} />
+                      <label className="radio-label" htmlFor="Easy">Easy</label>
+                      <input type="radio" id="Medium" name="complexity" value="Medium" onChange={handleDifficultyChange} />
+                      <label className="radio-label" htmlFor="Medium">Medium</label>
+                      <input type="radio" id="Hard" name="complexity" value="Hard" onChange={handleDifficultyChange} />
+                      <label className="radio-label" htmlFor="Hard">Hard</label>
                     </div>
                 </div>
                 <div className={`topic-selection ${targetTopicsArray.length === 0 ? '' : 'section-shown'}`}>
@@ -143,13 +152,13 @@ const NewSessionPage = () => {
                           targetTopicsArray.map((topic) => (
                             <React.Fragment key={topic.name}>
                               <input
-                                type="radio"
+                                type="checkbox"
                                 id={topic.name}
-                                name="topic"
+                                name="category"
                                 value={topic.name}
                                 onChange={handleTopicChange}
                               />
-                              <label className="radio-label" htmlFor={topic.name}>
+                              <label className="check-label" htmlFor={topic.name}>
                                 {`${topic.name} (${topic.count})`}
                               </label>
                             </React.Fragment>
