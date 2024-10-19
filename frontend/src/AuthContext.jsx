@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
     setUserId(null);
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userId');
+    localStorage.removeItem('onlineDate');
     Cookies.remove('accessToken');
     Cookies.remove('userId');
   };
