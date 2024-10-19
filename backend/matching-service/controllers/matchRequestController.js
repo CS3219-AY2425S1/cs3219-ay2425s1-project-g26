@@ -18,6 +18,8 @@ const createMatchRequest = async (req, res) => {
                 category: req.body.category
     }
 
+    console.log('create match request:', request);
+
     await MatchingQueue.handleMatchRequest(request).then(matchingResult => {
         if (matchingResult.matched) {
             MatchController.createMatch(matchingResult);
@@ -34,7 +36,7 @@ const createMatchRequest = async (req, res) => {
 }
 
 const cancelMatchRequest = async (req, res) => {
-    console.log('Received request body:', req.body);
+    console.log('cancel match request:', req.body);
     if (!(req.body.id && req.body.complexity && req.body.category)) {
         return res.status(400).json({ 'message' : 'At least one field is missing!'})
     }

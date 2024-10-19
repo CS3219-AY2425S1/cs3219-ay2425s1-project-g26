@@ -104,7 +104,7 @@ const NewSessionPage = () => {
     // Add userId to formObj, rename topic to category to match backend
     const userPref = {
       id: userId,
-      difficulty: formObj.difficulty,
+      complexity: formObj.difficulty,
       category: formObj.topic
     };
 
