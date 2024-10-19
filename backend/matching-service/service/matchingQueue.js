@@ -1,4 +1,5 @@
 const amqp = require('amqplib');
+const { v4: uuid } = require('uuid');
 
 const reqCh = process.env.RABBITMQ_REQ_CH;
 const resCh = process.env.RABBITMQ_RES_CH;
@@ -50,7 +51,8 @@ const matchUsers = async () => {
                     user1: newRequest.id,
                     user2: matchedRequest.otherId,
                     category: matchedRequest.category,
-                    complexity: matchedRequest.complexity
+                    complexity: matchedRequest.complexity,
+                    sessionId: uuid()
                 };
                 console.log(`Matched ${result.user1} and ${result.user2}`);
                 channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); // B to D
@@ -75,10 +77,11 @@ const matchUsers = async () => {
                     user1: newRequest.id,
                     user2: "",
                     category: [],
-                    complexity: ""
+                    complexity: "",
+                    sessionId: ""
                 };
                 channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); //B to D
-                console.log(`${newRequest.id} timed out.`)
+                console.log(`${newRequest.id} timed out.`);
             }
         }, timeout);
     }, { noAck: true });
@@ -167,7 +170,7 @@ const handleMatchRequest = async (request) => {
             resolve(result); 
         }, { noAck: true });
 
-        // Timeout after 45 seconds if no response is received (failsafe).
+        // Timeout after 35 seconds if no response is received (failsafe).
         setTimeout(() => {
             if (!received) {
                 console.log(`45 seconds timeout for matching user ${request.id}`);
@@ -180,7 +183,7 @@ const handleMatchRequest = async (request) => {
                     complexity: request.complexity
                 });
             }
-        }, 45000);
+        }, 35000);
     });
 
 }
@@ -188,7 +191,7 @@ const handleMatchRequest = async (request) => {
 const handleDeleteRequest = (user) => {
     if (requests.filter(request => request.id == user.id).length != 0) {
         requests = requests.filter(request => request.id !== user.id);
-        console.log(`Match request for user ${user.id} deleted.`)
+        console.log(`Deleted match request for user ${user.id}.`)
         return true;
     }
     return false;

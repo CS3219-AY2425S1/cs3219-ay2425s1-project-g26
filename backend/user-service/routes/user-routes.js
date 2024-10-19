@@ -10,16 +10,20 @@ import {
   updateUserPrivilege,
   addQuestionToUser,
   getQuestionDetails,
+  getPublicProfile,
 } from "../controller/user-controller.js";
 import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
 
 const router = express.Router();
 
-//Get all users
-router.get("/", verifyAccessToken, verifyIsAdmin, getAllUsers);
+//Get public profile (all and id)
+router.get("/public", getPublicProfile);
 
 //Get active users only
 router.get("/active", verifyAccessToken, verifyIsAdmin, getAllActiveUsers);
+
+//Get all users
+router.get("/", verifyAccessToken, verifyIsAdmin, getAllUsers);
 
 router.patch("/:id/privilege", verifyAccessToken, verifyIsAdmin, updateUserPrivilege);
 
@@ -31,8 +35,6 @@ router.patch("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, updateUser);
 
 //Soft delete
 router.delete("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, deleteUser);
-
-//Get public profile (all and id)
 
 
 //Get all completed questions from a user
