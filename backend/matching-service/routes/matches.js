@@ -3,7 +3,7 @@ const router = express.Router();
 const matchController = require('../controllers/matchController');
 const matchRequestController = require('../controllers/matchRequestController');
 
-// Matches
+// Getting match records from database.
 
 // Get all matches
 router.get('/', matchController.getAllMatches);
@@ -12,7 +12,7 @@ router.get('/', matchController.getAllMatches);
 router.get('/:id', matchController.getMatchById);
 
 
-// Match Requests
+// Match requests routes.
 
 // Create a new match request
 router.post('/', matchRequestController.createMatchRequest);

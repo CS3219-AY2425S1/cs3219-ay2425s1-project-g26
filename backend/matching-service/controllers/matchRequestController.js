@@ -52,7 +52,6 @@ const createMatchRequest = async (req, res) => {
                 responseResult.matchedUserName = user1Name;
             }
         }
-        // Return the result as 201 even if not matched.
         return res.status(201).json(responseResult);
 
     }).catch(error => {
