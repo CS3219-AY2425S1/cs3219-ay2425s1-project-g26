@@ -33,7 +33,6 @@ const matchUsers = async () => {
             matchScores.sort((a, b) => a.score - b.score); // Ascending order
 
             let viableMatches = matchScores.filter((req) => {
-                console.log(JSON.stringify(req))
                 return (req.score >= goalScore) && (req.otherId != newRequest.id)
             });
             let matchedRequest = false;
@@ -135,7 +134,7 @@ const calculateMatchScore = (newRequest, otherRequest) => {
 
     result = { 
         score: matchScore, 
-        category: matchingCategories[0], 
+        category: matchingCategories, 
         complexity: matchedComplexity,
         otherId: otherRequest.id 
     };
@@ -170,17 +169,18 @@ const handleMatchRequest = async (request) => {
             resolve(result); 
         }, { noAck: true });
 
-        // Timeout after 35 seconds if no response is received (failsafe).
+        // Timeout after 35 seconds if no response is received.
         setTimeout(() => {
             if (!received) {
-                console.log(`45 seconds timeout for matching user ${request.id}`);
+                console.log(`35 seconds timeout for matching user ${request.id}`);
                 connection.close();
                 resolve({
                     matched: false,
                     user1: "",
                     user2: "",
                     category: request.category,
-                    complexity: request.complexity
+                    complexity: request.complexity,
+                    sessionId: ""
                 });
             }
         }, 35000);

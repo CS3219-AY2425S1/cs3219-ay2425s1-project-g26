@@ -1,28 +1,4 @@
-const Match = require('../models/Match'); // Import the Match model
-
-/* This function is discontinued due to not interfacing with the frontend. Replacement below will be called by matchRequestController
-// Create a new match
-const createMatch = async (req, res) => {
-    const { user1Id, user2Id, category, complexity } = req.body;
-
-    // Validate required fields
-    if (!(user1Id && user2Id && category && complexity)) {
-        return res.status(400).json({ message: 'All fields are required (user1Id, user2Id, category, complexity).' });
-    }
-
-    try {
-        const result = await Match.create({
-            user1Id: req.body.user1Id,
-            user2Id: req.body.user2Id,
-            category: req.body.category,
-            complexity: req.body.complexity
-        });
-
-        return res.status(201).json(result);  // Return success response with the match data
-    } catch (err) {
-        return res.status(500).json({ message: 'Error creating match.', error: err.message });
-    }
-};*/
+const Match = require('../models/Match');
 
 // Create a new match to be stored in the database
 const createMatch = async (matchResult, user1Name, user2Name) => {
@@ -66,7 +42,7 @@ const getMatchById = async (req, res) => {
 // Retrieve all matches (optional: filter by category, complexity, etc.)
 const getAllMatches = async (req, res) => {
     try {
-        const matches = await Match.find();  // Retrieve all matches from the database
+        const matches = await Match.find();
 
         if (matches.length === 0) {
             return res.status(204).json(matches);
