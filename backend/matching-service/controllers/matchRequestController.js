@@ -34,6 +34,10 @@ const createMatchRequest = async (req, res) => {
 
             const usernames = await getUsername(matchedResult.user1, matchedResult.user2);
             
+            if (!usernames) {
+                return res.status(400).json({message: "Error fetching usernames."});
+            }
+
             const user1Name = usernames[0];
             const user2Name = usernames[1];
 
@@ -76,17 +80,21 @@ const cancelMatchRequest = async (req, res) => {
         const response = await axios.get('http://user-service:8081/users/public');
 
         if (!response) {
-            return res.status(400).json({ 'message': 'Error fetching username!' });
+            return false;
         }
 
         const data = response.data.data;
-        const user1Name = data.filter(user => user.id == user1Id)[0].username;
-        const user2Name = data.filter(user => user.id == user2Id)[0].username;
-        return [user1Name, user2Name];
+        const user1 = data.filter(user => user.id == user1Id);
+        const user2 = data.filter(user => user.id == user2Id);      
+        if (user1.length == 0 || user2.length == 0) {
+            return false;
+        }
+
+        return [user1[0].username, user2[0].username];
 
     } catch (error) {
         console.log("ERROR", error);
-        return res.status(400).json({ 'message': 'Matched users not found!' });
+        return false;
     }
  }
 
