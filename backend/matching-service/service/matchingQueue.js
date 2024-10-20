@@ -45,6 +45,9 @@ const matchUsers = async () => {
 
             if (matchedRequest) {
                 requests.splice(requests.indexOf(matchedRequest), 1)
+                if (inRequests) {
+                    requests.splice(requests.indexOf(requests.findIndex((req) => req.id === newRequest.id)))
+                };
                 result = {
                     matched: true,
                     user1: newRequest.id,
@@ -54,6 +57,7 @@ const matchUsers = async () => {
                     sessionId: uuid()
                 };
                 console.log(`Matched ${result.user1} and ${result.user2}`);
+                console.log(`Match requests removed from matching. ${requests.length} requests remaining in queue.`)
                 channel.publish(resCh, newRequest.id, Buffer.from(JSON.stringify(result))); // B to D
                 channel.publish(resCh, matchedRequest.otherId, Buffer.from(JSON.stringify(result)));
             };
