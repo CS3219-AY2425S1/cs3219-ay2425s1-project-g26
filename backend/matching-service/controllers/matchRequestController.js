@@ -51,7 +51,11 @@ const createMatchRequest = async (req, res) => {
                 responseResult.matchedUserId = matchedResult.user1;
                 responseResult.matchedUserName = user1Name;
             }
+            console.log("Response to", responseResult.matchedUserId, ":", JSON.stringify(responseResult));
+        } else {
+            console.log("Response to", matchedResult.user1, ":", JSON.stringify(responseResult));
         }
+        
         return res.status(201).json(responseResult);
 
     }).catch(error => {
