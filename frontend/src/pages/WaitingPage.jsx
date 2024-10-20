@@ -63,7 +63,7 @@ const WaitingPage = () => {
       timeoutId = setTimeout(() => {
         setLoading(false);
         setTimeoutReached(true);
-      }, 30000); 
+      }, 35000); 
 
       return () => {
         clearInterval(intervalId);
