@@ -180,8 +180,8 @@ const QuestionPage = () => {
       <button
         style={{
           position: "absolute",
-          top: "40px",
-          left: "35px",
+          top: "20px",
+          left: "38px",
         }}
         className="button-custom"
         onClick={handleBack}

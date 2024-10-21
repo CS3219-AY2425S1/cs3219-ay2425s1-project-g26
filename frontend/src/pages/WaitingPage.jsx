@@ -63,7 +63,7 @@ const WaitingPage = () => {
       timeoutId = setTimeout(() => {
         setLoading(false);
         setTimeoutReached(true);
-      }, 30000); 
+      }, 35000); 
 
       return () => {
         clearInterval(intervalId);
@@ -187,7 +187,7 @@ const WaitingPage = () => {
               <strong>Complexity:</strong> {`${matchData.complexity.charAt(0).toUpperCase()}${matchData.complexity.slice(1)}`}
             </p>
             <p style={subMessageStyle}>
-              <strong>Category:</strong> {matchData.category}
+              <strong>Category:</strong> {matchData.category.join(', ')}
             </p>
             <p style={subMessageStyle}>Starting the collaboration room now...</p>
           </div>

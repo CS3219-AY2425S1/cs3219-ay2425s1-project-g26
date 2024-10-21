@@ -82,7 +82,7 @@ const Login = () => {
       fontFamily: 'Figtree, sans-serif'  
     }}>
       <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1> 
-      <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Welcome back! Let’s get back on track.</p> 
+      <p style={{ fontSize: '1.2rem', margin: '36px 0' }}>Welcome back! Let’s get back on track.</p> 
       
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       
