@@ -17,7 +17,7 @@ const ForgetPassword = () => {
 
       if (response.status === 200) {
         alert("Check your email for the token."); 
-        navigate('/confirm-token'); 
+        navigate('/confirm-token', { state: { email } }); 
       }
     } catch (error) {
       if (error.response && error.response.data) {
@@ -32,7 +32,7 @@ const ForgetPassword = () => {
 
   return (
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1>
+      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1> 
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Reset your password.</p>
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Error message */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -84,6 +84,7 @@ const ForgetPassword = () => {
     </div>
   );
 };
+
 
 const styles = `
   input::placeholder {

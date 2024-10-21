@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const ConfirmToken = () => {
+  const location = useLocation();
+  const email = location.state?.email;
   const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -35,7 +37,7 @@ const ConfirmToken = () => {
     setIsResending(true);
 
     try {
-      const response = await axios.post('http://localhost:8081/users/resend-token');
+      const response = await axios.post('http://localhost:8081/users/forgot-password', { email }); 
 
       if (response.status === 200) {
         alert("Token resent to your email.");
@@ -49,7 +51,7 @@ const ConfirmToken = () => {
 
   return (
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1>
+      <h1 style={{ fontSize: '4rem', marginBottom: '20px'}}>PeerPrep</h1>
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Enter your token to confirm.</p>
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Error message */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

@@ -40,7 +40,7 @@ const ResetPassword = () => {
 
   return (
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1>
+      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1>
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Enter your new password.</p>
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} 
       {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>} 
