@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; 
+import axios from 'axios';
 
-const ForgetPassword = () => {
-  const [email, setEmail] = useState('');
+const ConfirmToken = () => {
+  const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isResending, setIsResending] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,34 +14,50 @@ const ForgetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8081/users/forgot-password', { email });
+      const response = await axios.post('http://localhost:8081/users/confirm-token', { token });
 
       if (response.status === 200) {
-        alert("Check your email for the token."); 
-        navigate('/confirm-token'); 
+        alert("Token confirmed! You can now reset your password.");
+        navigate('/reset-password'); 
       }
     } catch (error) {
       if (error.response && error.response.data) {
         setErrorMessage(error.response.data.message);
       } else {
-        setErrorMessage('An error occurred, please try again');
+        setErrorMessage('An error occurred, please try again.');
       }
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setIsResending(true);
+
+    try {
+      const response = await axios.post('http://localhost:8081/users/resend-token');
+
+      if (response.status === 200) {
+        alert("Token resent to your email.");
+      }
+    } catch (error) {
+      alert('Failed to resend token. Please try again.');
+    } finally {
+      setIsResending(false);
     }
   };
 
   return (
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1>
-      <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Reset your password.</p>
+      <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Enter your token to confirm.</p>
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Error message */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Enter token"
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
           required
           style={{
             display: 'block',
@@ -75,11 +92,22 @@ const ForgetPassword = () => {
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
           disabled={isLoading}
         >
-          {isLoading ? 'Sending...' : 'Reset Password'}
+          {isLoading ? 'Verifying...' : 'Confirm Token'}
         </button>
       </form>
       <p style={{ fontSize: '1rem' }}>
-        Remembered your password? <a href="/login" style={{ color: 'white' }}>Login</a>
+        Didn't receive a token?{' '}
+        <span
+          style={{
+            textDecoration: 'underline',
+            cursor: 'pointer',
+            color: 'white'
+          }}
+          onClick={handleResend}
+        >
+          Resend
+        </span>
+        {isResending && <span style={{ marginLeft: '10px' }}>Resending...</span>}
       </p>
     </div>
   );
@@ -87,15 +115,15 @@ const ForgetPassword = () => {
 
 const styles = `
   input::placeholder {
-    color: white; 
-    opacity: 0.8; 
+    color: white;
+    opacity: 0.8;
   }
 `;
 
 // Append styles to the head
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
+const styleSheet = document.createElement('style');
+styleSheet.type = 'text/css';
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
 
-export default ForgetPassword;
+export default ConfirmToken;
