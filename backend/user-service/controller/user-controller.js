@@ -235,7 +235,6 @@ export async function updateOnlineTime(user) {
   if (foundDate == 0) {
     onlineDate.push(parsedDate);
     await _updateOnlineTimeById(user.id, onlineDate);
-    console.log("New login date updated");
   }
 }
 
@@ -304,6 +303,17 @@ export async function getQuestionDetails(req, res) {
   }
 }
 
+export async function getPublicProfile(req, res) {
+  try {
+    const users = await _findAllUsers();
+
+    return res.status(200).json({ message: `Found all public users profile`, data: users.map(formatPublicUserResponse) });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unknown error when getting all users public profile!" });
+  }
+}
+
 export async function deleteUser(req, res) {
   try {
     const userId = req.params.id;
@@ -334,5 +344,14 @@ export function formatUserResponse(user) {
     onlineDate: user.onlineDate,
     questionDone: user.questionDone,
     createdAt: user.createdAt,
+  };
+}
+
+export function formatPublicUserResponse(user) {
+  return {
+    id: user.id,
+    username: user.username,
+    isActive: user.isActive,
+    questionDone: user.questionDone
   };
 }
