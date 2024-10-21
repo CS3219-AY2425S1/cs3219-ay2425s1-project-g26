@@ -1,0 +1,59 @@
+:root {
+    --radio-intial: #1a3042;
+    --radio-selected: #1a3042;
+}
+
+dialog {
+    margin: auto;
+    border: none;
+    border-radius: 0.25rem;
+}
+
+.question-dialog form {
+    display: grid;
+    gap: 1rem;
+    font-size: 1.5rem;
+}
+
+.question-dialog form > label {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.question-dialog form > button {
+    height: 2rem;
+    font-size: 100%;
+}
+
+.question-dialog form textarea {
+    resize: none;
+}
+
+.question-dialog dialog button {
+    font-weight: bold;
+}
+
+.question-dialog .complexity-group {
+    display: flex;
+}
+
+.question-dialog input[type='radio'] {
+    display: none;
+}
+
+.question-dialog .radio-label {
+    cursor: pointer;
+    border: 3px solid var(--radio-intial);
+    color: var(--radio-intial);
+    font-size: 0.9em;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+}
+
+.question-dialog input[type='radio']:checked + label {
+    background-color: var(--radio-selected);
+    border: 3px solid var(--radio-selected);
+    color: #f5f5f5;
+}
