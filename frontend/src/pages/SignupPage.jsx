@@ -63,7 +63,7 @@ const SignUp = () => {
       justifyContent: 'center',
       fontFamily: 'Figtree, sans-serif'
     }}>
-      <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1> 
+      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1> 
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Create an account to get started.</p> 
       
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}

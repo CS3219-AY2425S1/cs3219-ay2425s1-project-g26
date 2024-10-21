@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import QuestionPage from "./pages/QuestionPage";
@@ -8,9 +7,11 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NewSessionPage from "./pages/NewSessionPage";
 import WaitingPage from "./pages/WaitingPage";
-import backgroundImage from "./assets/images/darker.jpg"; // path for background
-import "./styles/App.css"; // css file
 import ManageProfilePage from "./pages/ManageProfilePage";
+import ConfirmTokenPage from "./pages/ConfirmTokenPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage"; 
+import backgroundImage from "./assets/images/darker.jpg"; 
+import "./styles/App.css"; 
 
 const App = () => {
   return (
@@ -32,6 +33,8 @@ const App = () => {
         <Route path="/new-session" element={<NewSessionPage />} />
         <Route path="/waiting" element={<WaitingPage />} />
         <Route path="/manage-profile" element={<ManageProfilePage />} />
+        <Route path="/confirm-token" element={<ConfirmTokenPage />} /> 
+        <Route path="/reset-password" element={<ResetPasswordPage />} /> 
       </Routes>
     </div>
   );

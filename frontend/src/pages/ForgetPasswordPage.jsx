@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; 
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // State to manage loading
-  const [errorMessage, setErrorMessage] = useState(''); // State for error messages
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -12,19 +13,26 @@ const ForgetPassword = () => {
     setIsLoading(true);
 
     try {
-      // Call API to handle password reset logic
-      // Assume password reset is always successful for now
-      navigate('/login'); // Navigate to the login page after successful reset
+      const response = await axios.post('http://localhost:8081/users/forgot-password', { email });
+
+      if (response.status === 200) {
+        alert("Check your email for the token."); 
+        navigate('/confirm-token', { state: { email } }); 
+      }
     } catch (error) {
-      setErrorMessage('An error occurred, please try again'); // Handle error
+      if (error.response && error.response.data) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage('An error occurred, please try again');
+      }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
   return (
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1>
+      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1> 
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Reset your password.</p>
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Error message */}
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -76,6 +84,7 @@ const ForgetPassword = () => {
     </div>
   );
 };
+
 
 const styles = `
   input::placeholder {

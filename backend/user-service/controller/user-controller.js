@@ -1,5 +1,11 @@
 import axios from 'axios';
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
+import crypto from "crypto";
+import User from "../model/user-model.js";
+import { body, validationResult } from "express-validator";
+
+
 import { isValidObjectId } from "mongoose";
 import {
   createUser as _createUser,
@@ -16,6 +22,102 @@ import {
   updateOnlineTimeById as _updateOnlineTimeById,
   updateQuestionDoneById as _updateQuestionDoneById,
 } from "../model/repository.js";
+
+export const sendPasswordResetEmail = async (req, res) => {
+  body("email").isEmail().withMessage("Please provide a valid email address");
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    user.resetToken = token; 
+    user.resetTokenExpiration = Date.now() + 3600000; 
+    await user.save(); 
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your Password Reset Token",
+      text: `Here is your password reset token: ${token}`, 
+    };
+
+    await transporter.sendMail(mailOptions);
+    res
+      .status(200)
+      .json({ message: "Password reset token sent to your email." });
+  } catch (error) {
+    console.error("Error in sendPasswordResetEmail:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+export const confirmToken = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiration: { $gt: Date.now() }, 
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token." });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Token is valid. You can now reset your password." });
+  } catch (error) {
+    console.error("Error in confirmToken:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetToken: token,
+      resetTokenExpiration: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.password = await bcrypt.hash(password, 12); 
+    user.resetToken = null; 
+    user.resetTokenExpiration = null;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Server error, please try again later." });
+  }
+};
 
 export async function createUser(req, res) {
   try {
