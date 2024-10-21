@@ -1,6 +1,7 @@
 import axios from 'axios';
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
+import crypto from "crypto";
 import User from "../model/user-model.js";
 import { body, validationResult } from "express-validator";
 
@@ -38,6 +39,12 @@ export const sendPasswordResetEmail = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const token = crypto.randomBytes(32).toString("hex");
+
+    user.resetToken = token; 
+    user.resetTokenExpiration = Date.now() + 3600000; 
+    await user.save(); 
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -46,24 +53,23 @@ export const sendPasswordResetEmail = async (req, res) => {
       },
     });
 
-    const resetLink = `http://localhost:8081/reset-password?email=${email}`; 
-
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Password Reset",
-      text: `To reset your password, please click the following link: ${resetLink}`,
+      subject: "Your Password Reset Token",
+      text: `Here is your password reset token: ${token}`, 
     };
 
     await transporter.sendMail(mailOptions);
     res
       .status(200)
-      .json({ message: "Password reset email sent. Please check your inbox." });
+      .json({ message: "Password reset token sent to your email." });
   } catch (error) {
     console.error("Error in sendPasswordResetEmail:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 export const renderResetPasswordPage = (req, res) => {
   const { email } = req.query;
