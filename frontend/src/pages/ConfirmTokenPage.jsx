@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const ConfirmToken = () => {
   const location = useLocation();
-  const email = location.state?.email;
+  const email = location.state?.email; 
   const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -15,16 +15,21 @@ const ConfirmToken = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    console.log("Submitting token:", token); 
+
     try {
       const response = await axios.post('http://localhost:8081/users/confirm-token', { token });
 
+      console.log("Response:", response); 
+
       if (response.status === 200) {
         alert("Token confirmed! You can now reset your password.");
-        navigate('/reset-password'); 
+        navigate('/reset-password', { state: { token } });
       }
     } catch (error) {
+      console.error("Error confirming token:", error);
       if (error.response && error.response.data) {
-        setErrorMessage(error.response.data.message);
+        setErrorMessage(error.response.data.message); 
       } else {
         setErrorMessage('An error occurred, please try again.');
       }
@@ -37,7 +42,7 @@ const ConfirmToken = () => {
     setIsResending(true);
 
     try {
-      const response = await axios.post('http://localhost:8081/users/forgot-password', { email }); 
+      const response = await axios.post('http://localhost:8081/users/forgot-password', { email });
 
       if (response.status === 200) {
         alert("Token resent to your email.");

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const ResetPassword = () => {
+  const location = useLocation();
+  const token = location.state?.token; 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -20,11 +22,20 @@ const ResetPassword = () => {
       return;
     }
 
+    if (!token) {
+      setErrorMessage("Invalid or missing token.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const response = await axios.post('http://localhost:8081/users/reset-password', { password });
+      const response = await axios.post('http://localhost:8081/users/reset-password', {
+        password,
+        token 
+      });
 
       if (response.status === 200) {
-        setSuccessMessage("Password reset successful! You can now log in.");
+        setSuccessMessage("Password reset successful! You will be redirected to the login page.");
         setTimeout(() => navigate('/login'), 3000); 
       }
     } catch (error) {
@@ -112,18 +123,5 @@ const ResetPassword = () => {
     </div>
   );
 };
-
-const styles = `
-  input::placeholder {
-    color: white;
-    opacity: 0.8;
-  }
-`;
-
-// Append styles to the head
-const styleSheet = document.createElement('style');
-styleSheet.type = 'text/css';
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);
 
 export default ResetPassword;
