@@ -13,12 +13,11 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "ai-service is running!"}
 
 @app.post("/")
 async def upload(request: Request) -> Dict[str, str]:
     """
-    Uploads PDF & chunks them into sentences
     Request Body:
     >>> {
     >>>     "query": The query that the user typed into the prompt.
@@ -27,26 +26,20 @@ async def upload(request: Request) -> Dict[str, str]:
     request_dict = await request.body()
     request_dict = json.loads(request_dict)
     query_str = request_dict.get("query")
-    print("Received a query:", query_str)
     if not (query_str):
-        print("Query not provided")
+        print("Query not provided. Returning status code 400.")
         raise HTTPException(
             status_code=400,
             detail="query must be provided in body!",
         )
-    print(request_dict)
+    print("Received a query:", query_str)
     llm_response = ask(query_str)
-    print("Responding to frontend!")
+    print("Language Model Response:\n", llm_response.split("\n")[0],"...")
     #Status 200 is returned
     return {"message": llm_response}
     
 
-def prompt_formatter(query) -> str:
-    """
-    Augments query with text-based context from context_items.
-    """
-
-    
+def prompt_formatter(query) -> str:    
     base_prompt = """Please answer the query.
                     Don't return the thinking, only return the answer.
                     Make sure your answers are as explanatory as possible.
@@ -74,7 +67,7 @@ def ask(query):
     ]
     prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     outputs = pipe(prompt, max_new_tokens=256, do_sample=True, temperature=0.5, top_k=50, top_p=0.95)
-    return outputs[0]["generated_text"].split("<|assistant|>")[1]
+    return outputs[0]["generated_text"].split("<|assistant|>\n")[1]
 
 
 if __name__ == "__main__":

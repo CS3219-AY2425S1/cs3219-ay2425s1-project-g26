@@ -10,7 +10,4 @@ COPY . .
 
 EXPOSE 9680
 
-CMD ["python", "main.py"]
-
-HEALTHCHECK --interval=99999s --timeout=10s --start-period=10s --retries=1 \
-CMD curl -s http://localhost:9680/
+CMD ["python", "-u", "main.py"]
