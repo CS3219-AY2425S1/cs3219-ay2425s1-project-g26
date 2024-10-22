@@ -10,7 +10,7 @@ const NewSessionPage = () => {
   const navigate = useNavigate();
   const [topicsArray, setTopicsArray] = useState([]);
   const [targetTopicsArray, setTargetTopicsArray] = useState([]);
-  const [selectedTopic, setSelectedTopic] = useState('');
+  const [selectedTopics, setSelectedTopics] = useState('');
 
   const getHeaders = () => {
     return {
@@ -90,7 +90,12 @@ const NewSessionPage = () => {
   };
 
   const handleTopicChange = (e) => {
-    setSelectedTopic(e.target.value);
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedTopics(prevTopics => [...prevTopics, value]);
+    } else {
+      setSelectedTopics(prevTopics => prevTopics.filter(topic => topic !== value));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -98,29 +103,18 @@ const NewSessionPage = () => {
 
     const form = e.target;
     const formData = new FormData(form);
-    const formObj = {};
-
-    formData.forEach((value, key) => {
-      if (key === 'category') {
-          if (!formObj[key]) {
-              formObj[key] = [];
-          }
-          formObj[key].push(value);
-      } else {
-          formObj[key] = value;
-      }
-  });
+    const formObj = Object.fromEntries(formData.entries());
 
     const userPref = {
       id: userId,
       complexity: formObj.complexity,
-      category: formObj.category
+      category: selectedTopics
     };
 
-    if (userPref.hasOwnProperty('complexity') && userPref.hasOwnProperty('category')) {
+    if (formObj.hasOwnProperty('complexity') && formObj.hasOwnProperty('category')) {
       navigate('/waiting', { state: { userPref } });
     } else {
-        alert('Select a difficulty/topic');
+      alert('Select a difficulty/topic');
     }
   };
 
@@ -167,7 +161,7 @@ const NewSessionPage = () => {
                       }
                     </div>
                 </div>
-                <button className={`start-btn ${selectedTopic === '' ? '' : 'show-btn'}`}>Start Matching</button>
+                <button className={`start-btn ${selectedTopics.length === 0 ? '' : 'show-btn'}`}>Start Matching</button>
             </form>
         </div>
     </div>
