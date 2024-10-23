@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Tabs from '../components/collaboration/Tabs';
+import CodePanel from '../components/collaboration/CodePanel';
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
@@ -57,6 +59,24 @@ const CollaborationPage = () => {
     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
   };
 
+  const contentContainerStyle = {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'row',
+    gap: '20px',
+    marginTop: '70px',
+  };
+
+  const leftPaneStyle = {
+    flex: 1,
+    padding: '6px',
+  };
+
+  const rightPaneStyle = {
+    flex: 2,
+    padding: '6px',
+  };
+
   return (
     <div style={containerStyle}>
       <div style={timerStyle}>Time Elapsed: {formatTime(secondsElapsed)}</div>
@@ -74,6 +94,19 @@ const CollaborationPage = () => {
       >
         End Session
       </button>
+
+      {/* Main Content Section */}
+      <div style={contentContainerStyle}>
+        {/* Left Pane with Tabs */}
+        <div style={leftPaneStyle}>
+          <Tabs />
+        </div>
+
+        {/* Right Pane with Code Panel */}
+        <div style={rightPaneStyle}>
+          <CodePanel />
+        </div>
+      </div>
     </div>
   );
 };

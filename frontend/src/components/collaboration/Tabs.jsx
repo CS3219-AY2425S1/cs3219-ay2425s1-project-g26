@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CodePanel = () => {
+const Tabs = () => {
   const containerStyle = {
     backgroundColor: '#fff',
     padding: '20px',
@@ -15,24 +15,21 @@ const CodePanel = () => {
     color: '#1a3042',
   };
 
-  const codeBlockStyle = {
-    backgroundColor: '#f4f4f4',
-    padding: '15px',
+  const tabStyle = {
+    margin: '10px 0',
+    padding: '10px',
+    backgroundColor: '#f0f0f0',
     borderRadius: '4px',
-    fontFamily: 'monospace',
+    cursor: 'pointer',
     fontSize: '1rem',
-    whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word',
   };
 
   return (
     <div style={containerStyle}>
-      <h2 style={headingStyle}>Code</h2>
-      <div style={codeBlockStyle}>
-        {'// code will appear here\nconst example = "raesa";\nconsole.log(example);'}
-      </div>
+      <h2 style={headingStyle}>Tabs</h2>
+
     </div>
   );
 };
 
-export default CodePanel;
+export default Tabs;
