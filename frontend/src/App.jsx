@@ -9,7 +9,8 @@ import NewSessionPage from "./pages/NewSessionPage";
 import WaitingPage from "./pages/WaitingPage";
 import ManageProfilePage from "./pages/ManageProfilePage";
 import ConfirmTokenPage from "./pages/ConfirmTokenPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage"; 
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import CollaborationPage from "./pages/CollaborationPage";  
 import backgroundImage from "./assets/images/darker.jpg"; 
 import "./styles/App.css"; 
 
@@ -34,7 +35,8 @@ const App = () => {
         <Route path="/waiting" element={<WaitingPage />} />
         <Route path="/manage-profile" element={<ManageProfilePage />} />
         <Route path="/confirm-token" element={<ConfirmTokenPage />} /> 
-        <Route path="/reset-password" element={<ResetPasswordPage />} /> 
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/collaboration-page" element={<CollaborationPage />} />
       </Routes>
     </div>
   );

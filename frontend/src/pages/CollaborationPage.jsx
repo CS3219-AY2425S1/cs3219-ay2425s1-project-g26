@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 
 const CollaborationPage = () => {
@@ -26,7 +27,9 @@ const CollaborationPage = () => {
   const containerStyle = {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'space-between',
     height: '100vh',
+    padding: '20px',
     position: 'relative',
     background: 'none',
   };
@@ -37,7 +40,7 @@ const CollaborationPage = () => {
     left: '20px',
     fontSize: '1.5rem',
     fontWeight: 'bold',
-    color: '#1a3042',
+    color: '#fff',
   };
 
   const buttonStyle = {
@@ -56,24 +59,22 @@ const CollaborationPage = () => {
     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
   };
 
-  const mainSectionStyle = {
+  const contentContainerStyle = {
     display: 'flex',
     flex: 1,
-    marginTop: '60px',
+    flexDirection: 'row',
+    gap: '20px',
+    marginTop: '70px',
   };
 
   const leftPaneStyle = {
     flex: 1,
-    borderRight: '2px solid #1a3042',
-    padding: '20px',
-    color: '#1a3042',
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
+    padding: '6px',
   };
 
   const rightPaneStyle = {
     flex: 2,
-    padding: '20px',
+    padding: '6px',
   };
 
   return (
@@ -94,10 +95,14 @@ const CollaborationPage = () => {
         End Session
       </button>
 
-      <div style={mainSectionStyle}>
+      {/* Main Content Section */}
+      <div style={contentContainerStyle}>
+        {/* Left Pane with Tabs */}
         <div style={leftPaneStyle}>
-          Tabs
+          <Tabs />
         </div>
+
+        {/* Right Pane with Code Panel */}
         <div style={rightPaneStyle}>
           <CodePanel />
         </div>
