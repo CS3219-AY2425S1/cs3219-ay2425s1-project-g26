@@ -33,7 +33,7 @@ async def upload(request: Request) -> Dict[str, str]:
             detail="query must be provided in body!",
         )
     print("Received a query:", query_str)
-    llm_response = ask(query_str)
+    llm_response = ask(prompt_formatter(query_str))
     print("Language Model Response:\n", llm_response.split("\n")[0],"...")
     #Status 200 is returned
     return {"message": llm_response}
@@ -41,24 +41,16 @@ async def upload(request: Request) -> Dict[str, str]:
 
 def prompt_formatter(query) -> str:    
     base_prompt = """Please answer the query.
-                    Don't return the thinking, only return the answer.
                     Make sure your answers are as explanatory as possible.
+                    Try to keep your answer in less than 200 words.
+                    Your name is RAESA. You can refer to your name when answering the question.
+                    Do not provide any form of code or pseduo-code unless specifically requested.
                     User query: {query}
                     Answer:"""
 
-    # Update base prompt with context items and query   
     base_prompt = base_prompt.format(query=query)
 
-    # Create prompt template for instruction-tuned model
-    dialogue_template = [
-        {"role": "user",
-        "content": base_prompt}
-    ]
-
-    # Apply the chat template
-    prompt = pipe.tokenizer.apply_chat_template(dialogue_template, tokenize=False, add_generation_prompt=True)
-
-    return prompt
+    return base_prompt
 
 
 def ask(query):
@@ -66,7 +58,7 @@ def ask(query):
         {"role": "user", "content": query},
     ]
     prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    outputs = pipe(prompt, max_new_tokens=256, do_sample=True, temperature=0.5, top_k=50, top_p=0.95)
+    outputs = pipe(prompt, max_new_tokens=None, do_sample=True, temperature=0.5, top_k=50, top_p=0.95)
     return outputs[0]["generated_text"].split("<|assistant|>\n")[1]
 
 
