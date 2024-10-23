@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Question from './Question';
+import Chat from './Chat'; 
+import AI from './AI';  
 
 const Tabs = () => {
+  const [selectedTab, setSelectedTab] = useState('Question'); 
+
   const containerStyle = {
     backgroundColor: '#fff',
     padding: '20px',
@@ -9,25 +14,69 @@ const Tabs = () => {
     height: '100%',
   };
 
-  const headingStyle = {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    color: '#1a3042',
+  const tabContainerStyle = {
+    display: 'flex',
+    justifyContent: 'space-between', 
   };
 
   const tabStyle = {
+    flex: 1,
     margin: '10px 0',
     padding: '10px',
     backgroundColor: '#f0f0f0',
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '1rem',
+    textAlign: 'center',
+  };
+
+  const activeTabStyle = {
+    ...tabStyle,
+    backgroundColor: '#e0e0e0', 
+    fontWeight: 'bold',
+  };
+
+  const renderTabContent = () => {
+    switch (selectedTab) {
+      case 'Question':
+        return <Question />;
+      case 'Chat':
+        return <Chat />;
+      case 'AI':
+        return <AI />;
+      default:
+        return null;
+    }
   };
 
   return (
     <div style={containerStyle}>
-      <h2 style={headingStyle}>Tabs</h2>
+      {/* Tab Buttons */}
+      <div style={tabContainerStyle}>
+        <div
+          style={selectedTab === 'Question' ? activeTabStyle : tabStyle}
+          onClick={() => setSelectedTab('Question')}
+        >
+          Question
+        </div>
+        <div
+          style={selectedTab === 'Chat' ? activeTabStyle : tabStyle}
+          onClick={() => setSelectedTab('Chat')}
+        >
+          Chat
+        </div>
+        <div
+          style={selectedTab === 'AI' ? activeTabStyle : tabStyle}
+          onClick={() => setSelectedTab('AI')}
+        >
+          AI
+        </div>
+      </div>
 
+      {/* Render Selected Tab Content */}
+      <div style={{ marginTop: '20px' }}>
+        {renderTabContent()}
+      </div>
     </div>
   );
 };
