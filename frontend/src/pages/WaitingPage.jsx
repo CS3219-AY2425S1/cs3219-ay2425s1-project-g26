@@ -163,6 +163,15 @@ const WaitingPage = () => {
 
   const [hoveredButton, setHoveredButton] = useState(null);
 
+  useEffect(() => {
+    if (matchFound && matchData) {
+      const timeout = setTimeout(() => {
+        navigate('/collaboration-page', { state: { matchData } });
+      }, 3000); 
+      return () => clearTimeout(timeout);
+    }
+  }, [matchFound, matchData, navigate]);
+
   return (
     <div style={containerStyle}>
       {loading ? (
