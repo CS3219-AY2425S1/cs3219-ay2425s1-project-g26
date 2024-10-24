@@ -52,3 +52,9 @@ services:
       context: ./backend/code-execution-service
     ports:
       - "8083:8083"
+
+  collaboration-service:
+    build:
+      context: ./backend/collaboration-service
+    ports:
+      - "8084:8084"
