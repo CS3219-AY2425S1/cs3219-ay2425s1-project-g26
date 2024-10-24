@@ -32,25 +32,38 @@ const runJava = (code) => {
     const filePath = path.join(__dirname, "Main.java");
     fs.writeFileSync(filePath, code); // Save code to a file
 
-    exec(`javac ${filePath}`, (compileError) => {
+    // Compile the Java code
+    exec(`javac ${filePath}`, (compileError, compileStdout, compileStderr) => {
+      // Log compile output and error
+      console.log("Compile stdout:", compileStdout);
+      console.log("Compile stderr:", compileStderr);
+
       if (compileError) {
         // Clean up
         fs.unlinkSync(filePath);
-        return reject(compileError.stderr);
+        return reject(`Compilation Error: ${compileStderr || "Unknown error"}`);
       }
 
+      // Execute the Java program
       exec(`java -cp ${__dirname} Main`, (runError, stdout, stderr) => {
         // Clean up
         fs.unlinkSync(filePath);
         fs.unlinkSync(path.join(__dirname, "Main.class"));
+
+        // Log execution output and error
+        console.log("Execution stdout:", stdout);
+        console.log("Execution stderr:", stderr);
+
         if (runError) {
-          return reject(stderr);
+          return reject(`Runtime Error: ${stderr || "Unknown error"}`);
         }
         resolve(stdout);
       });
     });
   });
 };
+
+
 
 // Function to run C code
 const runC = (code) => {
@@ -111,7 +124,7 @@ app.post("/run-code", async (req, res) => {
       case "c":
         output = await runC(code);
         break;
-      case "javascript": 
+      case "javascript":
         output = await runJavaScript(code);
         break;
       default:
@@ -120,9 +133,12 @@ app.post("/run-code", async (req, res) => {
 
     return res.status(200).json({ output });
   } catch (error) {
-    return res.status(500).json({ error });
+    console.error("Error running code:", error);
+    const errorMessage = error.message || error; 
+    return res.status(500).json({ error: errorMessage });
   }
 });
+
 
 const PORT = process.env.PORT || 8083;
 app.listen(PORT, () => {

@@ -39,33 +39,38 @@ int main() {
     const selectedLanguage = event.target.value;
     setLanguage(selectedLanguage);
     setCode(defaultCodes[selectedLanguage]);
-    setOutput(''); 
+    setOutput('');
   };
 
   const handleCodeChange = (event) => {
     setCode(event.target.value);
   };
 
-  const runJavaScriptCode = (userCode) => {
+  const handleRunCode = async () => {
+    setOutput('');
+
+    const requestBody = {
+      code: code,
+      language: language,
+    };
+
     try {
-      const consoleOutput = [];
-      const originalConsoleLog = console.log;
-      console.log = (output) => consoleOutput.push(output);
+      const response = await fetch('http://localhost:8083/run-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-      eval(userCode); 
-      console.log = originalConsoleLog;
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-      setOutput(consoleOutput.join('\n'));
+      const result = await response.json();
+      setOutput(result.output);
     } catch (error) {
       setOutput(`Error: ${error.message}`);
-    }
-  };
-
-  const handleRunCode = () => {
-    if (language === 'javascript') {
-      runJavaScriptCode(code);
-    } else {
-      setOutput(`Running ${language} code is not supported directly in the browser.\nYou will be able to run ${language} code maybe tomorrow if i can do it fast.`);
     }
   };
 
@@ -95,7 +100,7 @@ int main() {
 
   const textareaStyle = {
     width: '100%',
-    height: '400px', 
+    height: '400px',
     padding: '15px',
     backgroundColor: '#f4f4f4',
     borderRadius: '4px',

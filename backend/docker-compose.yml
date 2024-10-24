@@ -29,8 +29,3 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
-  code-execution-service:
-    build:
-      context: ./code-execution-service
-    ports:
-      - "5000:5000"
