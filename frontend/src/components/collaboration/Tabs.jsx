@@ -4,7 +4,10 @@ import Chat from './Chat';
 import AI from './AI';  
 
 const Tabs = () => {
-  const [selectedTab, setSelectedTab] = useState('Question'); 
+  const [selectedTab, setSelectedTab] = useState('Question');
+  
+  const [aiMessages, setAiMessages] = useState([]);
+  const [aiInputValue, setAiInputValue] = useState('');
 
   const containerStyle = {
     backgroundColor: '#fff',
@@ -43,7 +46,14 @@ const Tabs = () => {
       case 'Chat':
         return <Chat />;
       case 'AI':
-        return <AI />;
+        return (
+          <AI 
+            messages={aiMessages}
+            setMessages={setAiMessages}
+            inputValue={aiInputValue}
+            setInputValue={setAiInputValue}
+          />
+        );
       default:
         return null;
     }

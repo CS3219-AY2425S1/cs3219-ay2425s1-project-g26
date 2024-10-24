@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-const AI = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
+const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
+  const [loading, setLoading] = React.useState(false);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputValue) return;
 
+    // Add user's message to the chat
     setMessages((prevMessages) => [
       ...prevMessages,
       { text: inputValue, sender: 'user' },
@@ -17,6 +16,7 @@ const AI = () => {
     setLoading(true);
 
     try {
+      // Call the AI backend API
       const response = await fetch('http://localhost:9680/', {
         method: 'POST',
         headers: {
@@ -32,6 +32,7 @@ const AI = () => {
       const data = await response.json();
       const aiMessage = data.message;
 
+      // Add AI's message to the chat
       setMessages((prevMessages) => [
         ...prevMessages,
         { text: aiMessage, sender: 'ai' },
@@ -51,7 +52,7 @@ const AI = () => {
   return (
     <div>
       <h3>Chat with AI</h3>
-      <div className="chat-window" style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'scroll' }}>
+      <div className="chat-window" style={{ border: '1px solid #ccc', padding: '10px', height: '500px', overflowY: 'scroll' }}>
         {messages.map((msg, index) => (
           <div key={index} style={{ textAlign: msg.sender === 'user' ? 'right' : 'left' }}>
             <strong>{msg.sender === 'user' ? 'You:' : 'AI:'}</strong> {msg.text}
