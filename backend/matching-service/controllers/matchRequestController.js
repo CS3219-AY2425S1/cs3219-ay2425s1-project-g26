@@ -3,6 +3,13 @@ const MatchController = require('../controllers/matchController')
 const axios = require('axios');
 
 const createMatchRequest = async (req, res) => {
+    const authHeader = req.headers["authorization"];
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authentication failed" });
+    }
+    const accessToken = authHeader.split(" ")[1];
+
+
     if (!(req.body.id)) {
         return res.status(400).json({ 'message': 'User ID is missing!' });
     }
@@ -27,7 +34,8 @@ const createMatchRequest = async (req, res) => {
             matchedUserName: "",
             category: matchedResult.category,
             complexity: matchedResult.complexity,
-            sessionId: matchedResult.sessionId
+            sessionId: matchedResult.sessionId,
+            question: {},
         };
 
         if (matchedResult.matched) {
@@ -38,8 +46,17 @@ const createMatchRequest = async (req, res) => {
                 return res.status(400).json({message: "Error fetching usernames."});
             }
 
+            const question = await getQuestion(accessToken, matchedResult.category, matchedResult.complexity);
+
+            if (!question) {
+                return res.status(400).json({message: "Error fetching the question."});
+            }
+
             const user1Name = usernames[0];
             const user2Name = usernames[1];
+
+            responseResult.question = question;
+
 
             if (req.body.id == matchedResult.user1) {
                 //Only user1 save the data to the db
@@ -94,6 +111,28 @@ const cancelMatchRequest = async (req, res) => {
         }
 
         return [user1[0].username, user2[0].username];
+
+    } catch (error) {
+        console.log("ERROR", error);
+        return false;
+    }
+ }
+
+ const getQuestion = async (accessToken, category, complexity) => {
+    const dataToSend = { category: category, complexity: complexity };
+    try {
+        const response = await axios.post('http://question-service:8080/questions/specific', dataToSend, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+
+        if (!response) {
+            return false;
+        }
+
+        const data = response.data;
+        return data;
 
     } catch (error) {
         console.log("ERROR", error);

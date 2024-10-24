@@ -3,8 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import withAuth from "../hoc/withAuth";
 import axios from 'axios';
+import { useAuth } from "../AuthContext"; 
+
 
 const WaitingPage = () => {
+  const { accessToken } = useAuth();
   const location = useLocation();
   const { userPref } = location.state || { userPref: {} };
   const navigate = useNavigate();
@@ -36,8 +39,17 @@ const WaitingPage = () => {
     if (requestInProgress) return; 
     setRequestInProgress(true); 
 
+
+    const getHeaders = () => {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`
+      };
+    };
+
     try {
-      const response = await axios.post('http://localhost:8082/matches', userPref);
+      const response = await axios.post('http://localhost:8082/matches', userPref, 
+      { headers: getHeaders() });
 
       if (response.status === 200 || response.status === 201) {
         if (response.data.matched) {
