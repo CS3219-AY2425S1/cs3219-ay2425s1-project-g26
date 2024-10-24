@@ -1,10 +1,19 @@
 import React from 'react';
+import "./styles/question.css";
 
-const Question = () => {
+const Question = ({ question }) => {
   return (
-    <div>
-      <h3>Question Component</h3>
-      <p>This is the Question tab content.</p>
+    <div className='question-tab'>
+      <h3>{question.title}</h3>
+      <div className="tags">
+        <div className="complexity">{question.complexity}</div>
+        {
+          question.category.map((cat) => (
+            <div className="category">{cat}</div>
+          ))
+        }
+      </div>
+      <p>{question.description}</p>
     </div>
   );
 };
