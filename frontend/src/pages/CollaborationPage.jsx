@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
+import ConfirmationModal from '../components/collaboration/ConfirmationModal'; 
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   const updateElapsedTime = () => {
@@ -12,7 +14,7 @@ const CollaborationPage = () => {
 
     if (savedStartTime) {
       const startTime = parseInt(savedStartTime, 10);
-      const currentTime = Math.floor(Date.now() / 1000); 
+      const currentTime = Math.floor(Date.now() / 1000);
       const elapsed = currentTime - startTime;
       setSecondsElapsed(elapsed);
     }
@@ -26,7 +28,7 @@ const CollaborationPage = () => {
       localStorage.setItem('startTime', currentTime.toString());
     }
 
-    updateElapsedTime(); 
+    updateElapsedTime();
 
     const timer = setInterval(() => {
       setSecondsElapsed((prev) => prev + 1);
@@ -34,7 +36,7 @@ const CollaborationPage = () => {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        updateElapsedTime(); 
+        updateElapsedTime();
       }
     };
 
@@ -47,8 +49,16 @@ const CollaborationPage = () => {
   }, []);
 
   const handleEndSession = () => {
-    // localStorage.removeItem('startTime');
+    setShowModal(true); 
+  };
+
+  const handleConfirmEndSession = () => {
+    localStorage.removeItem('startTime');
     navigate('/dashboard');
+  };
+
+  const handleCancelEndSession = () => {
+    setShowModal(false); 
   };
 
   const formatTime = (seconds) => {
@@ -127,6 +137,13 @@ const CollaborationPage = () => {
       >
         End Session
       </button>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        show={showModal}
+        onConfirm={handleConfirmEndSession}
+        onCancel={handleCancelEndSession}
+      />
 
       {/* Main Content Section */}
       <div style={contentContainerStyle}>
