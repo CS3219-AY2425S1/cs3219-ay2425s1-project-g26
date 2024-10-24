@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import withAuth from "../hoc/withAuth";
@@ -31,6 +32,7 @@ const WaitingPage = () => {
 
   const createMatchRequest = async (userPref) => {
     console.log("MATCHINGG");
+    localStorage.removeItem('startTime');
     if (requestInProgress) return; 
     setRequestInProgress(true); 
 
@@ -162,6 +164,15 @@ const WaitingPage = () => {
   };
 
   const [hoveredButton, setHoveredButton] = useState(null);
+
+  useEffect(() => {
+    if (matchFound && matchData) {
+      const timeout = setTimeout(() => {
+        navigate('/collaboration', { state: { matchData } });
+      }, 3000); 
+      return () => clearTimeout(timeout);
+    }
+  }, [matchFound, matchData, navigate]);
 
   return (
     <div style={containerStyle}>
