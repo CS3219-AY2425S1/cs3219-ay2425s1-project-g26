@@ -1,0 +1,13 @@
+.question-tab > .tags {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.question-tab .complexity,
+.question-tab .category {
+    margin: 0.5rem 0;
+    background-color: #1A3042;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    color: #f5f5f5;
+}
