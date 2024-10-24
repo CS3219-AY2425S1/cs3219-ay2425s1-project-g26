@@ -20,27 +20,32 @@ const AI = () => {
       const response = await fetch('http://localhost:9680/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded', 
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({ query: inputValue }),
+        body: JSON.stringify({ query: inputValue }),
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('Error with AI response');
       }
 
       const data = await response.json();
+      const aiMessage = data.message;
 
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: data.message, sender: 'ai' },
+        { text: aiMessage, sender: 'ai' },
       ]);
     } catch (error) {
-      console.error('Error fetching AI response:', error);
-    } finally {
-      setLoading(false);
-      setInputValue(''); 
+      console.error('Error:', error);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: 'Sorry, something went wrong.', sender: 'ai' },
+      ]);
     }
+
+    setLoading(false);
+    setInputValue('');
   };
 
   return (
