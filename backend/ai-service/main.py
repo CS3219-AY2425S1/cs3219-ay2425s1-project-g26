@@ -42,9 +42,9 @@ async def upload(request: Request) -> Dict[str, str]:
 def prompt_formatter(query) -> str:    
     base_prompt = """Please answer the query.
                     Make sure your answers are as explanatory as possible.
-                    Try to keep your answer in less than 200 words.
                     Your name is RAESA. You can refer to your name when answering the question.
                     Do not provide any form of code or pseduo-code unless specifically requested.
+                    Strictly keep your answer within 150 words.
                     User query: {query}
                     Answer:"""
 
