@@ -315,7 +315,7 @@ export async function getQuestionDetails(req, res) {
     try {
       // Make a GET request to user-service with the token
       const dataToSend = { questions: questionDone };
-      const response = await axios.post('http://question-service:8080/questions/selected', dataToSend, {
+      const response = await axios.post('http://question-service:8080/questions/ids', dataToSend, {
           headers: {
               Authorization: `Bearer ${accessToken}`
           }

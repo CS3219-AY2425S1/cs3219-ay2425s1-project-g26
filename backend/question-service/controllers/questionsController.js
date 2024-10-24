@@ -7,7 +7,23 @@ const getAllQuestions = async (req, res) => {
     res.json(questions);
 }
 
-const getSelectedQuestions = async (req, res) => {
+const getQuestionOnMatch = async (req, res) => {
+    if (!(req?.body?.category && req?.body?.complexity)) {
+        return res.status(400).json({ 'message': 'Category (array) and complexity (string) are required!' });
+    }
+
+    const questions = await QuestionSchema.find();  
+    filteredQuestions = questions.filter(question => req?.body.complexity == question.complexity 
+        && req?.body.category.some(cat => question.category.includes(cat)) );
+    
+    if (filteredQuestions.length == 0) {
+        return res.status(400).json({ 'message': 'No quetions with the criteria is found!' });
+    }
+
+    res.json(filteredQuestions[0]);
+}
+
+const getQuestionsByID = async (req, res) => {
     if (!req?.body.questions) {
         return res.status(400).json({ 'message': 'questions (Array) field is required!' });
     }
@@ -143,5 +159,6 @@ module.exports = {
     updateQuestion,
     deleteQuestion,
     getQuestion,
-    getSelectedQuestions,
+    getQuestionsByID,
+    getQuestionOnMatch
 }
