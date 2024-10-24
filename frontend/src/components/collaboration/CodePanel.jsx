@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 
-const CodePanel = () => {
+const socket = io('http://localhost:8084');
+
+const CodePanel = ({ sessionId }) => {
   const defaultCodes = {
     javascript: `// JavaScript code
 const example = "raesa";
@@ -35,15 +38,46 @@ int main() {
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
 
+  useEffect(() => {
+    // Join the session
+    socket.emit('join', sessionId);
+
+    // Listen for code updates from other users
+    socket.on('codeUpdate', (code) => {
+      setCode(code);
+    });
+
+    // Listen for language and code updates from other users
+    socket.on('languageUpdate', (newLanguage, newCode) => {
+        setLanguage(newLanguage);
+        setCode(newCode); // Update the code to the new default
+        setOutput('');
+    });
+
+
+    return () => {
+      socket.off('codeUpdate');
+      socket.off('languageUpdate');
+    };
+  }, [sessionId]);
+
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
+    const newCode = defaultCodes[selectedLanguage]; // Get the default code for the new language
+    const updatedCode = `${newCode}\n\n${code}`; // Concatenate with new default code at the top
+
     setLanguage(selectedLanguage);
-    setCode(defaultCodes[selectedLanguage]);
+    setCode(updatedCode); // Update the local state
     setOutput('');
+
+    // Emit the language change and new code to the server
+    socket.emit('languageChange', sessionId, selectedLanguage, updatedCode);
   };
 
   const handleCodeChange = (event) => {
-    setCode(event.target.value);
+    const newCode = event.target.value;
+    setCode(newCode);
+    socket.emit('codeChange', sessionId, newCode); // Emit code change
   };
 
   const handleRunCode = async () => {
