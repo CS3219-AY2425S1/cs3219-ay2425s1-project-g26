@@ -3,7 +3,7 @@ import Question from './Question';
 import Chat from './Chat'; 
 import AI from './AI';  
 
-const Tabs = () => {
+const Tabs = ({ question }) => {
   const [selectedTab, setSelectedTab] = useState('Question');
   
   const [aiMessages, setAiMessages] = useState([]);
@@ -42,7 +42,7 @@ const Tabs = () => {
   const renderTabContent = () => {
     switch (selectedTab) {
       case 'Question':
-        return <Question />;
+        return <Question question={question} />;
       case 'Chat':
         return <Chat />;
       case 'AI':

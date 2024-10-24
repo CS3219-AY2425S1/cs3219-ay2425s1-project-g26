@@ -1,10 +1,10 @@
 import React from 'react';
 
-const Question = () => {
+const Question = ({ question }) => {
   return (
     <div>
-      <h3>Question Component</h3>
-      <p>This is the Question tab content.</p>
+      <h3>{question.title}</h3>
+      <p>{question.description}</p>
     </div>
   );
 };
