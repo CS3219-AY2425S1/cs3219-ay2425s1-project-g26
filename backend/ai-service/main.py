@@ -9,19 +9,19 @@ import torch
 from transformers import pipeline
 
 
-
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"], 
-    allow_headers=["*"], 
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")
 async def root():
     return {"message": "ai-service is running!"}
+
 
 @app.post("/")
 async def upload(request: Request) -> Dict[str, str]:
@@ -42,19 +42,21 @@ async def upload(request: Request) -> Dict[str, str]:
         )
     print("Received a query:", query_str)
     llm_response = ask(prompt_formatter(query_str))
-    print("Language Model Response:\n", llm_response.split("\n")[0],"...")
-    #Status 200 is returned
+    print("Language Model Response:\n", llm_response.split("<br>")[0], "...")
+    # Status 200 is returned
     return {"message": llm_response}
-    
 
-def prompt_formatter(query) -> str:    
-    base_prompt = """Please answer the query.
-                    Make sure your answers are as explanatory as possible.
-                    Your name is RAESA. You can refer to your name when answering the question.
-                    Do not provide any form of code or pseduo-code unless specifically requested.
-                    Strictly keep your answer within 150 words.
-                    User query: {query}
-                    Answer:"""
+
+def prompt_formatter(query) -> str:
+    base_prompt = """Your Objective: 
+        Generate short and concise answers to query.
+        Provide clear and concise answers to the query with minimum unnecessary information.
+
+        Query: 
+        {query}
+
+        Answer:
+        """
 
     base_prompt = base_prompt.format(query=query)
 
@@ -65,13 +67,15 @@ def ask(query):
     messages = [
         {"role": "user", "content": query},
     ]
-    prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-    outputs = pipe(prompt, max_new_tokens=None, do_sample=True, temperature=0.5, top_k=50, top_p=0.95)
-    return outputs[0]["generated_text"].split("<|assistant|>\n")[1]
+    prompt = pipe.tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True)
+    outputs = pipe(prompt, max_new_tokens=None, do_sample=True,
+                   temperature=0.3, top_k=50, top_p=0.95)
+    return outputs[0]["generated_text"].split("<|assistant|>\n")[1].replace("\n", "<br>")
 
 
 if __name__ == "__main__":
-    pipe = pipeline("text-generation", model="TinyLlama-1.1B-Chat-v1.0", torch_dtype=torch.bfloat16, device_map="auto")
+    pipe = pipeline("text-generation", model="TinyLlama-1.1B-Chat-v1.0",
+                    torch_dtype=torch.bfloat16, device_map="auto")
     print("Language model successfully initalized!")
     uvicorn.run(app, host="0.0.0.0", port=9680)
-
