@@ -31,6 +31,7 @@ const WaitingPage = () => {
 
   const createMatchRequest = async (userPref) => {
     console.log("MATCHINGG");
+    localStorage.removeItem('startTime');
     if (requestInProgress) return; 
     setRequestInProgress(true); 
 

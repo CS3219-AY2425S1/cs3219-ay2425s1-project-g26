@@ -47,7 +47,7 @@ const CollaborationPage = () => {
   }, []);
 
   const handleEndSession = () => {
-    localStorage.removeItem('startTime');
+    // localStorage.removeItem('startTime');
     navigate('/dashboard');
   };
 

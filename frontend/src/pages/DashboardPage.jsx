@@ -117,7 +117,7 @@ const DashboardPage = () => {
         />
       </div>
 
-      <div style={{ marginLeft: "20px", marginTop: "70px" }}>
+      <div style={{ marginLeft: "20px", marginTop: "63px" }}>
         <Calendar
           currentMonth={currentMonth}
           currentYear={currentYear}
