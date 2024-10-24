@@ -168,7 +168,7 @@ const WaitingPage = () => {
   useEffect(() => {
     if (matchFound && matchData) {
       const timeout = setTimeout(() => {
-        navigate('/collaboration-page', { state: { matchData } });
+        navigate('/collaboration', { state: { matchData } });
       }, 3000); 
       return () => clearTimeout(timeout);
     }

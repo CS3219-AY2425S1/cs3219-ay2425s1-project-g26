@@ -10,7 +10,8 @@ import WaitingPage from "./pages/WaitingPage";
 import ManageProfilePage from "./pages/ManageProfilePage";
 import ConfirmTokenPage from "./pages/ConfirmTokenPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import CollaborationPage from "./pages/CollaborationPage";  
+import CollaborationPage from "./pages/CollaborationPage"; 
+import SummaryPage from "./pages/SummaryPage"; 
 import backgroundImage from "./assets/images/darker.jpg"; 
 import "./styles/App.css"; 
 
@@ -36,7 +37,8 @@ const App = () => {
         <Route path="/manage-profile" element={<ManageProfilePage />} />
         <Route path="/confirm-token" element={<ConfirmTokenPage />} /> 
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/collaboration-page" element={<CollaborationPage />} />
+        <Route path="/collaboration" element={<CollaborationPage />} />
+        <Route path="/summary" element={<SummaryPage />} />
       </Routes>
     </div>
   );

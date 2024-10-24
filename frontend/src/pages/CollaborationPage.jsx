@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
-import ConfirmationModal from '../components/collaboration/ConfirmationModal'; 
+import ConfirmationModal from '../components/collaboration/ConfirmationModal';
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
@@ -54,7 +54,7 @@ const CollaborationPage = () => {
 
   const handleConfirmEndSession = () => {
     localStorage.removeItem('startTime');
-    navigate('/dashboard');
+    navigate('/summary'); 
   };
 
   const handleCancelEndSession = () => {
