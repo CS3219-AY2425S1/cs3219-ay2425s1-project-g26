@@ -23,7 +23,7 @@ async def upload(request: Request) -> Dict[str, str]:
     >>>     "query": The query that the user typed into the prompt.
     >>> }
     """
-    request_dict = await request.json()
+    request_dict = await request.body()
     request_dict = json.loads(request_dict)
     query_str = request_dict.get("query")
     if not (query_str):
