@@ -3,7 +3,6 @@ const MatchController = require('../controllers/matchController')
 const axios = require('axios');
 
 const createMatchRequest = async (req, res) => {
-    console.log("RECEIVED");
     const authHeader = req.headers["authorization"];
     if (!authHeader) {
       return res.status(401).json({ message: "Authentication failed" });
@@ -11,7 +10,6 @@ const createMatchRequest = async (req, res) => {
     const accessToken = authHeader.split(" ")[1];
 
 
-    console.log("DED!");
     if (!(req.body.id)) {
         return res.status(400).json({ 'message': 'User ID is missing!' });
     }
@@ -48,11 +46,9 @@ const createMatchRequest = async (req, res) => {
                 return res.status(400).json({message: "Error fetching usernames."});
             }
 
-            console.log("HERE!");
             const question = await getQuestion(accessToken, matchedResult.category, matchedResult.complexity);
 
             if (!question) {
-                console.log("FALSE!!")
                 return res.status(400).json({message: "Error fetching the question."});
             }
 
@@ -135,9 +131,7 @@ const cancelMatchRequest = async (req, res) => {
             return false;
         }
 
-        console.log(response);
         const data = response.data;
-        
         return data;
 
     } catch (error) {
