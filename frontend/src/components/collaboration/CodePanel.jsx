@@ -2,13 +2,36 @@ import React, { useState } from 'react';
 
 const CodePanel = () => {
   const defaultCodes = {
-    javascript: '// JavaScript code\nconst example = "raesa";\nconsole.log(example);',
-    python: '# Python code\nexample = "raesa"\nprint(example)',
-    java: '// Java code\npublic class Main {\n  public static void main(String[] args) {\n    String example = "raesa";\n    System.out.println(example);\n  }\n}',
-    c: '#include <stdio.h>\n\nint main() {\n  char example[] = "raesa";\n  printf("%s\\n", example);\n  return 0;\n}',
+    javascript: `// JavaScript code
+const example = "raesa";
+console.log(example);`,
+
+    python: `# Python code
+def main():
+    example = "raesa"
+    print(example)
+
+if __name__ == "__main__":
+    main()`,
+
+    java: `// Java code
+public class Main {
+  public static void main(String[] args) {
+    String example = "raesa";
+    System.out.println(example);
+  }
+}`,
+
+    c: `#include <stdio.h>
+
+int main() {
+  char example[] = "raesa";
+  printf("%s\\n", example);
+  return 0;
+}`,
   };
 
-  const [language, setLanguage] = useState('javascript');
+  const [language, setLanguage] = useState('python');
   const [code, setCode] = useState(defaultCodes[language]);
 
   const handleLanguageChange = (event) => {
@@ -47,7 +70,7 @@ const CodePanel = () => {
 
   const textareaStyle = {
     width: '100%',
-    height: '630px', 
+    height: '630px',
     padding: '15px',
     backgroundColor: '#f4f4f4',
     borderRadius: '4px',
