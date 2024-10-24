@@ -7,14 +7,47 @@ const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const navigate = useNavigate();
 
+  const updateElapsedTime = () => {
+    const savedStartTime = localStorage.getItem('startTime');
+
+    if (savedStartTime) {
+      const startTime = parseInt(savedStartTime, 10);
+      const currentTime = Math.floor(Date.now() / 1000); 
+      const elapsed = currentTime - startTime;
+      setSecondsElapsed(elapsed);
+    }
+  };
+
   useEffect(() => {
+    const savedStartTime = localStorage.getItem('startTime');
+
+    if (!savedStartTime) {
+      const currentTime = Math.floor(Date.now() / 1000);
+      localStorage.setItem('startTime', currentTime.toString());
+    }
+
+    updateElapsedTime(); 
+
     const timer = setInterval(() => {
       setSecondsElapsed((prev) => prev + 1);
     }, 1000);
-    return () => clearInterval(timer);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateElapsedTime(); 
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const handleEndSession = () => {
+    localStorage.removeItem('startTime');
     navigate('/dashboard');
   };
 
