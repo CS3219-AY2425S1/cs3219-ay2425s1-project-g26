@@ -134,7 +134,7 @@ public class Main {
     fontFamily: 'monospace',
   };
 
-  const textareaStyle = {
+   const textareaStyle = {
     width: '100%',
     height: '400px',
     padding: '15px',
@@ -142,12 +142,12 @@ public class Main {
     borderRadius: '4px',
     fontFamily: 'monospace',
     fontSize: '1rem',
-    whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word',
+    whiteSpace: 'pre', 
     border: '1px solid #ddd',
     boxSizing: 'border-box',
     resize: 'none',
     outline: 'none',
+    overflowX: 'auto', 
   };
 
   const outputStyle = {
@@ -157,10 +157,11 @@ public class Main {
     borderRadius: '4px',
     fontFamily: 'monospace',
     fontSize: '1rem',
-    whiteSpace: 'pre-wrap',
+    whiteSpace: 'pre', 
     border: '1px solid #ddd',
-    maxHeight: '200px', 
-    overflowY: 'auto', 
+    maxHeight: '200px',
+    overflowY: 'auto',
+    overflowX: 'auto', 
   };
 
   const buttonStyle = {
