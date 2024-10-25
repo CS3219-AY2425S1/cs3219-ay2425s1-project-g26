@@ -4,6 +4,7 @@ import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
 import { useLocation } from 'react-router-dom';
+import withAuth from "../hoc/withAuth";
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
@@ -167,4 +168,5 @@ const CollaborationPage = () => {
   );
 };
 
-export default CollaborationPage;
+const WrappedCollaborationPage = withAuth(CollaborationPage);
+export default WrappedCollaborationPage;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './AI.css'; 
+import './styles/AI.css'; 
 
 const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   const [loading, setLoading] = useState(false); 
@@ -15,9 +15,9 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
     ]);
 
     setLoading(true);
+    setInputValue(''); 
 
     try {
-      setInputValue('');
       // Call the AI backend API
       const response = await fetch('http://localhost:9680/', {
         method: 'POST',
@@ -45,10 +45,9 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         ...prevMessages,
         { text: 'Sorry, something went wrong.', sender: 'ai' },
       ]);
+    } finally {
+      setLoading(false); 
     }
-
-    setLoading(false);
-    setInputValue('');
   };
 
   const renderMessage = (text) => {
@@ -67,7 +66,6 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
             <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {renderMessage(msg.text)}
-
           </div>
         ))}
         {loading && <div className="loading">Loading...</div>}
@@ -80,8 +78,15 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
           placeholder="Type your message here..."
           className="message-input"
           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e)}
+          disabled={loading} 
         />
-        <button type="submit" className="send-button">Send</button>
+        <button 
+          type="submit" 
+          className="send-button"
+          disabled={loading}
+        >
+          Send
+        </button>
       </form>
     </div>
   );

@@ -9,12 +9,19 @@ const Question = ({ question }) => {
       <div className="tags">
         <div className="complexity">{question.complexity}</div>
         {
-          question.category.map((cat) => (
-            <div className="category">{cat}</div>
+          question.category.map((cat, index) => (
+            <div className="category" key={index}>{cat}</div>
           ))
         }
       </div>
-      <p>{question.description}</p>
+      <p>
+        {question.description.split('\n').map((line, index) => (
+          <span key={index}>
+            {line}
+            <br />
+          </span>
+        ))}
+      </p>
     </div>
   );
 };

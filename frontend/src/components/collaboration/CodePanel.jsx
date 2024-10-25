@@ -159,6 +159,8 @@ public class Main {
     fontSize: '1rem',
     whiteSpace: 'pre-wrap',
     border: '1px solid #ddd',
+    maxHeight: '200px', 
+    overflowY: 'auto', 
   };
 
   const buttonStyle = {
