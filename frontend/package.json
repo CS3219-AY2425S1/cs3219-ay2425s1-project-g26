@@ -10,9 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codemirror/lang-java": "^6.0.1",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-python": "^6.1.6",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@uiw/react-codemirror": "^4.23.6",
     "axios": "^1.7.7",
+    "codemirror": "^6.0.1",
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
