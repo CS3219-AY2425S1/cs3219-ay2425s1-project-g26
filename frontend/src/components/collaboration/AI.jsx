@@ -56,8 +56,11 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
       <h3>Chat with Raesa</h3>
       <div className="chat-window">
         {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {msg.text}
+          <div key={index} style={{ textAlign: msg.sender === 'user' ? 'right' : 'left' }}>
+            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> 
+            {msg.text.split('\n').map((line, i) => (
+              <div key={i}>{line}</div> 
+            ))}
           </div>
         ))}
         {loading && <div className="loading">Loading...</div>}
