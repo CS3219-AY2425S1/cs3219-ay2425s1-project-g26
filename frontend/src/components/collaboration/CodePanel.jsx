@@ -64,10 +64,9 @@ int main() {
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
     const newCode = defaultCodes[selectedLanguage]; // Get the default code for the new language
-    const updatedCode = `${newCode}\n\n${code}`; // Concatenate with new default code at the top
 
     setLanguage(selectedLanguage);
-    setCode(updatedCode); // Update the local state
+    setCode(newCode);
     setOutput('');
 
     // Emit the language change and new code to the server
