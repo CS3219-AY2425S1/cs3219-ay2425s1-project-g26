@@ -17,7 +17,6 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
     setLoading(true);
 
     try {
-      setInputValue('');
       // Call the AI backend API
       const response = await fetch('http://localhost:9680/', {
         method: 'POST',
@@ -45,10 +44,19 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         ...prevMessages,
         { text: 'Sorry, something went wrong.', sender: 'ai' },
       ]);
-    } finally {
-      setLoading(false);
-      setInputValue('');
     }
+
+    setLoading(false);
+    setInputValue('');
+  };
+
+  const renderMessage = (text) => {
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        <br />
+      </span>
+    ));
   };
 
   return (
@@ -56,11 +64,8 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
       <h3>Chat with Raesa</h3>
       <div className="chat-window">
         {messages.map((msg, index) => (
-          <div key={index} style={{ textAlign: msg.sender === 'user' ? 'right' : 'left' }}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> 
-            {msg.text.split('\n').map((line, i) => (
-              <div key={i}>{line}</div> 
-            ))}
+          <div key={index} className={`message ${msg.sender}`}>
+            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {renderMessage(msg.text)}
           </div>
         ))}
         {loading && <div className="loading">Loading...</div>}
