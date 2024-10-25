@@ -17,6 +17,7 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
     setLoading(true);
 
     try {
+      setInputValue('');
       // Call the AI backend API
       const response = await fetch('http://localhost:9680/', {
         method: 'POST',
@@ -44,10 +45,10 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         ...prevMessages,
         { text: 'Sorry, something went wrong.', sender: 'ai' },
       ]);
+    } finally {
+      setLoading(false);
+      setInputValue('');
     }
-
-    setLoading(false);
-    setInputValue('');
   };
 
   return (

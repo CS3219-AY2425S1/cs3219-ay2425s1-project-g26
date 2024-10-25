@@ -3,11 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
+import { useLocation } from 'react-router-dom';
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const { matchData } = location.state || { matchData: {} };
+  const sessionId = matchData.sessionId;
+
 
   const updateElapsedTime = () => {
     const savedStartTime = localStorage.getItem('startTime');
@@ -149,12 +155,12 @@ const CollaborationPage = () => {
       <div style={contentContainerStyle}>
         {/* Left Pane with Tabs */}
         <div style={leftPaneStyle}>
-          <Tabs />
+          <Tabs question={matchData.question} />
         </div>
 
         {/* Right Pane with Code Panel */}
         <div style={rightPaneStyle}>
-          <CodePanel />
+          <CodePanel sessionId={sessionId} />
         </div>
       </div>
     </div>

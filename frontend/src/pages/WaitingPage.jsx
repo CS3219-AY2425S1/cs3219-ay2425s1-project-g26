@@ -3,8 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import withAuth from "../hoc/withAuth";
 import axios from 'axios';
+import { useAuth } from "../AuthContext"; 
 
 const WaitingPage = () => {
+  const { accessToken } = useAuth();
   const location = useLocation();
   const { userPref } = location.state || { userPref: {} };
   const navigate = useNavigate();
@@ -15,6 +17,8 @@ const WaitingPage = () => {
   const [seconds, setSeconds] = useState(0);
   const [timeoutReached, setTimeoutReached] = useState(false);
   const [matchData, setMatchData] = useState(null);
+  const [countdown, setCountdown] = useState(5); 
+  const [countdownActive, setCountdownActive] = useState(false); 
   
   let intervalId, timeoutId;
   const hasRequestedRef = useRef(false); 
@@ -36,8 +40,16 @@ const WaitingPage = () => {
     if (requestInProgress) return; 
     setRequestInProgress(true); 
 
+    const getHeaders = () => {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`
+      };
+    };
+
     try {
-      const response = await axios.post('http://localhost:8082/matches', userPref);
+      const response = await axios.post('http://localhost:8082/matches', userPref, 
+      { headers: getHeaders() });
 
       if (response.status === 200 || response.status === 201) {
         if (response.data.matched) {
@@ -167,10 +179,19 @@ const WaitingPage = () => {
 
   useEffect(() => {
     if (matchFound && matchData) {
-      const timeout = setTimeout(() => {
-        navigate('/collaboration', { state: { matchData } });
-      }, 3000); 
-      return () => clearTimeout(timeout);
+      setCountdownActive(true);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            navigate('/collaboration', { state: { matchData } });
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000); 
+
+      return () => clearInterval(countdownInterval);
     }
   }, [matchFound, matchData, navigate]);
 
@@ -200,7 +221,7 @@ const WaitingPage = () => {
             <p style={subMessageStyle}>
               <strong>Category:</strong> {matchData.category.join(', ')}
             </p>
-            <p style={subMessageStyle}>Starting the collaboration room now...</p>
+            <p style={subMessageStyle}>Starting the collaboration room in {countdown} seconds...</p> {/* Display countdown */}
           </div>
         ) : timeoutReached ? (
           <div style={cardStyle}>
