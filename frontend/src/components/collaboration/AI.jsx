@@ -66,6 +66,7 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
             <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {renderMessage(msg.text)}
+
           </div>
         ))}
         {loading && <div className="loading">Loading...</div>}
