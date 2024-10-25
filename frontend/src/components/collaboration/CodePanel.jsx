@@ -24,19 +24,12 @@ public class Main {
     System.out.println(example);
   }
 }`,
-
-    c: `#include <stdio.h>
-
-int main() {
-  char example[] = "raesa";
-  printf("%s\\n", example);
-  return 0;
-}`,
   };
 
   const [language, setLanguage] = useState('python');
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false); 
 
   useEffect(() => {
     // Join the session
@@ -49,11 +42,10 @@ int main() {
 
     // Listen for language and code updates from other users
     socket.on('languageUpdate', (newLanguage, newCode) => {
-        setLanguage(newLanguage);
-        setCode(newCode); // Update the code to the new default
-        setOutput('');
+      setLanguage(newLanguage);
+      setCode(newCode); // Update the code to the new default
+      setOutput('');
     });
-
 
     return () => {
       socket.off('codeUpdate');
@@ -63,14 +55,14 @@ int main() {
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
-    const newCode = defaultCodes[selectedLanguage]; // Get the default code for the new language
+    const newCode = defaultCodes[selectedLanguage]; 
 
     setLanguage(selectedLanguage);
     setCode(newCode);
     setOutput('');
 
     // Emit the language change and new code to the server
-    socket.emit('languageChange', sessionId, selectedLanguage, updatedCode);
+    socket.emit('languageChange', sessionId, selectedLanguage, newCode);
   };
 
   const handleCodeChange = (event) => {
@@ -81,6 +73,7 @@ int main() {
 
   const handleRunCode = async () => {
     setOutput('');
+    setIsButtonDisabled(true);
 
     const requestBody = {
       code: code,
@@ -101,10 +94,20 @@ int main() {
       }
 
       const result = await response.json();
-      setOutput(result.output);
+      
+      if (result.error) {
+        setOutput(`Error: ${result.error}`); 
+      } else {
+        setOutput(result.output);
+      }
+
     } catch (error) {
-      setOutput(`Error: ${error.message}`);
+      setOutput(`Error: ${error.message}`);  
     }
+
+    setTimeout(() => {
+      setIsButtonDisabled(false);
+    }, 2000);
   };
 
   const containerStyle = {
@@ -161,11 +164,11 @@ int main() {
   const buttonStyle = {
     marginTop: '20px',
     padding: '10px 20px',
-    backgroundColor: '#1a3042',
+    backgroundColor: isButtonDisabled ? '#ccc' : '#1a3042', 
     color: 'white',
     border: 'none',
     borderRadius: '4px',
-    cursor: 'pointer',
+    cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
     fontSize: '1rem',
   };
 
@@ -176,14 +179,17 @@ int main() {
         <option value="javascript">JavaScript</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
-        <option value="c">C</option>
       </select>
       <textarea
         style={textareaStyle}
         value={code}
         onChange={handleCodeChange}
       />
-      <button style={buttonStyle} onClick={handleRunCode}>
+      <button
+        style={buttonStyle}
+        onClick={handleRunCode}
+        disabled={isButtonDisabled} 
+      >
         Run Code
       </button>
       <div style={outputStyle}>
