@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import './AI.css'; 
 
 const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false); 
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -50,25 +51,26 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   };
 
   return (
-    <div>
-      <h3>Chat with AI</h3>
-      <div className="chat-window" style={{ border: '1px solid #ccc', padding: '10px', height: '500px', overflowY: 'scroll' }}>
+    <div className="chat-container">
+      <h3>Chat with Raesa</h3>
+      <div className="chat-window">
         {messages.map((msg, index) => (
-          <div key={index} style={{ textAlign: msg.sender === 'user' ? 'right' : 'left' }}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'AI:'}</strong> {msg.text}
+          <div key={index} className={`message ${msg.sender}`}>
+            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {msg.text}
           </div>
         ))}
-        {loading && <div>Loading...</div>}
+        {loading && <div className="loading">Loading...</div>}
       </div>
-      <form onSubmit={handleSendMessage} style={{ display: 'flex', marginTop: '10px' }}>
+      <form onSubmit={handleSendMessage} className="message-form">
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Type your message here..."
-          style={{ flex: 1, padding: '5px' }}
+          className="message-input"
+          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e)}
         />
-        <button type="submit" style={{ padding: '5px 10px' }}>Send</button>
+        <button type="submit" className="send-button">Send</button>
       </form>
     </div>
   );
