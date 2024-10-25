@@ -48,9 +48,14 @@ public class Main {
       setOutput('');
     });
 
+    socket.on('partnerLeft', () => {
+      alert('Your partner has ended the session.');
+    });
+
     return () => {
       socket.off('codeUpdate');
       socket.off('languageUpdate');
+      socket.off('partnerLeft');
     };
   }, [sessionId]);
 

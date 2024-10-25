@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import io from 'socket.io-client';
+import withAuth from "../hoc/withAuth";
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
-import { useLocation } from 'react-router-dom';
-import withAuth from "../hoc/withAuth";
+
+const socket = io('http://localhost:8084');
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
@@ -14,7 +16,6 @@ const CollaborationPage = () => {
   const location = useLocation();
   const { matchData } = location.state || { matchData: {} };
   const sessionId = matchData.sessionId;
-
 
   const updateElapsedTime = () => {
     const savedStartTime = localStorage.getItem('startTime');
@@ -60,6 +61,7 @@ const CollaborationPage = () => {
   };
 
   const handleConfirmEndSession = () => {
+    socket.emit('endSession', sessionId);
     localStorage.removeItem('startTime');
     navigate('/summary'); 
   };
