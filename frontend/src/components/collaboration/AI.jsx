@@ -56,7 +56,10 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
       <div className="chat-window" style={{ border: '1px solid #ccc', padding: '10px', height: '500px', overflowY: 'scroll' }}>
         {messages.map((msg, index) => (
           <div key={index} style={{ textAlign: msg.sender === 'user' ? 'right' : 'left' }}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'AI:'}</strong> {msg.text}
+            <strong>{msg.sender === 'user' ? 'You:' : 'AI:'}</strong> 
+            {msg.text.split('\n').map((line, i) => (
+              <div key={i}>{line}</div> 
+            ))}
           </div>
         ))}
         {loading && <div>Loading...</div>}
