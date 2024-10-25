@@ -35,6 +35,11 @@ io.on('connection', (socket) => {
     socket.to(sessionId).emit('languageUpdate', newLanguage, newCode);
   });
 
+  socket.on('endSession', (sessionId) => {
+    console.log(`User ended the session in room: ${sessionId}`);
+    socket.to(sessionId).emit('partnerLeft');
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
