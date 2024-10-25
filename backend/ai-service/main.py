@@ -42,7 +42,7 @@ async def upload(request: Request) -> Dict[str, str]:
         )
     print("Received a query:", query_str)
     llm_response = ask(prompt_formatter(query_str))
-    print("Language Model Response:\n", llm_response.split("<br>")[0], "...")
+    print("Language Model Response:\n", llm_response.split("\n")[0], "...")
     # Status 200 is returned
     return {"message": llm_response}
 
@@ -71,7 +71,7 @@ def ask(query):
         messages, tokenize=False, add_generation_prompt=True)
     outputs = pipe(prompt, max_new_tokens=None, do_sample=True,
                    temperature=0.3, top_k=50, top_p=0.95)
-    return outputs[0]["generated_text"].split("<|assistant|>\n")[1].replace("\n", "<br>")
+    return outputs[0]["generated_text"].split("<|assistant|>\n")[1]
 
 
 if __name__ == "__main__":
