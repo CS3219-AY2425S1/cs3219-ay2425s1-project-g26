@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
 
 const socket = io('http://localhost:8084');
 
@@ -29,21 +33,18 @@ public class Main {
   const [language, setLanguage] = useState('python');
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false); 
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   useEffect(() => {
-    // Join the session
     socket.emit('join', sessionId);
 
-    // Listen for code updates from other users
-    socket.on('codeUpdate', (code) => {
-      setCode(code);
+    socket.on('codeUpdate', (newCode) => {
+      setCode(newCode);
     });
 
-    // Listen for language and code updates from other users
     socket.on('languageUpdate', (newLanguage, newCode) => {
       setLanguage(newLanguage);
-      setCode(newCode); // Update the code to the new default
+      setCode(newCode);
       setOutput('');
     });
 
@@ -55,20 +56,16 @@ public class Main {
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
-    const newCode = defaultCodes[selectedLanguage]; 
-
+    const newCode = defaultCodes[selectedLanguage];
     setLanguage(selectedLanguage);
     setCode(newCode);
     setOutput('');
-
-    // Emit the language change and new code to the server
     socket.emit('languageChange', sessionId, selectedLanguage, newCode);
   };
 
-  const handleCodeChange = (event) => {
-    const newCode = event.target.value;
-    setCode(newCode);
-    socket.emit('codeChange', sessionId, newCode); // Emit code change
+  const handleCodeChange = (value) => {
+    setCode(value);
+    socket.emit('codeChange', sessionId, value);
   };
 
   const handleRunCode = async () => {
@@ -76,125 +73,66 @@ public class Main {
     setIsButtonDisabled(true);
 
     const requestBody = {
-      code: code,
-      language: language,
+      code,
+      language,
     };
 
     try {
       const response = await fetch('http://localhost:8083/run-code', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('Network response was not ok');
 
       const result = await response.json();
-      
-      if (result.error) {
-        setOutput(`Error: ${result.error}`); 
-      } else {
-        setOutput(result.output);
-      }
+      setOutput(result.error ? `Error: ${result.error}` : result.output);
 
     } catch (error) {
-      setOutput(`Error: ${error.message}`);  
+      setOutput(`Error: ${error.message}`);
     }
 
-    setTimeout(() => {
-      setIsButtonDisabled(false);
-    }, 2000);
+    setTimeout(() => setIsButtonDisabled(false), 2000);
   };
 
-  const containerStyle = {
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-    height: '100%',
-    position: 'relative',
-  };
-
-  const headingStyle = {
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    color: '#1a3042',
-  };
-
-  const dropdownStyle = {
-    position: 'absolute',
-    top: '20px',
-    right: '20px',
-    padding: '5px',
-    fontSize: '1rem',
-    fontFamily: 'monospace',
-  };
-
-  const textareaStyle = {
-    width: '100%',
-    height: '400px',
-    padding: '15px',
-    backgroundColor: '#f4f4f4',
-    borderRadius: '4px',
-    fontFamily: 'monospace',
-    fontSize: '1rem',
-    whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word',
-    border: '1px solid #ddd',
-    boxSizing: 'border-box',
-    resize: 'none',
-    outline: 'none',
-  };
-
-  const outputStyle = {
-    marginTop: '20px',
-    padding: '10px',
-    backgroundColor: '#f0f0f0',
-    borderRadius: '4px',
-    fontFamily: 'monospace',
-    fontSize: '1rem',
-    whiteSpace: 'pre-wrap',
-    border: '1px solid #ddd',
-    maxHeight: '200px', 
-    overflowY: 'auto', 
-  };
-
-  const buttonStyle = {
-    marginTop: '20px',
-    padding: '10px 20px',
-    backgroundColor: isButtonDisabled ? '#ccc' : '#1a3042', 
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
-    fontSize: '1rem',
+  const languageExtensions = {
+    javascript: javascript(),
+    python: python(),
+    java: java(),
   };
 
   return (
-    <div style={containerStyle}>
-      <h2 style={headingStyle}>Code</h2>
-      <select style={dropdownStyle} value={language} onChange={handleLanguageChange}>
+    <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', height: '100%', position: 'relative' }}>
+      <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a3042' }}>Code</h2>
+      <select style={{ position: 'absolute', top: '10px', right: '20px', padding: '5px', fontSize: '1rem', fontFamily: 'monospace' }} value={language} onChange={handleLanguageChange}>
         <option value="javascript">JavaScript</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
       </select>
-      <textarea
-        style={textareaStyle}
+      <CodeMirror
         value={code}
+        height="400px"
+        extensions={[languageExtensions[language]]}
         onChange={handleCodeChange}
       />
       <button
-        style={buttonStyle}
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: isButtonDisabled ? '#ccc' : '#1a3042',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
         onClick={handleRunCode}
-        disabled={isButtonDisabled} 
+        disabled={isButtonDisabled}
       >
         Run Code
       </button>
-      <div style={outputStyle}>
+      <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '4px', fontFamily: 'monospace', fontSize: '1rem', whiteSpace: 'pre', border: '1px solid #ddd', maxHeight: '200px', overflowY: 'auto', overflowX: 'auto' }}>
         <h3>Output:</h3>
         <pre>{output}</pre>
       </div>
