@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import withAuth from "../hoc/withAuth"; 
 import AddQuestionButton from "../components/question/AddQuestionButton";
@@ -12,23 +12,19 @@ import "../components/question/DialogForm.css";
 
 const QuestionPage = () => {
   const { accessToken } = useAuth();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const location = useLocation();
   const [questions, setQuestions] = useState([]);
   const [dialogForm, setDialogForm] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isAdmin = location.state?.isAdmin;
   const dialogRef = useRef(null);
-
+  
   const getHeaders = () => {
     return {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${accessToken}`,
     };
   };
-
-  useEffect(() => {
-    const adminStatus = localStorage.getItem("isAdmin");
-    setIsAdmin(adminStatus === "true");
-  }, []);
 
   useEffect(() => {
     const fetchQuestions = async () => {

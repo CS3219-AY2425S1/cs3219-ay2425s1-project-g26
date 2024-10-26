@@ -1,5 +1,6 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { AuthProvider } from './AuthContext';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import QuestionPage from "./pages/QuestionPage";
 import DashboardPage from "./pages/DashboardPage";
 import ForgetPasswordPage from "./pages/ForgetPasswordPage";
@@ -25,21 +26,25 @@ const App = () => {
         minHeight: "100vh",
       }}
     >
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/questions" element={<QuestionPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/forget-password" element={<ForgetPasswordPage />} />
-        <Route path="/new-session" element={<NewSessionPage />} />
-        <Route path="/waiting" element={<WaitingPage />} />
-        <Route path="/manage-profile" element={<ManageProfilePage />} />
-        <Route path="/confirm-token" element={<ConfirmTokenPage />} /> 
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/collaboration" element={<CollaborationPage />} />
-        <Route path="/summary" element={<SummaryPage />} />
-      </Routes>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/questions" element={<QuestionPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forget-password" element={<ForgetPasswordPage />} />
+            <Route path="/new-session" element={<NewSessionPage />} />
+            <Route path="/waiting" element={<WaitingPage />} />
+            <Route path="/manage-profile" element={<ManageProfilePage />} />
+            <Route path="/confirm-token" element={<ConfirmTokenPage />} /> 
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/collaboration" element={<CollaborationPage />} />
+            <Route path="/summary" element={<SummaryPage />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </div>
   );
 };

@@ -4,43 +4,26 @@ import Cookies from 'js-cookie';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(() => {
-    return localStorage.getItem('accessToken') || Cookies.get('accessToken') || null; 
-  });
-  
-  const [userId, setUserId] = useState(() => {
-    return localStorage.getItem('userId') || Cookies.get('userId') || null; 
-  });
+  const [accessToken, setAccessToken] = useState(() => Cookies.get('accessToken') || null);
+  const [userId, setUserId] = useState(() => Cookies.get('userId') || null);
 
   const login = (token, id) => {
     setAccessToken(token);
     setUserId(id);
-    localStorage.setItem('accessToken', token);
-    localStorage.setItem('userId', id);
-    Cookies.set('accessToken', token, { expires: 7 });
-    Cookies.set('userId', id, { expires: 7 });
+    Cookies.set('accessToken', token, { secure: true, sameSite: 'strict' });
+    Cookies.set('userId', id, { secure: true, sameSite: 'strict' });
   };
 
   const logout = () => {
     setAccessToken(null);
     setUserId(null);
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('onlineDate');
     Cookies.remove('accessToken');
     Cookies.remove('userId');
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken') || Cookies.get('accessToken');  
-    const id = localStorage.getItem('userId') || Cookies.get('userId'); 
-
-    if (token) {
-      setAccessToken(token);
-    }
-    if (id) {
-      setUserId(id);
-    }
+    setAccessToken(Cookies.get('accessToken') || null);
+    setUserId(Cookies.get('userId') || null);
   }, []);
 
   return (
@@ -50,6 +33,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
