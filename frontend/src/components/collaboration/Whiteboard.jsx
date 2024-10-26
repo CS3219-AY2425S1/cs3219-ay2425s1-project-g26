@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useSocket } from './SocketContext';
+import { io } from 'socket.io-client';
 
 const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, savedCanvasData, sessionId }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState(null);
-  const socket = useSocket();
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if (socket) {
-      socket.emit('join', sessionId);
-    }
-  }, [sessionId, socket]);
+    const newSocket = io('http://localhost:8084');
+    setSocket(newSocket);
+
+    newSocket.emit('join', sessionId);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [sessionId]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
