@@ -1,8 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 
-const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, savedCanvasData }) => {
+const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, savedCanvasData, sessionId }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState(null);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:8084');
+    setSocket(newSocket);
+
+    newSocket.emit('join', sessionId);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [sessionId]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -16,12 +29,9 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
 
   useEffect(() => {
     if (savedCanvasData && context) {
-      const canvas = canvasRef.current;
       const img = new Image();
       img.src = savedCanvasData;
-      img.onload = () => {
-        context.drawImage(img, 0, 0);
-      };
+      img.onload = () => context.drawImage(img, 0, 0);
     }
   }, [savedCanvasData, context]);
 
@@ -39,30 +49,37 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
 
   const startDrawing = (e) => {
     setIsDrawing(true);
+    const { offsetX, offsetY } = e.nativeEvent;
+    if (socket) {
+      socket.emit('startDrawing', sessionId, offsetX, offsetY, color, lineWidth);
+    }
     draw(e);
   };
 
   const finishDrawing = () => {
     setIsDrawing(false);
     context.beginPath();
+    if (socket) {
+      socket.emit('endDrawing', sessionId);
+    }
   };
 
   const draw = (e) => {
     if (!isDrawing) return;
-
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const { offsetX, offsetY } = e.nativeEvent;
 
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
     context.lineCap = 'round';
 
-    context.lineTo(x, y);
+    context.lineTo(offsetX, offsetY);
     context.stroke();
     context.beginPath();
-    context.moveTo(x, y);
+    context.moveTo(offsetX, offsetY);
+
+    if (socket) {
+      socket.emit('drawing', sessionId, offsetX, offsetY);
+    }
   };
 
   const clearCanvas = () => {
@@ -70,7 +87,46 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (socket) {
+      socket.emit('clearWhiteboard', sessionId);
+    }
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('beginDrawing', ({ startX, startY, color, lineWidth }) => {
+        context.strokeStyle = color;
+        context.lineWidth = lineWidth;
+        context.beginPath();
+        context.moveTo(startX, startY);
+      });
+
+      socket.on('drawingUpdate', ({ x, y }) => {
+        context.lineTo(x, y);
+        context.stroke();
+        context.beginPath();
+        context.moveTo(x, y);
+      });
+
+      socket.on('finishDrawing', () => {
+        context.beginPath();
+      });
+
+      socket.on('clearCanvas', () => {
+        clearCanvas();
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('beginDrawing');
+        socket.off('drawingUpdate');
+        socket.off('finishDrawing');
+        socket.off('clearCanvas');
+      }
+    };
+  }, [socket, context]);
 
   return (
     <div style={{ textAlign: 'left' }}>
