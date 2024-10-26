@@ -19,6 +19,7 @@ const SummaryPage = () => {
   useEffect(() => {
     localStorage.removeItem('isMatched');
     localStorage.removeItem('matchData');
+    localStorage.removeItem('codeState');
 
     const updateMatchedStatus = async () => {
       try {
