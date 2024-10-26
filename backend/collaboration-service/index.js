@@ -8,7 +8,7 @@ const server = http.createServer(app);
 
 // CORS configuration
 const corsOptions = {
-  origin: 'http://localhost:5173', // Your frontend URL
+  origin: 'http://localhost:5173',
   methods: ['GET', 'POST'],
   credentials: true,
 };
@@ -20,28 +20,47 @@ const io = new Server(server, {
 const sessions = {}; // Store active sessions
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log("a user connected");
 
-  socket.on('join', (sessionId) => {
+  socket.on("join", (sessionId) => {
     socket.join(sessionId);
     console.log(`User joined session: ${sessionId}`);
   });
 
-  socket.on('codeChange', (sessionId, code) => {
-    socket.to(sessionId).emit('codeUpdate', code);
+  socket.on("codeChange", (sessionId, code) => {
+    socket.to(sessionId).emit("codeUpdate", code);
   });
 
-  socket.on('languageChange', (sessionId, newLanguage, newCode) => {
-    socket.to(sessionId).emit('languageUpdate', newLanguage, newCode);
+  socket.on("languageChange", (sessionId, newLanguage, newCode) => {
+    socket.to(sessionId).emit("languageUpdate", newLanguage, newCode);
   });
 
-  socket.on('endSession', (sessionId) => {
+  socket.on("endSession", (sessionId) => {
     console.log(`User ended the session in room: ${sessionId}`);
-    socket.to(sessionId).emit('partnerLeft');
+    socket.to(sessionId).emit("partnerLeft");
   });
 
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
+  // whiteboard stuff
+  socket.on("startDrawing", (sessionId, startX, startY, color, lineWidth) => {
+    socket
+      .to(sessionId)
+      .emit("beginDrawing", { startX, startY, color, lineWidth });
+  });
+
+  socket.on("drawing", (sessionId, x, y) => {
+    socket.to(sessionId).emit("drawingUpdate", { x, y });
+  });
+
+  socket.on("endDrawing", (sessionId) => {
+    socket.to(sessionId).emit("finishDrawing");
+  });
+
+  socket.on("clearWhiteboard", (sessionId) => {
+    socket.to(sessionId).emit("clearCanvas");
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
   });
 });
 
