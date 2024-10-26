@@ -76,16 +76,16 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   };
 
   useEffect(() => {
-          const textarea = textareaRef.current;
-          if (textarea) {
-              textarea.style.height = 'auto';
-              textarea.style.height = `${Math.max(textarea.scrollHeight, 60)}px`;
+    const textarea = textareaRef.current;
+    if (textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${Math.max(textarea.scrollHeight, 60)}px`;
 
-              if (inputValue === '') {
-                  textarea.style.height = '60px'; 
-              }
-          }
-      }, [inputValue]);
+        if (inputValue === '') {
+            textarea.style.height = '60px'; 
+        }
+    }
+}, [inputValue]);
 
   return (
     <div className="chat-container">

@@ -15,7 +15,7 @@
     overflow-x: hidden;
     white-space: nowrap;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
 }
 
 .message {
