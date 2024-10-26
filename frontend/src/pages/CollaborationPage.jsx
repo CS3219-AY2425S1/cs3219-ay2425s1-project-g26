@@ -158,7 +158,7 @@ const CollaborationPage = () => {
       <div style={contentContainerStyle}>
         {/* Left Pane with Tabs */}
         <div style={leftPaneStyle}>
-          <Tabs question={matchData.question} />
+          <Tabs question={matchData.question} sessionId={sessionId}/>
         </div>
 
         {/* Right Pane with Code Panel */}

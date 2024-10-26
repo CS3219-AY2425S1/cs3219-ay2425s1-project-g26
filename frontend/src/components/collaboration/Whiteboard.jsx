@@ -37,8 +37,18 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
 
   const setCanvasSize = () => {
     const canvas = canvasRef.current;
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    if (canvas) {
+      const newWidth = canvas.offsetWidth;
+      const newHeight = canvas.offsetHeight;
+
+      canvas.width = newWidth;
+      canvas.height = newHeight;
+
+      if (context) {
+        context.fillStyle = '#fff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
   };
 
   useEffect(() => {
