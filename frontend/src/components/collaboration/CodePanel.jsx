@@ -90,17 +90,22 @@ public class Main {
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) throw new Error('Network response was not ok');
-
       const result = await response.json();
-      setOutput(result.error ? `Error: ${result.error}` : result.output);
 
+      if (!response.ok) { // if http status >= 400
+        setOutput(`Error: ${result.error || 'Unknown error'}\nDetails: ${result.details || 'No additional details'}`);
+        return; 
+      }
+
+      setOutput(result.output);
+      
     } catch (error) {
       setOutput(`Error: ${error.message}`);
+    } finally {
+      setTimeout(() => setIsButtonDisabled(false), 2000);
     }
-
-    setTimeout(() => setIsButtonDisabled(false), 2000);
   };
+
 
   const languageExtensions = {
     javascript: javascript(),
