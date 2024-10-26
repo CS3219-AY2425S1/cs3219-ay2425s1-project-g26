@@ -11,7 +11,7 @@ import ManageProfilePage from "./pages/ManageProfilePage";
 import ConfirmTokenPage from "./pages/ConfirmTokenPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CollaborationPage from "./pages/CollaborationPage"; 
-import SummaryPage from "./pages/SummaryPage"; 
+import SummaryPage from "./pages/SummaryPage";
 import backgroundImage from "./assets/images/darker.jpg"; 
 import "./styles/App.css"; 
 
