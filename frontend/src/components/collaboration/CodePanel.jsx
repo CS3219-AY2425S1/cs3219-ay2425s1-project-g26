@@ -36,6 +36,13 @@ public class Main {
   const socket = useSocket();
 
   useEffect(() => {
+    const codeState = JSON.parse(localStorage.getItem('codeState'));
+    if (codeState) {
+      setCode(codeState);
+    }
+  }, []);
+
+  useEffect(() => {
     if (socket) {
       socket.emit('join', sessionId);
 
@@ -60,6 +67,16 @@ public class Main {
       };
     }
   }, [socket, sessionId]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      localStorage.setItem('codeState', JSON.stringify(code));
+    }, 3000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [code]);
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;

@@ -24,6 +24,15 @@ const WaitingPage = () => {
   const hasRequestedRef = useRef(false); 
 
   useEffect(() => {
+    const isMatched = JSON.parse(localStorage.getItem('isMatched'));
+
+    if (isMatched) {
+      const matchData = JSON.parse(localStorage.getItem('matchData'));
+      navigate('/collaboration', { state: { matchData } });
+    }
+  }, []);
+
+  useEffect(() => {
     if (!userPref || Object.keys(userPref).length === 0) {
       navigate('/new-session');
     } else {
@@ -55,7 +64,8 @@ const WaitingPage = () => {
         if (response.data.matched) {
           setMatchFound(true);
           setMatchData(response.data);
-          
+          updateMatchedStatus(response.data);
+
           clearInterval(intervalId);
           clearTimeout(timeoutId);
           setLoading(false);
@@ -65,6 +75,30 @@ const WaitingPage = () => {
       console.error('Error', error.message);
     } finally {
       setRequestInProgress(false); 
+    }
+  };
+
+  const updateMatchedStatus = async (matchData) => {
+    localStorage.setItem('isMatched', JSON.stringify(true));
+    localStorage.setItem('matchData', JSON.stringify(matchData));
+
+    try {
+      const response = await axios.patch(`http://localhost:8081/users/${userPref.id}/matched`, {
+        isMatched: true,
+        matchData: matchData,
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        console.log('Matched status updated successfully');
+      } else {
+        console.error('Failed to update matched status:', response.data);
+      }
+    } catch (error) {
+      console.error('Error updating matched status:', error);
     }
   };
 

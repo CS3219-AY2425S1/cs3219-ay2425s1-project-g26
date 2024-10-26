@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from "../AuthContext"; 
+import axios from 'axios';
 
 const SummaryPage = () => {
   const navigate = useNavigate();
+  const { accessToken, userId } = useAuth();
   const [hover, setHover] = useState(false); 
 
   const handleNavigateToDashboard = () => {
@@ -12,6 +15,35 @@ const SummaryPage = () => {
   const handleNavigateToCollaboration = () => {
     navigate('/collaboration'); 
   };
+
+  useEffect(() => {
+    localStorage.removeItem('isMatched');
+    localStorage.removeItem('matchData');
+    localStorage.removeItem('codeState');
+
+    const updateMatchedStatus = async () => {
+      try {
+        const response = await axios.patch(`http://localhost:8081/users/${userId}/matched`, {
+          isMatched: false,
+          matchData: {},
+        }, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+  
+        if (response.status === 200) {
+          console.log('Matched status updated successfully');
+        } else {
+          console.error('Failed to update matched status:', response.data);
+        }
+      } catch (error) {
+        console.error('Error updating matched status:', error);
+      }
+    };
+
+    updateMatchedStatus();
+  }, []);
 
   return (
     <div style={styles.container}>
