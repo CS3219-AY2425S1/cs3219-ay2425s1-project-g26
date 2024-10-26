@@ -16,8 +16,8 @@ console.log(example);`,
 
     python: `# Python code
 def main():
-    example = "raesa"
-    print(example)
+  example = "raesa"
+  print(example)
 
 if __name__ == "__main__":
     main()`,
