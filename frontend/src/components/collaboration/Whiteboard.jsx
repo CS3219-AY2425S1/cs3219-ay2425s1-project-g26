@@ -1,19 +1,29 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const Whiteboard = () => {
-  const canvasRef = useRef(null);
+const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, savedCanvasData }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState(null);
-  const [color, setColor] = useState('#000000');
-  const [lineWidth, setLineWidth] = useState(5);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    setContext(ctx);
-  }, []);
+    if (canvas && !context) {
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      setContext(ctx);
+    }
+  }, [canvasRef, context]);
+
+  useEffect(() => {
+    if (savedCanvasData && context) {
+      const canvas = canvasRef.current;
+      const img = new Image();
+      img.src = savedCanvasData;
+      img.onload = () => {
+        context.drawImage(img, 0, 0);
+      };
+    }
+  }, [savedCanvasData, context]);
 
   const setCanvasSize = () => {
     const canvas = canvasRef.current;
@@ -25,7 +35,7 @@ const Whiteboard = () => {
     setCanvasSize();
     window.addEventListener('resize', setCanvasSize);
     return () => window.removeEventListener('resize', setCanvasSize);
-  }, []);
+  }, [canvasRef]);
 
   const startDrawing = (e) => {
     setIsDrawing(true);
@@ -63,7 +73,7 @@ const Whiteboard = () => {
   };
 
   return (
-    <div style={{ textAlign: 'left', padding: '0px' }}>
+    <div style={{ textAlign: 'left' }}>
       <h3>Whiteboard</h3>
       <div style={{ marginBottom: '10px' }}>
         <label htmlFor="colorPicker">Color:</label>
@@ -98,8 +108,6 @@ const Whiteboard = () => {
           cursor: 'pointer',
           transition: 'background-color 0.3s',
         }}
-        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#0056b3')}
-        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#007BFF')}
       >
         Clear
       </button>
