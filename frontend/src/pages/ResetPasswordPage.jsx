@@ -14,19 +14,7 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage(''); // Clear any previous error message
-    setSuccessMessage(''); // Clear any previous success message
     setIsLoading(true);
-
-    // Password validation pattern
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
-
-    // Validate password
-    if (!passwordPattern.test(password)) {
-      setErrorMessage('Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
-      setIsLoading(false);
-      return;
-    }
 
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Calendar.css"; 
 
 const Calendar = ({
@@ -6,14 +6,14 @@ const Calendar = ({
   currentYear,
   setCurrentMonth,
   setCurrentYear,
-  onlineDate,
 }) => {
   const [activeDays, setActiveDays] = useState(new Set());
 
   useEffect(() => {
-    const activeDaysArray = onlineDate || [];
-    setActiveDays(new Set(activeDaysArray));
-  }, [onlineDate, currentMonth, currentYear]);
+    const storedDays = localStorage.getItem("onlineDate");
+    const activeDaysArray = storedDays ? storedDays.split(",") : []; 
+    setActiveDays(new Set(activeDaysArray)); 
+  }, [currentMonth, currentYear]);
 
   const formatDate = (year, month, day) => {
     const paddedMonth = String(month + 1).padStart(2, "0");

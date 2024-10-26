@@ -29,9 +29,7 @@ const SessionBox = ({ headerText, sessionText, buttonText, buttonLink }) => {
         {sessionText}
       </p>
       <button
-        onClick={() => 
-          navigate(buttonLink.pathname, buttonLink.state ? { state: buttonLink.state } : {})
-        }
+        onClick={() => navigate(buttonLink)}
         onMouseEnter={() => setIsHovered(true)} 
         onMouseLeave={() => setIsHovered(false)} 
         style={{

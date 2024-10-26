@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import { useSocket } from './SocketContext';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { Toaster, toast } from 'sonner';
-
-const socket = io('http://localhost:8084');
 
 const CodePanel = ({ sessionId }) => {
   const defaultCodes = {
@@ -16,8 +14,8 @@ console.log(example);`,
 
     python: `# Python code
 def main():
-  example = "raesa"
-  print(example)
+    example = "raesa"
+    print(example)
 
 if __name__ == "__main__":
     main()`,
@@ -35,30 +33,33 @@ public class Main {
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const socket = useSocket();
 
   useEffect(() => {
-    socket.emit('join', sessionId);
+    if (socket) {
+      socket.emit('join', sessionId);
 
-    socket.on('codeUpdate', (newCode) => {
-      setCode(newCode);
-    });
+      socket.on('codeUpdate', (newCode) => {
+        setCode(newCode);
+      });
 
-    socket.on('languageUpdate', (newLanguage, newCode) => {
-      setLanguage(newLanguage);
-      setCode(newCode);
-      setOutput('');
-    });
+      socket.on('languageUpdate', (newLanguage, newCode) => {
+        setLanguage(newLanguage);
+        setCode(newCode);
+        setOutput('');
+      });
 
-    socket.on('partnerLeft', () => {
-      toast.info('Your partner has ended the session.');
-    });
+      socket.on('partnerLeft', () => {
+        toast.info('Your partner has ended the session.');
+      });
 
-    return () => {
-      socket.off('codeUpdate');
-      socket.off('languageUpdate');
-      socket.off('partnerLeft');
-    };
-  }, [sessionId]);
+      return () => {
+        socket.off('codeUpdate');
+        socket.off('languageUpdate');
+        socket.off('partnerLeft');
+      };
+    }
+  }, [socket, sessionId]);
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
@@ -120,9 +121,9 @@ public class Main {
     <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', height: '100%', position: 'relative' }}>
       <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a3042' }}>Code</h2>
       <select style={{ position: 'absolute', top: '10px', right: '20px', padding: '5px', fontSize: '1rem', fontFamily: 'monospace' }} value={language} onChange={handleLanguageChange}>
+        <option value="javascript">JavaScript</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
-        <option value="javascript">JavaScript</option>
       </select>
       <CodeMirror
         value={code}

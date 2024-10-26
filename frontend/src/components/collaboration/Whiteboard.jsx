@@ -1,21 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import { useSocket } from './SocketContext';
 
 const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, savedCanvasData, sessionId }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const socket = useSocket();
 
   useEffect(() => {
-    const newSocket = io('http://localhost:8084');
-    setSocket(newSocket);
-
-    newSocket.emit('join', sessionId);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [sessionId]);
+    if (socket) {
+      socket.emit('join', sessionId);
+    }
+  }, [sessionId, socket]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -41,14 +36,12 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
       const newWidth = canvas.offsetWidth;
       const newHeight = canvas.offsetHeight;
 
-      if (canvas.width !== newWidth || canvas.height !== newHeight) {
-        canvas.width = newWidth;
-        canvas.height = newHeight;
+      canvas.width = newWidth;
+      canvas.height = newHeight;
 
-        if (context) {
-          context.fillStyle = '#fff';
-          context.fillRect(0, 0, canvas.width, canvas.height);
-        }
+      if (context) {
+        context.fillStyle = '#fff';
+        context.fillRect(0, 0, canvas.width, canvas.height);
       }
     }
   };
@@ -94,6 +87,18 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
     }
   };
 
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    setIsDrawing(false);
+    if (socket) {
+      socket.emit('clearWhiteboard', sessionId);
+    }
+  };
+
   useEffect(() => {
     if (socket && context) {
       socket.on('beginDrawing', ({ startX, startY, color, lineWidth }) => {
@@ -115,9 +120,7 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
       });
 
       socket.on('clearCanvas', () => {
-        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        context.fillStyle = '#fff';
-        context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        clearCanvas();
       });
     }
 
@@ -156,6 +159,20 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
           style={{ marginLeft: '10px', width: '60px' }}
         />
       </div>
+      <button
+        onClick={clearCanvas}
+        style={{
+          padding: '10px 15px',
+          backgroundColor: '#007BFF',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          transition: 'background-color 0.3s',
+        }}
+      >
+        Clear
+      </button>
       <div style={{ marginTop: '20px', marginBottom: '10px' }}>
         <canvas
           ref={canvasRef}

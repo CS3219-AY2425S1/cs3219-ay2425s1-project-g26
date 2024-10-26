@@ -16,9 +16,9 @@ const DashboardPage = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [username, setUsername] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [onlineDate, setOnlineDate] = useState(null);
   const hasActiveSession = false;
+
+  const isAdmin = localStorage.getItem("isAdmin") === "true";
 
   const handleLogout = () => {
     logout();
@@ -57,8 +57,6 @@ const DashboardPage = () => {
 
         const data = await response.json();
         setUsername(data.data.username);
-        setIsAdmin(data.data.isAdmin);
-        setOnlineDate(data.data.onlineDate);
       } catch (error) {
         console.error(error);
       }
@@ -104,10 +102,7 @@ const DashboardPage = () => {
               : "No active session. Ready for more?"
           }
           buttonText={hasActiveSession ? "Rejoin Session" : "New Question"}
-          buttonLink={{
-            pathname: hasActiveSession ? "/rejoin" : "/new-session",
-            // can add state here
-          }}
+          buttonLink={hasActiveSession ? "/rejoin" : "/new-session"}
         />
 
         <SessionBox
@@ -118,12 +113,8 @@ const DashboardPage = () => {
               : "Navigate to the question page to view questions."
           }
           buttonText={isAdmin ? "Manage Questions" : "View Questions"}
-          buttonLink={{
-            pathname: "/questions",
-            state: { isAdmin },
-          }}
+          buttonLink="/questions"
         />
-
       </div>
 
       <div style={{ marginLeft: "20px", marginTop: "63px" }}>
@@ -132,7 +123,6 @@ const DashboardPage = () => {
           currentYear={currentYear}
           setCurrentMonth={setCurrentMonth}
           setCurrentYear={setCurrentYear}
-          onlineDate={onlineDate}
         />
 
         {/* Random Challenge Section */}
