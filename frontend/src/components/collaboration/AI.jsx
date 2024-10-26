@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './styles/AI.css'; 
 
 const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   const [loading, setLoading] = useState(false); 
+  const textareaRef = useRef(null);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -59,6 +60,28 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
     ));
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        setInputValue((prev) => prev + '\n');
+        e.preventDefault();
+      } else {
+        handleSendMessage(e);
+      }
+    }
+  };
+
+  const handleInput = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [inputValue]);
+
   return (
     <div className="chat-container">
       <h3>Chat with Raesa</h3>
@@ -71,14 +94,14 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         {loading && <div className="loading">Loading...</div>}
       </div>
       <form onSubmit={handleSendMessage} className="message-form">
-        <input
-          type="text"
+        <textarea
+          ref={textareaRef} 
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={handleInput}
           placeholder="Type your message here..."
           className="message-input"
-          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e)}
-          disabled={loading} 
+          onKeyDown={handleKeyDown} 
+          disabled={loading}
         />
         <button 
           type="submit" 

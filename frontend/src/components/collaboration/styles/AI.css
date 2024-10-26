@@ -3,16 +3,19 @@
     margin: auto;
     border-radius: 8px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
 }
 
 .chat-window {
     padding: 10px;
-    height: 530px;
+    flex: 1;
     overflow-y: auto;
-    overflow-x: auto;
+    overflow-x: hidden;
     white-space: nowrap;
     display: flex;
-    flex-direction: column;
+    flex-direction: column-reverse;
 }
 
 .message {
@@ -51,6 +54,11 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     outline: none;
+    resize: none;
+    min-height: 40px;
+    max-height: 200px;
+    overflow: auto;
+    transition: height 0.2s;
 }
 
 .message-input:focus {
