@@ -16,7 +16,8 @@ const DashboardPage = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [username, setUsername] = useState('');
-  const hasActiveSession = false;
+  const [hasActiveSession, setHasActiveSession] = useState(false);
+  const [matchedUsername, setMatchedUsername] = useState();
 
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
@@ -57,6 +58,10 @@ const DashboardPage = () => {
 
         const data = await response.json();
         setUsername(data.data.username);
+        setHasActiveSession(data.data.isMatched);
+        setMatchedUsername(data.data.matchData.matchedUserName);
+        localStorage.setItem('isMatched', data.data.isMatched);
+        localStorage.setItem('matchData', JSON.stringify(data.data.matchData));
       } catch (error) {
         console.error(error);
       }
@@ -98,11 +103,11 @@ const DashboardPage = () => {
           headerText="Current Active Session"
           sessionText={
             hasActiveSession
-              ? "Current active session with ____"
+              ? `Current active session with @${matchedUsername}`
               : "No active session. Ready for more?"
           }
           buttonText={hasActiveSession ? "Rejoin Session" : "New Question"}
-          buttonLink={hasActiveSession ? "/rejoin" : "/new-session"}
+          buttonLink="/new-session"
         />
 
         <SessionBox
