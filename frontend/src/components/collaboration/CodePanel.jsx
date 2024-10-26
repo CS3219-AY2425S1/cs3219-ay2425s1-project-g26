@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import { useSocket } from './SocketContext';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
-import { Toaster, toast } from 'sonner'
-
-const socket = io('http://localhost:8084');
+import { Toaster, toast } from 'sonner';
 
 const CodePanel = ({ sessionId }) => {
   const defaultCodes = {
@@ -35,30 +33,33 @@ public class Main {
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const socket = useSocket();
 
   useEffect(() => {
-    socket.emit('join', sessionId);
+    if (socket) {
+      socket.emit('join', sessionId);
 
-    socket.on('codeUpdate', (newCode) => {
-      setCode(newCode);
-    });
+      socket.on('codeUpdate', (newCode) => {
+        setCode(newCode);
+      });
 
-    socket.on('languageUpdate', (newLanguage, newCode) => {
-      setLanguage(newLanguage);
-      setCode(newCode);
-      setOutput('');
-    });
+      socket.on('languageUpdate', (newLanguage, newCode) => {
+        setLanguage(newLanguage);
+        setCode(newCode);
+        setOutput('');
+      });
 
-    socket.on('partnerLeft', () => {
-      toast.info('Your partner has ended the session.');
-    });
+      socket.on('partnerLeft', () => {
+        toast.info('Your partner has ended the session.');
+      });
 
-    return () => {
-      socket.off('codeUpdate');
-      socket.off('languageUpdate');
-      socket.off('partnerLeft');
-    };
-  }, [sessionId]);
+      return () => {
+        socket.off('codeUpdate');
+        socket.off('languageUpdate');
+        socket.off('partnerLeft');
+      };
+    }
+  }, [socket, sessionId]);
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
@@ -66,12 +67,16 @@ public class Main {
     setLanguage(selectedLanguage);
     setCode(newCode);
     setOutput('');
-    socket.emit('languageChange', sessionId, selectedLanguage, newCode);
+    if (socket) {
+      socket.emit('languageChange', sessionId, selectedLanguage, newCode);
+    }
   };
 
   const handleCodeChange = (value) => {
     setCode(value);
-    socket.emit('codeChange', sessionId, value);
+    if (socket) {
+      socket.emit('codeChange', sessionId, value);
+    }
   };
 
   const handleRunCode = async () => {
@@ -105,7 +110,6 @@ public class Main {
       setTimeout(() => setIsButtonDisabled(false), 2000);
     }
   };
-
 
   const languageExtensions = {
     javascript: javascript(),
