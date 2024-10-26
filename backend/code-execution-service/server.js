@@ -23,7 +23,9 @@ const runPython = (code) => {
       (error, stdout, stderr) => {
         fs.unlinkSync(filePath); // Clean up
         if (error || stderr) {
-          return reject(stderr || error.message || "Unknown error");
+          const errorMessage = stderr || error.message || "Unknown error";
+          console.error("Python Error:", errorMessage); 
+          return reject({ message: "Python Error", error: errorMessage });
         }
         resolve(stdout);
       }
@@ -44,11 +46,13 @@ const runJava = (code) => {
       (compileError, compileStdout, compileStderr) => {
         if (compileError || compileStderr) {
           fs.unlinkSync(filePath); // Clean up
-          return reject(
-            `Compilation Error: ${
-              compileStderr || compileError.message || "Unknown error"
-            }`
-          );
+          const errorMessage =
+            compileStderr || compileError.message || "Unknown error";
+          console.error("Java Compilation Error:", errorMessage); 
+          return reject({
+            message: "Java Compilation Error",
+            error: errorMessage,
+          });
         }
 
         // Execute the Java program
@@ -60,11 +64,13 @@ const runJava = (code) => {
             fs.unlinkSync(path.join(__dirname, "Main.class")); // Clean up
 
             if (runError || stderr) {
-              return reject(
-                `Runtime Error: ${
-                  stderr || runError.message || "Unknown error"
-                }`
-              );
+              const errorMessage =
+                stderr || runError.message || "Unknown error";
+              console.error("Java Runtime Error:", errorMessage); 
+              return reject({
+                message: "Java Runtime Error",
+                error: errorMessage,
+              });
             }
             resolve(stdout);
           }
@@ -86,7 +92,9 @@ const runJavaScript = (code) => {
       (error, stdout, stderr) => {
         fs.unlinkSync(filePath); // Clean up
         if (error || stderr) {
-          return reject(stderr || error.message || "Unknown error");
+          const errorMessage = stderr || error.message || "Unknown error";
+          console.error("JavaScript Error:", errorMessage); 
+          return reject({ message: "JavaScript Error", error: errorMessage });
         }
         resolve(stdout);
       }
@@ -116,8 +124,11 @@ app.post("/run-code", async (req, res) => {
 
     return res.status(200).json({ output });
   } catch (error) {
-    console.error("Error running code:", error);
-    return res.status(500).json({ error: error });
+    console.error("Error running code:", error.error); 
+    return res.status(500).json({
+      error: error.message,
+      details: error.error,
+    });
   }
 });
 
