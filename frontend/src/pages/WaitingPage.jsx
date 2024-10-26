@@ -55,7 +55,8 @@ const WaitingPage = () => {
         if (response.data.matched) {
           setMatchFound(true);
           setMatchData(response.data);
-          
+          updateMatchedStatus(response.data);
+
           clearInterval(intervalId);
           clearTimeout(timeoutId);
           setLoading(false);
@@ -65,6 +66,27 @@ const WaitingPage = () => {
       console.error('Error', error.message);
     } finally {
       setRequestInProgress(false); 
+    }
+  };
+
+  const updateMatchedStatus = async (matchData) => {
+    try {
+      const response = await axios.patch(`http://localhost:8081/users/${userPref.id}/matched`, {
+        isMatched: true,
+        matchData: matchData,
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        console.log('Matched status updated successfully');
+      } else {
+        console.error('Failed to update matched status:', response.data);
+      }
+    } catch (error) {
+      console.error('Error updating matched status:', error);
     }
   };
 
