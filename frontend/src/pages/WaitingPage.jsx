@@ -22,14 +22,17 @@ const WaitingPage = () => {
   
   let intervalId, timeoutId;
   const hasRequestedRef = useRef(false); 
-  const isMatched = localStorage.getItem('isMatched');
 
   useEffect(() => {
+    const isMatched = JSON.parse(localStorage.getItem('isMatched'));
+
     if (isMatched) {
       const matchData = JSON.parse(localStorage.getItem('matchData'));
       navigate('/collaboration', { state: { matchData } });
     }
+  }, []);
 
+  useEffect(() => {
     if (!userPref || Object.keys(userPref).length === 0) {
       navigate('/new-session');
     } else {

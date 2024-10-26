@@ -12,7 +12,6 @@ const NewSessionPage = () => {
   const [topicsArray, setTopicsArray] = useState([]);
   const [targetTopicsArray, setTargetTopicsArray] = useState([]);
   const [selectedTopics, setSelectedTopics] = useState('');
-  const isMatched = localStorage.getItem('isMatched');
 
   const getHeaders = () => {
     return {
@@ -22,11 +21,15 @@ const NewSessionPage = () => {
   };
 
   useEffect(() => {
+    const isMatched = JSON.parse(localStorage.getItem('isMatched'));
+
     if (isMatched) {
       const matchData = JSON.parse(localStorage.getItem('matchData'));
       navigate('/collaboration', { state: { matchData } });
     }
+  }, []);
 
+  useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await fetch("http://localhost:8080/questions", {

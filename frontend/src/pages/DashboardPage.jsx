@@ -60,7 +60,7 @@ const DashboardPage = () => {
         setUsername(data.data.username);
         setHasActiveSession(data.data.isMatched);
         setMatchedUsername(data.data.matchData.matchedUserName);
-        localStorage.setItem('isMatched', data.data.isMatched);
+        localStorage.setItem('isMatched', JSON.stringify(data.data.isMatched));
         localStorage.setItem('matchData', JSON.stringify(data.data.matchData));
       } catch (error) {
         console.error(error);
