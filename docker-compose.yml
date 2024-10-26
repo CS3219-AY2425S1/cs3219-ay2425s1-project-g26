@@ -3,29 +3,25 @@
 services:
   frontend:
     build:
-      context: ./frontend
+      context: ./frontend 
     ports:
-      - "5173:5173"
+      - "5173:5173" 
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    command: npm run dev -- --host
+      - ./frontend:/app 
+      - /app/node_modules 
+    command: npm run dev -- --host 
 
   question-service:
     build:
       context: ./backend/question-service
     ports:
       - "8080:8080"
-    env_file:
-      - ./.env 
 
   user-service:
     build:
       context: ./backend/user-service
     ports:
       - "8081:8081"
-    env_file:
-      - ./.env
 
   matching-service:
     build:
@@ -34,15 +30,13 @@ services:
       - "8082:8082"
     depends_on:
       - rabbitmq
-    env_file:
-      - ./.env
 
   ai-service:
     image: "yongshikang/cs3219-ay2425s1-project-g26-ai-service:1.4"
+    # build:
+    #   context: ./backend/ai-service
     ports:
       - "9680:9680"
-    env_file:
-      - ./.env
 
   rabbitmq:
     image: "rabbitmq:3-management"
@@ -50,23 +44,90 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-    env_file:
-      - ./.env
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
   code-execution-service:
     build:
       context: ./backend/code-execution-service
     ports:
       - "8083:8083"
-    env_file:
-      - ./.env
 
   collaboration-service:
     build:
       context: ./backend/collaboration-service
     ports:
       - "8084:8084"
-    env_file:
-      - ./.env
+
+# if using 1 env file in root folder (env.example is in google docs)
+
+# services:
+#   frontend:
+#     build:
+#       context: ./frontend
+#     ports:
+#       - "5173:5173"
+#     volumes:
+#       - ./frontend:/app
+#       - /app/node_modules
+#     command: npm run dev -- --host
+
+#   question-service:
+#     build:
+#       context: ./backend/question-service
+#     ports:
+#       - "8080:8080"
+#     env_file:
+#       - ./.env 
+
+#   user-service:
+#     build:
+#       context: ./backend/user-service
+#     ports:
+#       - "8081:8081"
+#     env_file:
+#       - ./.env
+
+#   matching-service:
+#     build:
+#       context: ./backend/matching-service
+#     ports:
+#       - "8082:8082"
+#     depends_on:
+#       - rabbitmq
+#     env_file:
+#       - ./.env
+
+#   ai-service:
+#     image: "yongshikang/cs3219-ay2425s1-project-g26-ai-service:1.4"
+#     ports:
+#       - "9680:9680"
+#     env_file:
+#       - ./.env
+
+#   rabbitmq:
+#     image: "rabbitmq:3-management"
+#     ports:
+#       - "5672:5672"
+#       - "15672:15672"
+#     environment:
+#       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+#       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+#     env_file:
+#       - ./.env
+
+#   code-execution-service:
+#     build:
+#       context: ./backend/code-execution-service
+#     ports:
+#       - "8083:8083"
+#     env_file:
+#       - ./.env
+
+#   collaboration-service:
+#     build:
+#       context: ./backend/collaboration-service
+#     ports:
+#       - "8084:8084"
+#     env_file:
+#       - ./.env
