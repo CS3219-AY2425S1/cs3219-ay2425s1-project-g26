@@ -79,6 +79,9 @@ const WaitingPage = () => {
   };
 
   const updateMatchedStatus = async (matchData) => {
+    localStorage.setItem('isMatched', JSON.stringify(true));
+    localStorage.setItem('matchData', JSON.stringify(matchData));
+
     try {
       const response = await axios.patch(`http://localhost:8081/users/${userPref.id}/matched`, {
         isMatched: true,
