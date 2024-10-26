@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Question from './Question';
 import Chat from './Chat'; 
 import AI from './AI';  
+import Whiteboard from './Whiteboard';
 
 const Tabs = ({ question }) => {
   const [selectedTab, setSelectedTab] = useState('Question');
@@ -54,6 +55,8 @@ const Tabs = ({ question }) => {
             setInputValue={setAiInputValue}
           />
         );
+      case 'Whiteboard': 
+        return <Whiteboard />;
       default:
         return null;
     }
@@ -80,6 +83,12 @@ const Tabs = ({ question }) => {
           onClick={() => setSelectedTab('AI')}
         >
           AI
+        </div>
+        <div
+          style={selectedTab === 'Whiteboard' ? activeTabStyle : tabStyle}
+          onClick={() => setSelectedTab('Whiteboard')}  
+        >
+          Whiteboard
         </div>
       </div>
 
