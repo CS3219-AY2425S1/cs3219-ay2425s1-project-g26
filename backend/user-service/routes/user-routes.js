@@ -15,6 +15,7 @@ import {
   resetPassword,
   getPublicProfile,
   updateUserMatchedStatus,
+  verifyPassword,
 } from "../controller/user-controller.js";
 import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
 
@@ -55,6 +56,8 @@ router.post("/forgot-password", sendPasswordResetEmail);
 router.post("/confirm-token", confirmToken);
 
 router.post("/reset-password", resetPassword);
+
+router.post("/verify-password", verifyPassword);
 
 
 export default router;

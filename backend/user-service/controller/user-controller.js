@@ -23,6 +23,30 @@ import {
   updateQuestionDoneById as _updateQuestionDoneById,
 } from "../model/repository.js";
 
+export const verifyPassword = async (req, res) => {
+  const { userId, currentPassword } = req.body;
+
+  try {
+    const user = await _findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ message: "Current password is incorrect." });
+    }
+
+    return res.status(200).json({ message: "Current password is correct." });
+  } catch (error) {
+    console.error("Error verifying password:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
 export const sendPasswordResetEmail = async (req, res) => {
   body("email").isEmail().withMessage("Please provide a valid email address");
 

@@ -21,6 +21,7 @@ const ManageProfilePage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+  // Fetch user data on mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -53,18 +54,13 @@ const ManageProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedUser = {};
+    const updatedUser = { username, email, password: newPassword };
 
-    if (username) updatedUser.username = username;
-    if (email) updatedUser.email = email;
-    if (newPassword) updatedUser.password = newPassword;
+    if (newPassword && newPassword !== confirmPassword) {
+      return setError("New password and confirmation do not match.");
+    }
 
     try {
-      // Validate password confirmation
-      if (newPassword !== confirmPassword) {
-        throw new Error("New password and confirmation do not match.");
-      }
-
       const response = await fetch(`http://localhost:8081/users/${userId}`, {
         method: 'PATCH', 
         headers: {
@@ -102,7 +98,6 @@ const ManageProfilePage = () => {
       }
 
       alert("Account deleted successfully!");
-
       logout();
       localStorage.clear();
       sessionStorage.clear();
@@ -159,12 +154,10 @@ const ManageProfilePage = () => {
           />
         </div>
 
-        {/* Change Password Header */}
         <div className="form-group">
           <h3 className="sub-title">Change Password</h3>
         </div>
 
-        {/* Current Password Field */}
         <div className="form-group">
           <label htmlFor="currentPassword" className="label">Current Password</label>
           <div style={{ position: "relative" }}>
@@ -182,7 +175,6 @@ const ManageProfilePage = () => {
           </div>
         </div>
 
-        {/* New Password Field */}
         <div className="form-group">
           <label htmlFor="newPassword" className="label">New Password</label>
           <div style={{ position: "relative" }}>
@@ -200,7 +192,6 @@ const ManageProfilePage = () => {
           </div>
         </div>
 
-        {/* Confirm Password Field */}
         <div className="form-group">
           <label htmlFor="confirmPassword" className="label">Confirm Password</label>
           <div style={{ position: "relative" }}>
