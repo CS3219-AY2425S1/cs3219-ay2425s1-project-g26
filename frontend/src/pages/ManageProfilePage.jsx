@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext"; 
 import { useNavigate } from "react-router-dom"; 
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
-import './styles/manageprofile.css'; 
+import './styles/manageprofilepage.css'; 
 
 const ManageProfilePage = () => {
   const { userId, accessToken, logout } = useAuth();
@@ -157,6 +157,11 @@ const ManageProfilePage = () => {
             placeholder="Leave blank to keep current email"
             className="input"
           />
+        </div>
+
+        {/* Change Password Header */}
+        <div className="form-group">
+          <h3 className="sub-title">Change Password</h3>
         </div>
 
         {/* Current Password Field */}
