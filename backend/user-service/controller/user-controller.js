@@ -24,13 +24,20 @@ import {
 } from "../model/repository.js";
 
 export const verifyPassword = async (req, res) => {
-  console.log("Verify password endpoint hit"); 
+  console.log("Verify password endpoint hit");
   const { userId, currentPassword } = req.body;
+
+  if (!userId || !currentPassword) {
+    return res
+      .status(400)
+      .json({ message: "User ID and password are required." });
+  }
 
   try {
     const user = await _findUserById(userId);
 
     if (!user) {
+      console.log("User not found");
       return res.status(404).json({ message: "User not found." });
     }
 

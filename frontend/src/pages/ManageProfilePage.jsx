@@ -61,7 +61,7 @@ const ManageProfilePage = () => {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ password: currentPassword })
+        body: JSON.stringify({ userId, currentPassword })
       });
 
       if (!response.ok) {
@@ -74,6 +74,7 @@ const ManageProfilePage = () => {
       return false; 
     }
   };
+
 
   const handleSaveChanges = async (e) => {
     e.preventDefault();
