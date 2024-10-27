@@ -1,10 +1,12 @@
 .form-container {
-    max-width: 400px;
     width: 100%;
-    max-height: 500px;
+    height: 100%;
     overflow-y: auto;
     margin: 0 auto;
-    padding: 20px;
+    margin-top: 100px;
+    margin-left: 450px;
+    margin-right: 450px;
+    padding: 40px;
     border-radius: 10px;
 }
 
@@ -17,6 +19,7 @@
     color: white;
     position: relative;
 }
+
 .button-back {
     position: absolute;
     top: 30px;
@@ -34,12 +37,6 @@
 
 .button-back:hover {
     background-color: #f0f0f0;
-}
-
-.form-container {
-    max-width: 400px;
-    width: 100%;
-    margin: 0 auto;
 }
 
 .title {

@@ -217,14 +217,15 @@ const ManageProfilePage = () => {
           className="button-submit"
           onMouseEnter={() => setIsHoveredSave(true)}
           onMouseLeave={() => setIsHoveredSave(false)}
-          style={{ marginBottom: '50px' }}
+          style={{ marginBottom: '150px' }}
         >
           Save Changes
         </button>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <h3 className="sub-title">Change Password</h3>
-        </div>
+        </div> */}
+        <div className="title"> Change Password</div>
 
         <div className="form-group">
           <label htmlFor="currentPassword" className="label">Current Password</label>
