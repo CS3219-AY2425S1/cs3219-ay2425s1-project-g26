@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import withAuth from "../hoc/withAuth";
+import io from 'socket.io-client';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
-import { SocketProvider } from '../components/collaboration/SocketContext';
+
+const socket = io('http://localhost:8084');
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
@@ -59,6 +61,8 @@ const CollaborationPage = () => {
   };
 
   const handleConfirmEndSession = () => {
+    socket.emit('endSession', sessionId);
+    localStorage.removeItem('startTime');
     navigate('/summary'); 
   };
 
@@ -126,44 +130,42 @@ const CollaborationPage = () => {
   };
 
   return (
-    <SocketProvider sessionId={sessionId}> 
-      <div style={containerStyle}>
-        <div style={timerStyle}>Time Elapsed: {formatTime(secondsElapsed)}</div>
-        <button
-          onClick={handleEndSession}
-          style={buttonStyle}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#1a3042';
-            e.target.style.color = '#fff';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#fff';
-            e.target.style.color = '#1a3042';
-          }}
-        >
-          End Session
-        </button>
+    <div style={containerStyle}>
+      <div style={timerStyle}>Time Elapsed: {formatTime(secondsElapsed)}</div>
+      <button
+        onClick={handleEndSession}
+        style={buttonStyle}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = '#1a3042';
+          e.target.style.color = '#fff';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = '#fff';
+          e.target.style.color = '#1a3042';
+        }}
+      >
+        End Session
+      </button>
 
-        {/* Confirmation Modal */}
-        <ConfirmationModal
-          show={showModal}
-          onConfirm={handleConfirmEndSession}
-          onCancel={handleCancelEndSession}
-        />
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        show={showModal}
+        onConfirm={handleConfirmEndSession}
+        onCancel={handleCancelEndSession}
+      />
 
-        {/* Main Content Section */}
-        <div style={contentContainerStyle}>
-          {/* Left Pane with Tabs */}
-          <div style={leftPaneStyle}>
-            <Tabs question={matchData.question} sessionId={sessionId} />
-          </div>
-          {/* Right Pane with Code Panel */}
-          <div style={rightPaneStyle}>
-            <CodePanel sessionId={sessionId} />
-          </div>
+      {/* Main Content Section */}
+      <div style={contentContainerStyle}>
+        {/* Left Pane with Tabs */}
+        <div style={leftPaneStyle}>
+          <Tabs question={matchData.question} sessionId={sessionId} />
+        </div>
+        {/* Right Pane with Code Panel */}
+        <div style={rightPaneStyle}>
+          <CodePanel sessionId={sessionId} />
         </div>
       </div>
-    </SocketProvider>
+    </div>
   );
 };
 

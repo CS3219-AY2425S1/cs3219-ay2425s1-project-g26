@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useSocket } from './SocketContext';
+import io from 'socket.io-client';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { Toaster, toast } from 'sonner';
+
+const socket = io('http://localhost:8084');
+
 
 const CodePanel = ({ sessionId }) => {
   const defaultCodes = {
@@ -33,7 +36,6 @@ public class Main {
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const socket = useSocket();
 
   useEffect(() => {
     const codeState = JSON.parse(localStorage.getItem('codeState'));
@@ -43,30 +45,28 @@ public class Main {
   }, []);
 
   useEffect(() => {
-    if (socket) {
-      socket.emit('join', sessionId);
+    socket.emit('join', sessionId);
 
-      socket.on('codeUpdate', (newCode) => {
-        setCode(newCode);
-      });
+    socket.on('codeUpdate', (newCode) => {
+      setCode(newCode);
+    });
 
-      socket.on('languageUpdate', (newLanguage, newCode) => {
-        setLanguage(newLanguage);
-        setCode(newCode);
-        setOutput('');
-      });
+    socket.on('languageUpdate', (newLanguage, newCode) => {
+      setLanguage(newLanguage);
+      setCode(newCode);
+      setOutput('');
+    });
 
-      socket.on('partnerLeft', () => {
-        toast.info('Your partner has ended the session.');
-      });
+    socket.on('partnerLeft', () => {
+      toast.info('Your partner has ended the session.');
+    });
 
-      return () => {
-        socket.off('codeUpdate');
-        socket.off('languageUpdate');
-        socket.off('partnerLeft');
-      };
-    }
-  }, [socket, sessionId]);
+    return () => {
+      socket.off('codeUpdate');
+      socket.off('languageUpdate');
+      socket.off('partnerLeft');
+    };
+  }, [sessionId]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
