@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext"; 
 import { useNavigate } from "react-router-dom"; 
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import './styles/manageprofile.css'; 
 
 const ManageProfilePage = () => {
   const { userId, accessToken, logout } = useAuth();
@@ -119,276 +120,113 @@ const ManageProfilePage = () => {
   if (error) return <p style={{ color: "white", textAlign: "center" }}>{error}</p>;
 
   return (
-    <div style={{ 
-      display: "flex", 
-      justifyContent: "center", 
-      alignItems: "center", 
-      height: "100vh", 
-      textAlign: "center", 
-      color: "white",
-      position: "relative" 
-    }}>
+    <div className="container">
       <button
+        className="button-back"
         onClick={handleBack}
         onMouseEnter={() => setIsHoveredBack(true)} 
         onMouseLeave={() => setIsHoveredBack(false)} 
-        style={{
-          position: "absolute", 
-          top: "30px", 
-          left: "30px", 
-          padding: "15px 30px",
-          backgroundColor: isHoveredBack ? '#f0f0f0' : 'white', 
-          color: isHoveredBack ? 'black' : 'black',
-          border: "none",
-          borderRadius: "15px",
-          cursor: "pointer",
-          fontSize: '16px',
-          fontFamily: 'Figtree',
-          transition: "background-color 0.3s",
-        }}
       >
         Back
       </button>
 
-      <form onSubmit={handleSubmit} style={{ maxWidth: "400px", width: "100%", margin: "0 auto" }}>
-        <div style={{ marginBottom: "20px" }}>
-          <div style={{ 
-            fontSize: "24px", 
-            fontWeight: "600", 
-            marginBottom: "20px" 
-          }}>
-            Manage Profile
-          </div>
+      <form onSubmit={handleSubmit} className="form-container">
+        <div className="title">Manage Profile</div>
+
+        <div className="form-group">
+          <label htmlFor="username" className="label">Username</label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="off"
+            placeholder="Leave blank to keep current username"
+            className="input"
+          />
         </div>
 
-        <div style={{ marginBottom: "20px", textAlign: "left" }}>
-          <label htmlFor="username" style={{ fontSize: "16px", fontWeight: "500", color: "#e0e0e0" }}>Username</label>
-          <div>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="off"
-              placeholder="Leave blank to keep current username"
-              style={{
-                border: "none",
-                borderBottom: "2px solid #e0e0e0",
-                outline: "none",
-                backgroundColor: "transparent",
-                color: "white",
-                fontSize: "18px",
-                fontFamily: 'Figtree', // Ensure Figtree font
-                marginTop: "5px",
-                width: "100%",
-                padding: "5px 0",
-                transition: "border-color 0.3s",
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#f0f0f0"}
-              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
-            />
-          </div>
-        </div>
-
-        <div style={{ marginBottom: "20px", textAlign: "left" }}>
-          <label htmlFor="email" style={{ fontSize: "16px", fontWeight: "500", color: "#e0e0e0" }}>Email</label>
-          <div>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="off" 
-              placeholder="Leave blank to keep current email"
-              style={{
-                border: "none",
-                borderBottom: "2px solid #e0e0e0",
-                outline: "none",
-                backgroundColor: "transparent",
-                color: "white",
-                fontSize: "18px",
-                fontFamily: 'Figtree', 
-                marginTop: "5px",
-                width: "100%",
-                padding: "5px 0",
-                transition: "border-color 0.3s",
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#f0f0f0"}
-              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
-            />
-          </div>
+        <div className="form-group">
+          <label htmlFor="email" className="label">Email</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="off" 
+            placeholder="Leave blank to keep current email"
+            className="input"
+          />
         </div>
 
         {/* Current Password Field */}
-        <div style={{ marginBottom: "20px", textAlign: "left" }}>
-          <label htmlFor="currentPassword" style={{ fontSize: "16px", fontWeight: "500", color: "#e0e0e0" }}>Current Password</label>
+        <div className="form-group">
+          <label htmlFor="currentPassword" className="label">Current Password</label>
           <div style={{ position: "relative" }}>
             <input
               type={showCurrentPassword ? 'text' : 'password'}
               id="currentPassword"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter your current password"
-              autoComplete="off"
-              style={{
-                border: "none",
-                borderBottom: "2px solid #e0e0e0",
-                outline: "none",
-                backgroundColor: "transparent",
-                color: "white",
-                fontSize: "18px",
-                fontFamily: 'Figtree',
-                marginTop: "5px",
-                width: "100%",
-                padding: "5px 0",
-                transition: "border-color 0.3s",
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#f0f0f0"}
-              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+              placeholder="Enter current password"
+              className="input"
             />
-            <div 
-              onClick={() => setShowCurrentPassword(!showCurrentPassword)} 
-              style={{
-                position: "absolute",
-                right: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                color: "#e0e0e0",
-              }}
-            >
-              {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
-            </div>
+            <span className="password-eye" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
+              {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
           </div>
         </div>
 
         {/* New Password Field */}
-        <div style={{ marginBottom: "20px", textAlign: "left" }}>
-          <label htmlFor="newPassword" style={{ fontSize: "16px", fontWeight: "500", color: "#e0e0e0" }}>New Password</label>
+        <div className="form-group">
+          <label htmlFor="newPassword" className="label">New Password</label>
           <div style={{ position: "relative" }}>
             <input
-              type={showNewPassword ? 'text' : 'password'} 
+              type={showNewPassword ? 'text' : 'password'}
               id="newPassword"
-              value={newPassword} 
+              value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter a new password"
-              autoComplete="off" 
-              style={{
-                border: "none",
-                borderBottom: "2px solid #e0e0e0",
-                outline: "none",
-                backgroundColor: "transparent",
-                color: "white",
-                fontSize: "18px",
-                fontFamily: 'Figtree', 
-                marginTop: "5px",
-                width: "100%",
-                padding: "5px 0",
-                transition: "border-color 0.3s",
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#f0f0f0"}
-              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+              placeholder="Enter new password"
+              className="input"
             />
-            <div 
-              onClick={() => setShowNewPassword(!showNewPassword)} 
-              style={{
-                position: "absolute",
-                right: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                color: "#e0e0e0",
-              }}
-            >
-              {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-            </div>
+            <span className="password-eye" onClick={() => setShowNewPassword(!showNewPassword)}>
+              {showNewPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
           </div>
         </div>
 
-        {/* Confirm New Password Field */}
-        <div style={{ marginBottom: "20px", textAlign: "left" }}>
-          <label htmlFor="confirmPassword" style={{ fontSize: "16px", fontWeight: "500", color: "#e0e0e0" }}>Confirm New Password</label>
+        {/* Confirm Password Field */}
+        <div className="form-group">
+          <label htmlFor="confirmPassword" className="label">Confirm Password</label>
           <div style={{ position: "relative" }}>
             <input
-              type={showConfirmPassword ? 'text' : 'password'} 
+              type={showConfirmPassword ? 'text' : 'password'}
               id="confirmPassword"
-              value={confirmPassword} 
+              value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm your new password"
-              autoComplete="off" 
-              style={{
-                border: "none",
-                borderBottom: "2px solid #e0e0e0",
-                outline: "none",
-                backgroundColor: "transparent",
-                color: "white",
-                fontSize: "18px",
-                fontFamily: 'Figtree', 
-                marginTop: "5px",
-                width: "100%",
-                padding: "5px 0",
-                transition: "border-color 0.3s",
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#f0f0f0"}
-              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+              placeholder="Confirm new password"
+              className="input"
             />
-            <div 
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
-              style={{
-                position: "absolute",
-                right: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                cursor: "pointer",
-                color: "#e0e0e0",
-              }}
-            >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-            </div>
+            <span className="password-eye" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+              {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
           </div>
         </div>
 
         <button
           type="submit"
-          onMouseEnter={() => setIsHoveredSave(true)} 
-          onMouseLeave={() => setIsHoveredSave(false)} 
-          style={{
-            marginTop: "30px",
-            padding: "10px 0", 
-            backgroundColor: isHoveredSave ? '#f0f0f0' : 'white',
-            color: 'black',
-            border: "none",
-            borderRadius: "15px",
-            cursor: "pointer",
-            fontSize: '16px',
-            fontFamily: 'Figtree',
-            transition: "background-color 0.3s",
-            width: "100%", 
-            height: "50px", 
-          }}
+          className="button-submit"
+          onMouseEnter={() => setIsHoveredSave(true)}
+          onMouseLeave={() => setIsHoveredSave(false)}
         >
           Save Changes
         </button>
 
         <button
-          type="button"
+          className="button-delete"
           onClick={handleDeleteAccount}
-          onMouseEnter={() => setIsHoveredDelete(true)} 
-          onMouseLeave={() => setIsHoveredDelete(false)} 
-          style={{
-            marginTop: "70px", 
-            padding: "10px 0", 
-            backgroundColor: isHoveredDelete ? '#cc0000' : '#990000', 
-            color: 'white',
-            border: "none",
-            borderRadius: "15px",
-            cursor: "pointer",
-            fontSize: '16px',
-            fontFamily: 'Figtree',
-            transition: "background-color 0.3s",
-            width: "100%",
-            height: "50px", 
-          }}
+          onMouseEnter={() => setIsHoveredDelete(true)}
+          onMouseLeave={() => setIsHoveredDelete(false)}
         >
           Delete Account
         </button>
