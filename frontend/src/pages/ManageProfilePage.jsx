@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext"; 
 import { useNavigate } from "react-router-dom"; 
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/manageprofilepage.css'; 
 
 const ManageProfilePage = () => {
@@ -12,7 +14,6 @@ const ManageProfilePage = () => {
   const [newPassword, setNewPassword] = useState(""); 
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isHoveredBack, setIsHoveredBack] = useState(false);
   const [isHoveredSave, setIsHoveredSave] = useState(false); 
   const [isHoveredDelete, setIsHoveredDelete] = useState(false);
@@ -41,7 +42,7 @@ const ManageProfilePage = () => {
         setUsername(data.data.username);
         setEmail(data.data.email);
       } catch (err) {
-        setError(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
@@ -57,7 +58,7 @@ const ManageProfilePage = () => {
     const updatedUser = { username, email, password: newPassword };
 
     if (newPassword && newPassword !== confirmPassword) {
-      return setError("New password and confirmation do not match.");
+      return toast.error("New password and confirmation do not match.");
     }
 
     try {
@@ -74,9 +75,9 @@ const ManageProfilePage = () => {
         throw new Error("Failed to update profile.");
       }
 
-      alert("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -97,13 +98,13 @@ const ManageProfilePage = () => {
         throw new Error("Failed to delete account.");
       }
 
-      alert("Account deleted successfully!");
+      toast.success("Account deleted successfully!");
       logout();
       localStorage.clear();
       sessionStorage.clear();
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -112,10 +113,10 @@ const ManageProfilePage = () => {
   };
 
   if (loading) return <p style={{ color: "white", textAlign: "center" }}>Loading...</p>; 
-  if (error) return <p style={{ color: "white", textAlign: "center" }}>{error}</p>;
 
   return (
     <div className="container">
+      <ToastContainer /> 
       <button
         className="button-back"
         onClick={handleBack}
