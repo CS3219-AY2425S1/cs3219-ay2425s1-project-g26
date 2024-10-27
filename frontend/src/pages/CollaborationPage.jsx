@@ -63,8 +63,9 @@ const CollaborationPage = () => {
   const handleConfirmEndSession = () => {
     socket.emit('endSession', sessionId);
     localStorage.removeItem('startTime');
-    navigate('/summary'); 
+    navigate('/summary', { state: { matchData, secondsElapsed } });
   };
+
 
   const handleCancelEndSession = () => {
     setShowModal(false); 
