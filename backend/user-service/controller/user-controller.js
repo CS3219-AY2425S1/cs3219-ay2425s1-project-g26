@@ -24,15 +24,26 @@ import {
 } from "../model/repository.js";
 
 export const verifyPassword = async (req, res) => {
+  console.log("Verify password endpoint hit"); 
   const { userId, currentPassword } = req.body;
 
   try {
     const user = await _findUserById(userId);
+
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
 
+    console.log("User's Hashed Password:", user.password);
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    console.log("Password Comparison:", {
+      providedPassword: currentPassword,
+      storedPassword: user.password,
+      isMatch: isMatch,
+    });
+
     if (!isMatch) {
       return res
         .status(401)
@@ -45,6 +56,7 @@ export const verifyPassword = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 
 export const sendPasswordResetEmail = async (req, res) => {

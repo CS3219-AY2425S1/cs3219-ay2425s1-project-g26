@@ -53,13 +53,32 @@ const ManageProfilePage = () => {
     }
   }, [userId, accessToken]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const updatedUser = { username, email, password: newPassword };
+  const handleVerifyPassword = async () => {
+    try {
+      const response = await fetch(`http://localhost:8081/users/verify-password`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ password: currentPassword })
+      });
 
-    if (newPassword && newPassword !== confirmPassword) {
-      return toast.error("New password and confirmation do not match.");
+      if (!response.ok) {
+        throw new Error("Current password is incorrect.");
+      }
+
+      return true;
+    } catch (err) {
+      toast.error(err.message);
+      return false; 
     }
+  };
+
+  const handleSaveChanges = async (e) => {
+    e.preventDefault();
+
+    const updatedUser = { username, email };
 
     try {
       const response = await fetch(`http://localhost:8081/users/${userId}`, {
@@ -76,6 +95,43 @@ const ManageProfilePage = () => {
       }
 
       toast.success("Profile updated successfully!");
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    if (newPassword && newPassword !== confirmPassword) {
+      return toast.error("New password and confirmation do not match.");
+    }
+
+    const isVerified = await handleVerifyPassword();
+    if (!isVerified) {
+      return;
+    }
+
+    try {
+      const updatedPassword = { password: newPassword };
+
+      const response = await fetch(`http://localhost:8081/users/${userId}`, {
+        method: 'PATCH', 
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedPassword)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update password.");
+      }
+
+      toast.success("Password changed successfully!");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
       toast.error(err.message);
     }
@@ -126,8 +182,8 @@ const ManageProfilePage = () => {
         Back
       </button>
 
-      <form onSubmit={handleSubmit} className="form-container">
-        <div className="title">Manage Profile</div>
+      <form className="form-container">
+        <div className="title"> Manage Profile</div>
 
         <div className="form-group">
           <label htmlFor="username" className="label">Username</label>
@@ -154,6 +210,16 @@ const ManageProfilePage = () => {
             className="input"
           />
         </div>
+
+        <button
+          onClick={handleSaveChanges}
+          className="button-submit"
+          onMouseEnter={() => setIsHoveredSave(true)}
+          onMouseLeave={() => setIsHoveredSave(false)}
+          style={{ marginBottom: '50px' }}
+        >
+          Save Changes
+        </button>
 
         <div className="form-group">
           <h3 className="sub-title">Change Password</h3>
@@ -211,12 +277,12 @@ const ManageProfilePage = () => {
         </div>
 
         <button
-          type="submit"
+          onClick={handleChangePassword}
           className="button-submit"
           onMouseEnter={() => setIsHoveredSave(true)}
           onMouseLeave={() => setIsHoveredSave(false)}
         >
-          Save Changes
+          Change Password
         </button>
 
         <button
