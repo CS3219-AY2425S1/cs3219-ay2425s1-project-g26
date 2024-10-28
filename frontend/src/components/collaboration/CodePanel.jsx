@@ -8,7 +8,8 @@ import { Toaster, toast } from 'sonner';
 
 const socket = io('http://localhost:8084');
 
-const testcase = {       
+//NEED TO REPLACE (TODO)
+const testcase = {
   "python": {
     "params": "s",
     "input": ["['h','e','l','l','o']", "['H','a','n','n','a', 'h']"],
@@ -32,13 +33,39 @@ def solution(${testcase.python.params}):
     `,
 
     java: `// Java code
-public class Main {
-  public static void main(String[] args) {
-    String example = "raesa";
-    System.out.println(example);
+class Solution {
+  public static void solution(${testcase.java.params}) {
+
   }
-}`,
+}   
+`,
   };
+
+// Solutions for Reverse a String (Easy & Algo)
+const solutionCodes = {
+    javascript: `// JavaScript code
+const example = "raesa";
+console.log(example);`,
+
+    python: `# Python code
+def solution(${testcase.python.params}):
+  s.reverse()
+  return s`,
+
+    java: `// Java code
+class Solution {
+  public static void solution(${testcase.java.params}) {
+    int n = s.length;
+    for(int i=0; i<n/2; i++)
+    {
+        char tmp = s[i];
+        s[i] = s[n-1-i];
+        s[n-1-i] = tmp;
+    }
+  }
+}   
+`};
+
 
   const [language, setLanguage] = useState('python');
   const [code, setCode] = useState(defaultCodes[language]);
@@ -107,9 +134,6 @@ public class Main {
   const handleRunCode = async () => {
     setOutput('');
     setIsButtonDisabled(true);
-
-    //TODO/TOREMOVE:
-
 
     const requestBody = {
       code,

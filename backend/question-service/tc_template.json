@@ -1,10 +1,10 @@
 {
   "id": "66f94b18520a7a8a0cf275ef",
-  "testcase": {
+  "testcase": {       
     "python": {
       "params": "s",
-      "input": ["['h','e','l','l','o']", "['o','l','l','e','h']"],
-      "output": ["['H','a','n','n','a', 'h']", "['H','a','n','n','a','h']"]
+      "input": ["['h','e','l','l','o']", "['H','a','n','n','a', 'h']"],
+      "output": ["['o','l','l','e','h']", "['h','a','n','n','a','H']"]
     },
     "java": {
       "params": "char[] s",

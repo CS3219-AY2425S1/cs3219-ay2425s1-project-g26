@@ -11,19 +11,25 @@ app.use(express.json());
 
 const EXECUTION_TIMEOUT = 5000;
 
-const python_in = ['["h","e","l","l","o"]', '["H","a","n","n","a", "h"]']
-const python_out = ['["o","l","l","e","h"]', '["h","a","n","n","a", "H"]']
-
-const python_r = `
-if __name__ == "__main__":
-    print(solution(${python_in}) == ${python_out})`
-
 const python_tc = (input, output) => {
   return `
 if __name__ == "__main__":
     print(solution(${input}) == ${output})`
 }
 
+const java_tc = (params, input, output) => {
+  const className = params.split(" ")[0];
+  const variableName = params.split(" ")[1];
+  return `
+  public class Main {
+    public static void main(String[] args) {
+      ${params} = ${input};
+      Solution.solution(${variableName});
+      ${className} answer = ${output};
+      System.out.println(String.valueOf(${variableName}).equals(String.valueOf(answer)));
+    }
+  }`
+}
 
 // Function to run Python code
 const runPython = (code) => {
@@ -88,7 +94,8 @@ const runJava = (code) => {
                 error: errorMessage,
               });
             }
-            resolve(stdout);
+            const split_output = stdout.split("\n");
+            resolve(split_output[split_output.length - 2]);
           }
         );
       }
@@ -99,7 +106,6 @@ const runJava = (code) => {
 // Function to run JavaScript code
 const runJavaScript = (code) => {
   return new Promise((resolve, reject) => {
-    console.log("HERE3");
     const filePath = path.join(__dirname, "script.js");
     fs.writeFileSync(filePath, code); // Save code to a file
 
@@ -129,22 +135,21 @@ app.post("/run-code", async (req, res) => {
     let result = [];
     const python_in = testcase.python.input;
     const python_out = testcase.python.output;
-    console.log("TC");
-    console.log(python_in);
-    console.log(python_out);
-    const java_in = testcase.java.input
-    const java_out = testcase.java.output
+    const java_params = testcase.java.params;
+    const java_in = testcase.java.input;
+    const java_out = testcase.java.output;
     for (let i = 0; i < python_in.length; i++) {
       
       switch (language.toLowerCase()) {
         case "python":
-
           formatted = python_tc(python_in[i], python_out[i]);
           output = await runPython(code + formatted);
           result.push(output == 'True')
           break;
-        case "java":
-          output = await runJava(code);
+        case "java":          
+          formatted = java_tc(java_params, java_in[i], java_out[i]);
+          output = await runJava(code + formatted);
+          result.push(output == 'true')
           break;
         case "javascript":
           output = await runJavaScript(code);
