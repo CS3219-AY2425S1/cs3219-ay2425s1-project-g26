@@ -17,16 +17,14 @@ if __name__ == "__main__":
     print(solution(${input}) == ${output})`
 }
 
-const java_tc = (params, input, output) => {
-  const className = params.split(" ")[0];
-  const variableName = params.split(" ")[1];
+const java_tc = (params, input, output, return_type) => {
   return `
   public class Main {
     public static void main(String[] args) {
-      ${params} = ${input};
-      Solution.solution(${variableName});
-      ${className} answer = ${output};
-      System.out.println(String.valueOf(${variableName}).equals(String.valueOf(answer)));
+      ${input}
+      ${return_type} user_solution = Solution.solution(${params});
+      ${output}
+      System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));
     }
   }`
 }
@@ -135,9 +133,10 @@ app.post("/run-code", async (req, res) => {
     let result = [];
     const python_in = testcase.python.input;
     const python_out = testcase.python.output;
-    const java_params = testcase.java.params;
+    const java_params = testcase.python.params; //As intended, not a bug.
     const java_in = testcase.java.input;
     const java_out = testcase.java.output;
+    const java_rt = testcase.java.return_type;
     for (let i = 0; i < python_in.length; i++) {
       
       switch (language.toLowerCase()) {
@@ -147,7 +146,7 @@ app.post("/run-code", async (req, res) => {
           result.push(output == 'True')
           break;
         case "java":          
-          formatted = java_tc(java_params, java_in[i], java_out[i]);
+          formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
           output = await runJava(code + formatted);
           result.push(output == 'true')
           break;
@@ -159,7 +158,7 @@ app.post("/run-code", async (req, res) => {
       }
     }
 
-
+    //result: {true, true, false}
     return res.status(200).json({ output, result });
   } catch (error) {
     console.error("Error running code:", error.error);

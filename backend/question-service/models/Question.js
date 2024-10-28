@@ -38,7 +38,10 @@ const questionSchema = new mongoose.Schema({
             },
             output: {
                 type: Array
-            }
+            },
+            return_type: {
+                type: String
+            },
         }
     }
 })

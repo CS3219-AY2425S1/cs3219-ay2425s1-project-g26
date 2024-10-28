@@ -11,14 +11,27 @@ const socket = io('http://localhost:8084');
 //NEED TO REPLACE (TODO)
 const testcase = {
   "python": {
-    "params": "s",
-    "input": ["['h','e','l','l','o']", "['H','a','n','n','a', 'h']"],
-    "output": ["['o','l','l','e','h']", "['h','a','n','n','a','H']"]
+      "params": "s",
+      "input": [
+          "['h','e','l','l','o']",
+          "['H','a','n','n','a', 'h']"
+      ],
+      "output": [
+          "['o','l','l','e','h']",
+          "['h','a','n','n','a','H']"
+      ]
   },
   "java": {
-    "params": "char[] s",
-    "input": ["{'h', 'e', 'l', 'l', 'o'}", "{'H','a','n','n','a','h'}"],
-    "output": ["{'o', 'l', 'l', 'e', 'h'}", "{'h','a','n','n','a','H'}"]
+      "params": "char[] s",
+      "return_type": "char[]",
+      "input": [
+          "char[] s = {'h', 'e', 'l', 'l', 'o'};",
+          "char[] s = {'H','a','n','n','a','h'};"
+      ],
+      "output": [
+          "char[] tc_output = {'o', 'l', 'l', 'e', 'h'};",
+          "char[] tc_output = {'h','a','n','n','a','H'};"
+      ]
   }
 };
 
@@ -34,7 +47,7 @@ def solution(${testcase.python.params}):
 
     java: `// Java code
 class Solution {
-  public static void solution(${testcase.java.params}) {
+  public static ${testcase.java.return_type} solution(${testcase.java.params}) {
 
   }
 }   
@@ -62,6 +75,7 @@ class Solution {
         s[i] = s[n-1-i];
         s[n-1-i] = tmp;
     }
+    return s;
   }
 }   
 `};
@@ -246,8 +260,8 @@ class Solution {
         //onClick={handleRunCode}
         disabled={true}
       >
-        Finalize Submission
-      </button>
+        Finalise Submission
+      </button> 
 
       </div>
 
