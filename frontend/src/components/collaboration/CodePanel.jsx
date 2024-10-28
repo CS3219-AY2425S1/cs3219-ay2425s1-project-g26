@@ -195,6 +195,7 @@ class Solution {
         extensions={[languageExtensions[language]]}
         onChange={handleCodeChange}
       />
+      <div style={{ marginTop: '20px', marginRight: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
       <button
         style={{
@@ -230,6 +231,26 @@ class Solution {
         Run Code
       </button>
       </div>
+      
+      <button
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#1a3042',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
+        //onClick={handleRunCode}
+        disabled={true}
+      >
+        Finalize Submission
+      </button>
+
+      </div>
+
       <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '4px', fontFamily: 'monospace', fontSize: '1rem', whiteSpace: 'pre', border: '1px solid #ddd', maxHeight: '200px', overflowY: 'auto', overflowX: 'auto' }}>
         <h3>Output:</h3>
         <pre>{output}</pre>
