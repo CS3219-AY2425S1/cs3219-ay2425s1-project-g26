@@ -79,7 +79,7 @@ const ManageProfilePage = () => {
   const handleSaveChanges = async (e) => {
     e.preventDefault();
 
-    const updatedUser = { username, email };
+    const updatedUser = { username, email: email.toLowerCase() };
 
     try {
       const response = await fetch(`http://localhost:8081/users/${userId}`, {
