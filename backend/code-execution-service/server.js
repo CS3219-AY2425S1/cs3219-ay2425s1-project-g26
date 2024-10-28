@@ -9,20 +9,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const EXECUTION_TIMEOUT = 5000;
+
 // Function to run Python code
 const runPython = (code) => {
   return new Promise((resolve, reject) => {
     const filePath = path.join(__dirname, "script.py");
     fs.writeFileSync(filePath, code); // Save code to a file
 
-    exec(`python3 ${filePath}`, (error, stdout, stderr) => {
-      // Clean up
-      fs.unlinkSync(filePath);
-      if (error) {
-        return reject(stderr);
+    exec(
+      `python3 ${filePath}`,
+      { timeout: EXECUTION_TIMEOUT },
+      (error, stdout, stderr) => {
+        fs.unlinkSync(filePath); // Clean up
+        if (error || stderr) {
+          const errorMessage = stderr || error.message || "Unknown error";
+          console.error("Python Error:", errorMessage); 
+          return reject({ message: "Python Error", error: errorMessage });
+        }
+        resolve(stdout);
       }
-      resolve(stdout);
-    });
+    );
   });
 };
 
@@ -33,61 +40,43 @@ const runJava = (code) => {
     fs.writeFileSync(filePath, code); // Save code to a file
 
     // Compile the Java code
-    exec(`javac ${filePath}`, (compileError, compileStdout, compileStderr) => {
-      // Log compile output and error
-      console.log("Compile stdout:", compileStdout);
-      console.log("Compile stderr:", compileStderr);
-
-      if (compileError) {
-        // Clean up
-        fs.unlinkSync(filePath);
-        return reject(`Compilation Error: ${compileStderr || "Unknown error"}`);
-      }
-
-      // Execute the Java program
-      exec(`java -cp ${__dirname} Main`, (runError, stdout, stderr) => {
-        // Clean up
-        fs.unlinkSync(filePath);
-        fs.unlinkSync(path.join(__dirname, "Main.class"));
-
-        // Log execution output and error
-        console.log("Execution stdout:", stdout);
-        console.log("Execution stderr:", stderr);
-
-        if (runError) {
-          return reject(`Runtime Error: ${stderr || "Unknown error"}`);
+    exec(
+      `javac ${filePath}`,
+      { timeout: EXECUTION_TIMEOUT },
+      (compileError, compileStdout, compileStderr) => {
+        if (compileError || compileStderr) {
+          fs.unlinkSync(filePath); // Clean up
+          const errorMessage =
+            compileStderr || compileError.message || "Unknown error";
+          console.error("Java Compilation Error:", errorMessage); 
+          return reject({
+            message: "Java Compilation Error",
+            error: errorMessage,
+          });
         }
-        resolve(stdout);
-      });
-    });
-  });
-};
 
+        // Execute the Java program
+        exec(
+          `java -cp ${__dirname} Main`,
+          { timeout: EXECUTION_TIMEOUT },
+          (runError, stdout, stderr) => {
+            fs.unlinkSync(filePath);
+            fs.unlinkSync(path.join(__dirname, "Main.class")); // Clean up
 
-
-// Function to run C code
-const runC = (code) => {
-  return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, "program.c");
-    fs.writeFileSync(filePath, code); // Save code to a file
-
-    exec(`gcc ${filePath} -o program`, (compileError) => {
-      if (compileError) {
-        // Clean up
-        fs.unlinkSync(filePath);
-        return reject(compileError.stderr);
+            if (runError || stderr) {
+              const errorMessage =
+                stderr || runError.message || "Unknown error";
+              console.error("Java Runtime Error:", errorMessage); 
+              return reject({
+                message: "Java Runtime Error",
+                error: errorMessage,
+              });
+            }
+            resolve(stdout);
+          }
+        );
       }
-
-      exec(`./program`, (runError, stdout, stderr) => {
-        // Clean up
-        fs.unlinkSync(filePath);
-        fs.unlinkSync(path.join(__dirname, "program"));
-        if (runError) {
-          return reject(stderr);
-        }
-        resolve(stdout);
-      });
-    });
+    );
   });
 };
 
@@ -97,14 +86,19 @@ const runJavaScript = (code) => {
     const filePath = path.join(__dirname, "script.js");
     fs.writeFileSync(filePath, code); // Save code to a file
 
-    exec(`node ${filePath}`, (error, stdout, stderr) => {
-      // Clean up
-      fs.unlinkSync(filePath);
-      if (error) {
-        return reject(stderr);
+    exec(
+      `node ${filePath}`,
+      { timeout: EXECUTION_TIMEOUT },
+      (error, stdout, stderr) => {
+        fs.unlinkSync(filePath); // Clean up
+        if (error || stderr) {
+          const errorMessage = stderr || error.message || "Unknown error";
+          console.error("JavaScript Error:", errorMessage); 
+          return reject({ message: "JavaScript Error", error: errorMessage });
+        }
+        resolve(stdout);
       }
-      resolve(stdout);
-    });
+    );
   });
 };
 
@@ -121,9 +115,6 @@ app.post("/run-code", async (req, res) => {
       case "java":
         output = await runJava(code);
         break;
-      case "c":
-        output = await runC(code);
-        break;
       case "javascript":
         output = await runJavaScript(code);
         break;
@@ -133,12 +124,13 @@ app.post("/run-code", async (req, res) => {
 
     return res.status(200).json({ output });
   } catch (error) {
-    console.error("Error running code:", error);
-    const errorMessage = error.message || error; 
-    return res.status(500).json({ error: errorMessage });
+    console.error("Error running code:", error.error); 
+    return res.status(500).json({
+      error: error.message,
+      details: error.error,
+    });
   }
 });
-
 
 const PORT = process.env.PORT || 8083;
 app.listen(PORT, () => {

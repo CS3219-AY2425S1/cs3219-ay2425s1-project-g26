@@ -38,6 +38,14 @@ const UserModelSchema = new Schema({
     type: Array,
     default: [],
   },
+  isMatched: {
+    type: Boolean,
+    default: false,
+  },
+  matchData: {
+    type: Object,
+    default: {},
+  },
   resetToken: {
     type: String,
     default: null, 

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import './styles/AI.css'; 
 
 const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false); 
+  const textareaRef = useRef(null);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -14,6 +16,7 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
     ]);
 
     setLoading(true);
+    setInputValue(''); 
 
     try {
       // Call the AI backend API
@@ -43,32 +46,75 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         ...prevMessages,
         { text: 'Sorry, something went wrong.', sender: 'ai' },
       ]);
+    } finally {
+      setLoading(false); 
     }
-
-    setLoading(false);
-    setInputValue('');
   };
 
+  const renderMessage = (text) => {
+    return text.split('\n').map((line, index) => (
+      <span key={index}>
+        {line}
+        <br />
+      </span>
+    ));
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        setInputValue((prev) => prev + '\n');
+        e.preventDefault();
+      } else {
+        handleSendMessage(e);
+      }
+    }
+  };
+
+  const handleInput = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${Math.max(textarea.scrollHeight, 60)}px`;
+
+        if (inputValue === '') {
+            textarea.style.height = '60px'; 
+        }
+    }
+}, [inputValue]);
+
   return (
-    <div>
-      <h3>Chat with AI</h3>
-      <div className="chat-window" style={{ border: '1px solid #ccc', padding: '10px', height: '500px', overflowY: 'scroll' }}>
+    <div className="chat-container">
+      <h3>Chat with Raesa</h3>
+      <div className="chat-window">
         {messages.map((msg, index) => (
-          <div key={index} style={{ textAlign: msg.sender === 'user' ? 'right' : 'left' }}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'AI:'}</strong> {msg.text}
+          <div key={index} className={`message ${msg.sender}`}>
+            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {renderMessage(msg.text)}
           </div>
         ))}
-        {loading && <div>Loading...</div>}
+        {loading && <div className="loading">Loading...</div>}
       </div>
-      <form onSubmit={handleSendMessage} style={{ display: 'flex', marginTop: '10px' }}>
-        <input
-          type="text"
+      <form onSubmit={handleSendMessage} className="message-form">
+        <textarea
+          ref={textareaRef} 
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={handleInput}
           placeholder="Type your message here..."
-          style={{ flex: 1, padding: '5px' }}
+          className="message-input"
+          onKeyDown={handleKeyDown} 
+          disabled={loading}
         />
-        <button type="submit" style={{ padding: '5px 10px' }}>Send</button>
+        <button 
+          type="submit" 
+          className="send-button"
+          disabled={loading}
+        >
+          Send
+        </button>
       </form>
     </div>
   );

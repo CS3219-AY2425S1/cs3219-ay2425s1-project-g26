@@ -3,8 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import withAuth from "../hoc/withAuth";
 import axios from 'axios';
+import { useAuth } from "../AuthContext"; 
 
 const WaitingPage = () => {
+  const { accessToken } = useAuth();
   const location = useLocation();
   const { userPref } = location.state || { userPref: {} };
   const navigate = useNavigate();
@@ -15,9 +17,20 @@ const WaitingPage = () => {
   const [seconds, setSeconds] = useState(0);
   const [timeoutReached, setTimeoutReached] = useState(false);
   const [matchData, setMatchData] = useState(null);
+  const [countdown, setCountdown] = useState(5); 
+  const [countdownActive, setCountdownActive] = useState(false); 
   
   let intervalId, timeoutId;
   const hasRequestedRef = useRef(false); 
+
+  useEffect(() => {
+    const isMatched = JSON.parse(localStorage.getItem('isMatched'));
+
+    if (isMatched) {
+      const matchData = JSON.parse(localStorage.getItem('matchData'));
+      navigate('/collaboration', { state: { matchData } });
+    }
+  }, []);
 
   useEffect(() => {
     if (!userPref || Object.keys(userPref).length === 0) {
@@ -36,14 +49,23 @@ const WaitingPage = () => {
     if (requestInProgress) return; 
     setRequestInProgress(true); 
 
+    const getHeaders = () => {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`
+      };
+    };
+
     try {
-      const response = await axios.post('http://localhost:8082/matches', userPref);
+      const response = await axios.post('http://localhost:8082/matches', userPref, 
+      { headers: getHeaders() });
 
       if (response.status === 200 || response.status === 201) {
         if (response.data.matched) {
           setMatchFound(true);
           setMatchData(response.data);
-          
+          updateMatchedStatus(response.data);
+
           clearInterval(intervalId);
           clearTimeout(timeoutId);
           setLoading(false);
@@ -53,6 +75,30 @@ const WaitingPage = () => {
       console.error('Error', error.message);
     } finally {
       setRequestInProgress(false); 
+    }
+  };
+
+  const updateMatchedStatus = async (matchData) => {
+    localStorage.setItem('isMatched', JSON.stringify(true));
+    localStorage.setItem('matchData', JSON.stringify(matchData));
+
+    try {
+      const response = await axios.patch(`http://localhost:8081/users/${userPref.id}/matched`, {
+        isMatched: true,
+        matchData: matchData,
+      }, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (response.status === 200) {
+        console.log('Matched status updated successfully');
+      } else {
+        console.error('Failed to update matched status:', response.data);
+      }
+    } catch (error) {
+      console.error('Error updating matched status:', error);
     }
   };
 
@@ -167,10 +213,19 @@ const WaitingPage = () => {
 
   useEffect(() => {
     if (matchFound && matchData) {
-      const timeout = setTimeout(() => {
-        navigate('/collaboration', { state: { matchData } });
-      }, 3000); 
-      return () => clearTimeout(timeout);
+      setCountdownActive(true);
+      const countdownInterval = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            navigate('/collaboration', { state: { matchData } });
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000); 
+
+      return () => clearInterval(countdownInterval);
     }
   }, [matchFound, matchData, navigate]);
 
@@ -200,7 +255,7 @@ const WaitingPage = () => {
             <p style={subMessageStyle}>
               <strong>Category:</strong> {matchData.category.join(', ')}
             </p>
-            <p style={subMessageStyle}>Starting the collaboration room now...</p>
+            <p style={subMessageStyle}>Starting the collaboration room in {countdown} seconds...</p> {/* Display countdown */}
           </div>
         ) : timeoutReached ? (
           <div style={cardStyle}>

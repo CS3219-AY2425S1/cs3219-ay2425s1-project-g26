@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import withAuth from "../hoc/withAuth";
+import io from 'socket.io-client';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
+
+const socket = io('http://localhost:8084');
 
 const CollaborationPage = () => {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const { matchData } = location.state || { matchData: {} };
+  const sessionId = matchData.sessionId;
 
   const updateElapsedTime = () => {
     const savedStartTime = localStorage.getItem('startTime');
@@ -53,9 +61,11 @@ const CollaborationPage = () => {
   };
 
   const handleConfirmEndSession = () => {
+    socket.emit('endSession', sessionId);
     localStorage.removeItem('startTime');
-    navigate('/summary'); 
+    navigate('/summary', { state: { matchData, secondsElapsed } });
   };
+
 
   const handleCancelEndSession = () => {
     setShowModal(false); 
@@ -149,16 +159,16 @@ const CollaborationPage = () => {
       <div style={contentContainerStyle}>
         {/* Left Pane with Tabs */}
         <div style={leftPaneStyle}>
-          <Tabs />
+          <Tabs question={matchData.question} sessionId={sessionId} />
         </div>
-
         {/* Right Pane with Code Panel */}
         <div style={rightPaneStyle}>
-          <CodePanel />
+          <CodePanel sessionId={sessionId} />
         </div>
       </div>
     </div>
   );
 };
 
-export default CollaborationPage;
+const WrappedCollaborationPage = withAuth(CollaborationPage);
+export default WrappedCollaborationPage;

@@ -14,6 +14,8 @@ import {
   confirmToken,
   resetPassword,
   getPublicProfile,
+  updateUserMatchedStatus,
+  verifyPassword,
 } from "../controller/user-controller.js";
 import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
 
@@ -36,6 +38,8 @@ router.get("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, getUser);
 
 router.patch("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, updateUser);
 
+router.patch('/:id/matched', updateUserMatchedStatus);
+
 //Soft delete
 router.delete("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, deleteUser);
 
@@ -52,6 +56,8 @@ router.post("/forgot-password", sendPasswordResetEmail);
 router.post("/confirm-token", confirmToken);
 
 router.post("/reset-password", resetPassword);
+
+router.post("/verify-password", verifyPassword);
 
 
 export default router;

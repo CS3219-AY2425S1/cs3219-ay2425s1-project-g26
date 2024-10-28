@@ -23,6 +23,49 @@ import {
   updateQuestionDoneById as _updateQuestionDoneById,
 } from "../model/repository.js";
 
+export const verifyPassword = async (req, res) => {
+  console.log("Verify password endpoint hit");
+  const { userId, currentPassword } = req.body;
+
+  if (!userId || !currentPassword) {
+    return res
+      .status(400)
+      .json({ message: "User ID and password are required." });
+  }
+
+  try {
+    const user = await _findUserById(userId);
+
+    if (!user) {
+      console.log("User not found");
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    console.log("User's Hashed Password:", user.password);
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    console.log("Password Comparison:", {
+      providedPassword: currentPassword,
+      storedPassword: user.password,
+      isMatch: isMatch,
+    });
+
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ message: "Current password is incorrect." });
+    }
+
+    return res.status(200).json({ message: "Current password is correct." });
+  } catch (error) {
+    console.error("Error verifying password:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+
 export const sendPasswordResetEmail = async (req, res) => {
   body("email").isEmail().withMessage("Please provide a valid email address");
 
@@ -315,7 +358,7 @@ export async function getQuestionDetails(req, res) {
     try {
       // Make a GET request to user-service with the token
       const dataToSend = { questions: questionDone };
-      const response = await axios.post('http://question-service:8080/questions/selected', dataToSend, {
+      const response = await axios.post('http://question-service:8080/questions/ids', dataToSend, {
           headers: {
               Authorization: `Bearer ${accessToken}`
           }
@@ -364,6 +407,36 @@ export async function deleteUser(req, res) {
   }
 }
 
+export async function updateUserMatchedStatus(req, res) {
+  try {
+    const { isMatched, matchData } = req.body;
+
+    if (isMatched !== undefined) {
+      const userId = req.params.id;
+      if (!isValidObjectId(userId)) {
+        return res.status(404).json({ message: `User ${userId} not found` });
+      }
+      const user = await _findUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: `User ${userId} not found` });
+      }
+      user.isMatched = isMatched;
+      user.matchData = matchData;
+      await user.save();
+  
+      return res.status(200).json({
+        message: `Updated matched status for user ${userId}`,
+        data: formatUserResponse(user),
+      });
+    } else {
+      return res.status(400).json({ message: "isMatched is missing!" });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unknown error when updating user matched status!" });
+  }
+}
+
 export function formatUserResponse(user) {
   return {
     id: user.id,
@@ -374,6 +447,8 @@ export function formatUserResponse(user) {
     onlineDate: user.onlineDate,
     questionDone: user.questionDone,
     createdAt: user.createdAt,
+    isMatched: user.isMatched,
+    matchData: user.matchData,
   };
 }
 
