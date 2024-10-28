@@ -8,6 +8,18 @@ import { Toaster, toast } from 'sonner';
 
 const socket = io('http://localhost:8084');
 
+const testcase = {       
+  "python": {
+    "params": "s",
+    "input": ["['h','e','l','l','o']", "['H','a','n','n','a', 'h']"],
+    "output": ["['o','l','l','e','h']", "['h','a','n','n','a','H']"]
+  },
+  "java": {
+    "params": "char[] s",
+    "input": ["{'h', 'e', 'l', 'l', 'o'}", "{'H','a','n','n','a','h'}"],
+    "output": ["{'o', 'l', 'l', 'e', 'h'}", "{'h','a','n','n','a','H'}"]
+  }
+};
 
 const CodePanel = ({ sessionId }) => {
   const defaultCodes = {
@@ -16,12 +28,8 @@ const example = "raesa";
 console.log(example);`,
 
     python: `# Python code
-def main():
-    example = "raesa"
-    print(example)
-
-if __name__ == "__main__":
-    main()`,
+def solution(${testcase.python.params}):
+    `,
 
     java: `// Java code
 public class Main {
@@ -100,13 +108,13 @@ public class Main {
     setOutput('');
     setIsButtonDisabled(true);
 
+    //TODO/TOREMOVE:
+
+
     const requestBody = {
       code,
-      language,
-      //TODO:
-      // Language
-      // TC
-      // Questions
+      language,     
+      testcase 
     };
 
     try {

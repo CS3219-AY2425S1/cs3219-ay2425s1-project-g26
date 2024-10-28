@@ -122,15 +122,23 @@ const runJavaScript = (code) => {
 //Submit -- Need code, language, tc, starting --> Return tc
 
 app.post("/run-code", async (req, res) => {
-  const { code, language } = req.body;
+  const { code, language, testcase } = req.body;
 
   try {
     let output;
     let result = [];
+    const python_in = testcase.python.input;
+    const python_out = testcase.python.output;
+    console.log("TC");
+    console.log(python_in);
+    console.log(python_out);
+    const java_in = testcase.java.input
+    const java_out = testcase.java.output
     for (let i = 0; i < python_in.length; i++) {
-
+      
       switch (language.toLowerCase()) {
         case "python":
+
           formatted = python_tc(python_in[i], python_out[i]);
           output = await runPython(code + formatted);
           result.push(output == 'True')
