@@ -131,6 +131,11 @@ class Solution {
     }
   };
 
+  const handleResetCode = async () => {
+    const newCode = defaultCodes[language];
+    setCode(newCode);
+  }
+
   const handleRunCode = async () => {
     setOutput('');
     setIsButtonDisabled(true);
@@ -156,6 +161,11 @@ class Solution {
       }
 
       setOutput(result.output);
+
+      //TODO
+      //result.result returns a boolean array: [true, true] or [true, false]
+      //Determines the result pass or fail vs the testcases.
+      //Have some kind of widget to show them!
       console.log(result.result)
       
     } catch (error) {
@@ -185,6 +195,24 @@ class Solution {
         extensions={[languageExtensions[language]]}
         onChange={handleCodeChange}
       />
+      <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
+      <button
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#ccc',
+          color: 'black',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
+        onClick={handleResetCode}
+        disabled={isButtonDisabled}
+      >
+        Reset Answer
+      </button>
+
       <button
         style={{
           marginTop: '20px',
@@ -201,6 +229,7 @@ class Solution {
       >
         Run Code
       </button>
+      </div>
       <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '4px', fontFamily: 'monospace', fontSize: '1rem', whiteSpace: 'pre', border: '1px solid #ddd', maxHeight: '200px', overflowY: 'auto', overflowX: 'auto' }}>
         <h3>Output:</h3>
         <pre>{output}</pre>
