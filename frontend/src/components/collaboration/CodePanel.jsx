@@ -120,6 +120,7 @@ public class Main {
       }
 
       setOutput(result.output);
+      console.log(result.result)
       
     } catch (error) {
       setOutput(`Error: ${error.message}`);
