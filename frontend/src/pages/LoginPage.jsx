@@ -31,7 +31,7 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          lowercaseEmail,
+          email: lowercaseEmail,
           password,
         }),
       });
