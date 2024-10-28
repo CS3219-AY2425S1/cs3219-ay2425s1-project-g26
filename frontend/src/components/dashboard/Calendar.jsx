@@ -6,35 +6,20 @@ const Calendar = ({
   currentYear,
   setCurrentMonth,
   setCurrentYear,
+  onlineDates,
 }) => {
   const [activeDays, setActiveDays] = useState(new Set());
+
+  useEffect(() => {
+    console.log("calender", onlineDates);
+    setActiveDays(new Set(onlineDates));
+  }, [currentMonth, currentYear, onlineDates]);
 
   const formatDate = (year, month, day) => {
     const paddedMonth = String(month + 1).padStart(2, "0");
     const paddedDay = String(day).padStart(2, "0");
     return `${year}-${paddedMonth}-${paddedDay}`;
   };
-
-  useEffect(() => {
-    const storedDays = localStorage.getItem("onlineDate");
-    const activeDaysArray = storedDays ? storedDays.split(",") : [];
-    const updatedDays = new Set(activeDaysArray);
-
-    const today = new Date();
-    const formattedToday = formatDate(today.getFullYear(), today.getMonth(), today.getDate());
-
-    // Check if today's date is not already in the set
-    if (!updatedDays.has(formattedToday)) {
-      updatedDays.add(formattedToday);
-      // Update localStorage with the new set of active days
-      localStorage.setItem("onlineDate", Array.from(updatedDays).join(","));
-    }
-
-    // Set the state with the updated active days
-    setActiveDays(updatedDays);
-  }, [currentMonth, currentYear]);
-
-
 
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -65,8 +50,8 @@ const Calendar = ({
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const formattedDate = formatDate(currentYear, currentMonth, day); 
-      const isActive = activeDays.has(formattedDate); 
+      const formattedDate = formatDate(currentYear, currentMonth, day);
+      const isActive = activeDays.has(formattedDate);
       calendarDays.push(
         <div key={day} className={`calendar-day ${isActive ? "active" : ""}`}>
           {day}

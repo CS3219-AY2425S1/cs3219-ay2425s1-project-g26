@@ -18,6 +18,7 @@ const DashboardPage = () => {
   const [username, setUsername] = useState('');
   const [hasActiveSession, setHasActiveSession] = useState(false);
   const [matchedUsername, setMatchedUsername] = useState();
+  const [onlineDates, setOnlineDates] = useState(new Set()); // New state for online dates
 
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
@@ -60,6 +61,8 @@ const DashboardPage = () => {
         setUsername(data.data.username);
         setHasActiveSession(data.data.isMatched);
         setMatchedUsername(data.data.matchData.matchedUserName);
+        setOnlineDates(new Set(data.data.onlineDate)); // Update online dates
+
         localStorage.setItem('isMatched', JSON.stringify(data.data.isMatched));
         localStorage.setItem('matchData', JSON.stringify(data.data.matchData));
       } catch (error) {
@@ -128,6 +131,7 @@ const DashboardPage = () => {
           currentYear={currentYear}
           setCurrentMonth={setCurrentMonth}
           setCurrentYear={setCurrentYear}
+          onlineDates={onlineDates} // Pass onlineDates to Calendar
         />
 
         {/* Random Challenge Section */}
