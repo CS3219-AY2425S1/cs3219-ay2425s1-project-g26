@@ -39,6 +39,18 @@ const getMatchById = async (req, res) => {
     }
 };
 
+// Retrieve a single match by its sessionID
+const getMatchBySessionId = async (req, res) => {
+    const { sessionId } = req.params;
+    try {
+        const match = await Match.find({ sessionId: sessionId });
+        console.log("Match found:", match);
+        return res.status(200).json(match);
+    } catch (err) {
+        return res.status(500).json({ message: 'Error retrieving match.', error: err.message });
+    }
+};
+
 // Retrieve all matches (optional: filter by category, complexity, etc.)
 const getAllMatches = async (req, res) => {
     try {
@@ -76,5 +88,6 @@ module.exports = {
     createMatch,
     getMatchById,
     getAllMatches,
-    deleteMatchById
+    deleteMatchById,
+    getMatchBySessionId
 };
