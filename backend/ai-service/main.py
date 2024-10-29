@@ -62,7 +62,5 @@ def prompt_formatter(query) -> str:
 
 
 if __name__ == "__main__":
-    requests.post("http://ollama:11434/api/generate",
-                  json={"model": "llama3.2", "prompt": "", "stream": True}, stream=True)
     print("AI Service successfully initalized!")
     uvicorn.run(app, host="0.0.0.0", port=9680)
