@@ -16,15 +16,27 @@ const python_tc = (input, output) => {
 if __name__ == "__main__":
     print(solution(${input}) == ${output})`
 }
+const java_import = () => {
+  return `import java.util.*;
+  `
+}
 
 const java_tc = (params, input, output, return_type) => {
+  const isArray = return_type.includes("[]");
+  let eval;
+  if (isArray) {
+    eval = `System.out.println(Arrays.equals(user_solution, tc_output));`
+  } else {
+    eval = `System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));`;
+  }
+  
   return `
   public class Main {
     public static void main(String[] args) {
       ${input}
       ${return_type} user_solution = Solution.solution(${params});
-      ${output}
-      System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));
+      ${return_type} tc_output = ${output};
+      ${eval}
     }
   }`
 }
@@ -147,7 +159,7 @@ app.post("/run-code", async (req, res) => {
           break;
         case "java":          
           formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
-          output = await runJava(code + formatted);
+          output = await runJava(java_import() + code + formatted);
           result.push(output == 'true')
           break;
         case "javascript":

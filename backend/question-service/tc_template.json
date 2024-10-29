@@ -1,6 +1,7 @@
 {
   "id": "66f94b18520a7a8a0cf275ef",
   "testcase": {
+      "isAvailable": true,
       "python": {
           "params": "s",
           "input": [

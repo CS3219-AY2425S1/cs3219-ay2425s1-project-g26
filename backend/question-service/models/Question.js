@@ -18,29 +18,40 @@ const questionSchema = new mongoose.Schema({
         required: true
     },
     testcase: {
+        isAvailable: {
+            type: Boolean,
+            default: false
+        },
         python: {
             params: {
-                type: String
+                type: String,
+                default: ""
             },
             input: {
-                type: Array
+                type: Array,
+                default: []
             },
             output: {
-                type: Array
+                type: Array,
+                default: []
             }
         },
         java: {
             params: {
-                type: String
+                type: String,
+                default: ""
             },
             input: {
-                type: Array
+                type: Array,
+                default: []
             },
             output: {
-                type: Array
+                type: Array,
+                default: []
             },
             return_type: {
-                type: String
+                type: String,
+                default: ""
             },
         }
     }
