@@ -44,12 +44,12 @@ const getChatById = async (req, res) => {
 // Add a message into chat db by session ID
 const addMessage = async (req, res) => {
     const { id } = req.params;
-    const { userId, message } = req.body;
+    const { userId, username, message } = req.body;
 
     try {
         const chat = await Chat.findOne({ id });
         if (chat) {
-          chat.messages.push({ userId, message });
+          chat.messages.push({ userId, username, message });
           await chat.save();
           res.status(201).json(chat.messages);
         } else {
