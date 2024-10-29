@@ -6,7 +6,7 @@ const createChat = async (req, res) => {
     console.log(req.body);
     try {
         // Check if the session already exists
-        const existingChat = await Chat.findOne({ sessionId });
+        const existingChat = await Chat.findOne({ sessionId: sessionId });
         if (existingChat) {
           return res.status(400).send('Session already exists');
         }
