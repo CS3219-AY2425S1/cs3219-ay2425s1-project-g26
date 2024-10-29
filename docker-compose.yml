@@ -61,6 +61,12 @@ services:
     ports:
       - "8084:8084"
 
+  chat-service:
+    build:
+      context: ./backend/chat-service
+    ports:
+      - "8085:8085"
+
 # if using 1 env file in root folder (env.example is in google docs)
 
 # services:
