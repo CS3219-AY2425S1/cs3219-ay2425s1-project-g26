@@ -4,7 +4,7 @@ import Chat from './Chat';
 import AI from './AI';  
 import Whiteboard from './Whiteboard';
 
-const Tabs = ({ question, sessionId }) => {
+const Tabs = ({ question, sessionId, userId }) => {
   const [selectedTab, setSelectedTab] = useState('Question');
   const [aiMessages, setAiMessages] = useState([]);
   const [aiInputValue, setAiInputValue] = useState('');
@@ -33,7 +33,7 @@ const Tabs = ({ question, sessionId }) => {
       case 'Question':
         return <Question question={question} />;
       case 'Chat':
-        return <Chat />;
+        return <Chat sessionId={sessionId} userId={userId} />;
       case 'AI':
         return (
           <AI 
