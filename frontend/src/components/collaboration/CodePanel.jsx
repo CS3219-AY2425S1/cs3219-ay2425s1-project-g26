@@ -196,7 +196,7 @@ public class Main {
         fontSize: '1rem', 
         whiteSpace: 'pre', 
         border: '1px solid #ddd', 
-        maxHeight: '200px', 
+        maxHeight: '150px', 
         overflowY: 'auto', 
         overflowX: 'auto' 
       }}>
