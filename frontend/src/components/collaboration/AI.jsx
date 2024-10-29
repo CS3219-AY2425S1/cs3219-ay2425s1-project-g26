@@ -4,6 +4,7 @@ import './styles/AI.css';
 const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   const [loading, setLoading] = useState(false); 
   const textareaRef = useRef(null);
+  const chatWindowRef = useRef(null);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -19,27 +20,44 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
     setInputValue(''); 
 
     try {
-      // Call the AI backend API
-      const response = await fetch('http://localhost:9680/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: inputValue }),
+      let aiMessage = '';
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: aiMessage, sender: 'ai' },
+      ]);
+
+      const response = await fetch(`http://localhost:9680/stream?query=${encodeURIComponent(inputValue)}`, {
+        method: 'GET',
       });
 
       if (!response.ok) {
         throw new Error('Error with AI response');
       }
 
-      const data = await response.json();
-      const aiMessage = data.message;
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
 
-      // Add AI's message to the chat
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: aiMessage, sender: 'ai' },
-      ]);
+      while (!done) {
+        const { value, done: isDone } = await reader.read();
+        done = isDone;
+        const chunk = decoder.decode(value);
+
+        const cleanedChunk = chunk.replace(/^data:\s?/, '').trim();
+        
+        const replacedChunk = cleanedChunk
+          .replace(/\/s/g, ' ')
+          .replace(/\\n/g, '<br />');
+          
+        aiMessage += replacedChunk;
+        
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages];
+          updatedMessages[updatedMessages.length - 1] = { text: aiMessage, sender: 'ai' };
+          return updatedMessages;
+        });
+      }
+
     } catch (error) {
       console.error('Error:', error);
       setMessages((prevMessages) => [
@@ -52,12 +70,9 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   };
 
   const renderMessage = (text) => {
-    return text.split('\n').map((line, index) => (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    ));
+    return (
+      <span dangerouslySetInnerHTML={{ __html: text }} />
+    );
   };
 
   const handleKeyDown = (e) => {
@@ -78,22 +93,30 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-        textarea.style.height = 'auto';
-        textarea.style.height = `${Math.max(textarea.scrollHeight, 60)}px`;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.max(textarea.scrollHeight, 60)}px`;
 
-        if (inputValue === '') {
-            textarea.style.height = '60px'; 
-        }
+      if (inputValue === '') {
+        textarea.style.height = '60px'; 
+      }
     }
-}, [inputValue]);
+  }, [inputValue]);
+
+  useEffect(() => {
+    const chatWindow = chatWindowRef.current;
+    if (chatWindow) {
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <div className="chat-container">
       <h3>Chat with Raesa</h3>
-      <div className="chat-window">
+      <div className="chat-window" ref={chatWindowRef}> 
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {renderMessage(msg.text)}
+            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> 
+            {renderMessage(msg.text)} 
           </div>
         ))}
         {loading && <div className="loading">Loading...</div>}

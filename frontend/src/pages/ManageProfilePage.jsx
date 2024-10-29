@@ -5,6 +5,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './styles/manageprofilepage.css'; 
+import withAuth from "../hoc/withAuth";
 
 const ManageProfilePage = () => {
   const { userId, accessToken, logout } = useAuth();
@@ -142,6 +143,8 @@ const ManageProfilePage = () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
     if (!confirmDelete) return;
 
+    setLoading(true);
+
     try {
       const response = await fetch(`http://localhost:8081/users/${userId}`, {
         method: 'DELETE',
@@ -159,9 +162,11 @@ const ManageProfilePage = () => {
       logout();
       localStorage.clear();
       sessionStorage.clear();
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       toast.error(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -300,4 +305,5 @@ const ManageProfilePage = () => {
   );
 };
 
-export default ManageProfilePage;
+const WrappedManageProfilePage = withAuth(ManageProfilePage);
+export default WrappedManageProfilePage;

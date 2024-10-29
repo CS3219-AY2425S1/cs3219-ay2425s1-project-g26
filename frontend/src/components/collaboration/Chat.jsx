@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios'; // Make sure to install axios
-import './styles/Chat.css';
 
 const Chat = ({ sessionId, userId }) => {
   const [messages, setMessages] = useState([]); // State to hold messages
