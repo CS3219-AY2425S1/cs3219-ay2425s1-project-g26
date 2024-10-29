@@ -9,33 +9,34 @@ import { Toaster, toast } from 'sonner';
 const socket = io('http://localhost:8084');
 
 //NEED TO REPLACE (TODO)
-const testcase = {
-  "python": {
-      "params": "s",
-      "input": [
-          "['h','e','l','l','o']",
-          "['H','a','n','n','a', 'h']"
-      ],
-      "output": [
-          "['o','l','l','e','h']",
-          "['h','a','n','n','a','H']"
-      ]
-  },
-  "java": {
-      "params": "char[] s",
-      "return_type": "char[]",
-      "input": [
-          "char[] s = {'h', 'e', 'l', 'l', 'o'};",
-          "char[] s = {'H','a','n','n','a','h'};"
-      ],
-      "output": [
-          "char[] tc_output = {'o', 'l', 'l', 'e', 'h'};",
-          "char[] tc_output = {'h','a','n','n','a','H'};"
-      ]
-  }
-};
+// const testcase = {
+//   "python": {
+//       "params": "s",
+//       "input": [
+//           "['h','e','l','l','o']",
+//           "['H','a','n','n','a', 'h']"
+//       ],
+//       "output": [
+//           "['o','l','l','e','h']",
+//           "['h','a','n','n','a','H']"
+//       ]
+//   },
+//   "java": {
+//       "params": "char[] s",
+//       "return_type": "char[]",
+//       "input": [
+//           "char[] s = {'h', 'e', 'l', 'l', 'o'};",
+//           "char[] s = {'H','a','n','n','a','h'};"
+//       ],
+//       "output": [
+//           "char[] tc_output = {'o', 'l', 'l', 'e', 'h'};",
+//           "char[] tc_output = {'h','a','n','n','a','H'};"
+//       ]
+//   }
+// };
 
-const CodePanel = ({ sessionId }) => {
+const CodePanel = ({ question, sessionId }) => {
+  const testcase = question.testcase;
   const defaultCodes = {
     javascript: `// JavaScript code
 const example = "raesa";
