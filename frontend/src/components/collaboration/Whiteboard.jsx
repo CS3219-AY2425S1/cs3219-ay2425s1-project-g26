@@ -140,6 +140,18 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
     };
   }, [socket, context]);
 
+  const clearCanvas = () => {
+    if (context) {
+      context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      context.fillStyle = '#fff';
+      context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+      if (socket) {
+        socket.emit('clearWhiteboard', sessionId);
+      }
+    }
+  };
+
   return (
     <div style={{ textAlign: 'left' }}>
       <h3>Whiteboard</h3>
@@ -164,6 +176,11 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
           onChange={(e) => setLineWidth(e.target.value)}
           style={{ marginLeft: '10px', width: '60px' }}
         />
+      </div>
+      <div style={{ marginBottom: '10px' }}>
+        <button onClick={clearCanvas} style={{ marginRight: '10px' }}>
+          Clear Canvas
+        </button>
       </div>
       <div style={{ marginTop: '20px', marginBottom: '10px' }}>
         <canvas
