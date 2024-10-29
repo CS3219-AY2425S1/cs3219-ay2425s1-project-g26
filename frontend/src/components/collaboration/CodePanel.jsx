@@ -5,9 +5,9 @@ import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { Toaster, toast } from 'sonner';
+import { basicSetup } from 'codemirror';
 
 const socket = io('http://localhost:8084');
-
 
 const CodePanel = ({ sessionId }) => {
   const defaultCodes = {
@@ -135,19 +135,42 @@ public class Main {
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', height: '100%', position: 'relative' }}>
+    <div style={{ 
+      backgroundColor: '#fff', 
+      padding: '20px', 
+      borderRadius: '8px', 
+      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', 
+      height: '100%', 
+      position: 'relative', 
+      overflow: 'hidden'
+    }}>
       <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a3042' }}>Code</h2>
-      <select style={{ position: 'absolute', top: '10px', right: '20px', padding: '5px', fontSize: '1rem', fontFamily: 'monospace' }} value={language} onChange={handleLanguageChange}>
+      <select style={{ 
+        position: 'absolute', 
+        top: '10px', 
+        right: '20px', 
+        padding: '5px', 
+        fontSize: '1rem', 
+        fontFamily: 'monospace' 
+      }} value={language} onChange={handleLanguageChange}>
         <option value="javascript">JavaScript</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
       </select>
-      <CodeMirror
-        value={code}
-        height="400px"
-        extensions={[languageExtensions[language]]}
-        onChange={handleCodeChange}
-      />
+      <div style={{ height: '400px', overflow: 'hidden', position: 'relative' }}>
+        <CodeMirror
+          value={code}
+          height="100%"
+          extensions={[basicSetup, languageExtensions[language]]}
+          onChange={handleCodeChange}
+          style={{ 
+            height: '100%', 
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            whiteSpace: 'pre-wrap'
+          }} 
+        />
+      </div>
       <button
         style={{
           marginTop: '20px',
@@ -164,7 +187,19 @@ public class Main {
       >
         Run Code
       </button>
-      <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '4px', fontFamily: 'monospace', fontSize: '1rem', whiteSpace: 'pre', border: '1px solid #ddd', maxHeight: '200px', overflowY: 'auto', overflowX: 'auto' }}>
+      <div style={{ 
+        marginTop: '20px', 
+        padding: '10px', 
+        backgroundColor: '#f0f0f0', 
+        borderRadius: '4px', 
+        fontFamily: 'monospace', 
+        fontSize: '1rem', 
+        whiteSpace: 'pre', 
+        border: '1px solid #ddd', 
+        maxHeight: '200px', 
+        overflowY: 'auto', 
+        overflowX: 'auto' 
+      }}>
         <h3>Output:</h3>
         <pre>{output}</pre>
       </div>
