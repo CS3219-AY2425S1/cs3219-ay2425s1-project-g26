@@ -43,15 +43,21 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         const chunk = decoder.decode(value);
 
         const cleanedChunk = chunk.replace(/^data:\s?/, '').trim();
-        const replacedChunk = cleanedChunk.replace(/\/s/g, ' '); // Replace "/s" with a space
+        
+        const replacedChunk = cleanedChunk
+          .replace(/\/s/g, ' ')
+          .replace(/\n/g, '<br />')
+          .replace(/\/n/g, '<br />');
 
         aiMessage += replacedChunk;
+        
         setMessages((prevMessages) => {
           const updatedMessages = [...prevMessages];
           updatedMessages[updatedMessages.length - 1] = { text: aiMessage, sender: 'ai' };
           return updatedMessages;
         });
       }
+
     } catch (error) {
       console.error('Error:', error);
       setMessages((prevMessages) => [
@@ -64,12 +70,9 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   };
 
   const renderMessage = (text) => {
-    return text.split('\n').map((line, index) => (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    ));
+    return (
+      <span dangerouslySetInnerHTML={{ __html: text }} />
+    );
   };
 
   const handleKeyDown = (e) => {
@@ -105,7 +108,8 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
       <div className="chat-window">
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {renderMessage(msg.text)}
+            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> 
+            {renderMessage(msg.text)} 
           </div>
         ))}
         {loading && <div className="loading">Loading...</div>}

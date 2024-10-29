@@ -41,7 +41,8 @@ def get_response(query):
     for chunk in response.iter_content(None, decode_unicode=True):
         if chunk:
             chunk_str = chunk.decode().split("\"response\":\"")[1].split("\",\"done\"")[0]
-            formatted_chunk = "data:" + chunk_str.replace(" ", "/s") + "\n\n"
+            formatted_chunk = "data:" + \
+                chunk_str.replace(" ", "/s").replace("\n", "/n")
             yield formatted_chunk
 
 
