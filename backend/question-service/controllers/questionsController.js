@@ -3,7 +3,7 @@ const QuestionSchema = require('../models/Question');
 
 const getAllQuestions = async (req, res) => {
     const questions = await QuestionSchema.find();
-    if (!questions) return res.status(204).json({ 'message': 'No questions found.' });
+    if (!questions) return res.status(404).json({ 'message': 'No questions found.' });
     res.json(questions);
 }
 
