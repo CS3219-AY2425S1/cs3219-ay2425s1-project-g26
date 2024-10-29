@@ -43,8 +43,9 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         const chunk = decoder.decode(value);
 
         const cleanedChunk = chunk.replace(/^data:\s?/, '').trim();
+        const replacedChunk = cleanedChunk.replace(/\/s/g, ' '); // Replace "/s" with a space
 
-        aiMessage += cleanedChunk;
+        aiMessage += replacedChunk;
         setMessages((prevMessages) => {
           const updatedMessages = [...prevMessages];
           updatedMessages[updatedMessages.length - 1] = { text: aiMessage, sender: 'ai' };
