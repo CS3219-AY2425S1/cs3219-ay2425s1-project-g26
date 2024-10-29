@@ -9,51 +9,50 @@ import { Toaster, toast } from 'sonner';
 const socket = io('http://localhost:8084');
 
 const CodePanel = ({ question, sessionId }) => {
-  const testcase = question.testcase.available;
-  const defaultCodes = {
-    javascript: `// JavaScript code
+  const testcase = question.testcase;
+  const isTestcaseAvailable = question.testcase.isAvailable;
+  let defaultCodes;
+
+  if (isTestcaseAvailable) {
+    defaultCodes = {
+      javascript: `// JavaScript code
 const example = "raesa";
 console.log(example);`,
-
-    python: `# Python code
+  
+      python: `# Python code
 def solution(${testcase.python.params}):
     return
     `,
 
-    java: `// Java code
+      java: `// Java code
 class Solution {
   public static ${testcase.java.return_type} solution(${testcase.java.params}) {
 
   }
-}   
-`,
-  };
-
-// Solutions for Reverse a String (Easy & Algo)
-const solutionCodes = {
-    javascript: `// JavaScript code
+}`};
+  } else {
+    defaultCodes = {
+      javascript: `// JavaScript code
 const example = "raesa";
 console.log(example);`,
+  
+      python: `# Python code
+def main():
+    example = "raesa"
+    print(example)
 
-    python: `# Python code
-def solution(${testcase.python.params}):
-  s.reverse()
-  return s`,
-
-    java: `// Java code
-class Solution {
-  public static void solution(${testcase.java.params}) {
-    int n = s.length;
-    for(int i=0; i<n/2; i++)
-    {
-        char tmp = s[i];
-        s[i] = s[n-1-i];
-        s[n-1-i] = tmp;
-    }
-    return s;
+if __name__ == "__main__":
+    main()`,
+  
+      java: `// Java code
+public class Main {
+  public static void main(String[] args) {
+    String example = "raesa";
+    System.out.println(example);
   }
-}   
-`};
+}`
+    };
+  }
 
 
   const [language, setLanguage] = useState('python');

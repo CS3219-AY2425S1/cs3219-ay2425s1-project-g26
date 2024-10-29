@@ -145,7 +145,7 @@ app.post("/run-code", async (req, res) => {
     let result = [];
     const python_in = testcase.python.input;
     const python_out = testcase.python.output;
-    const java_params = testcase.python.params; //As intended, not a bug.
+    const java_params = testcase.python.params;
     const java_in = testcase.java.input;
     const java_out = testcase.java.output;
     const java_rt = testcase.java.return_type;
@@ -155,10 +155,12 @@ app.post("/run-code", async (req, res) => {
         case "python":
           formatted = python_tc(python_in[i], python_out[i]);
           output = await runPython(code + formatted);
+          //TODO: Can edit output
           result.push(output == 'True')
           break;
         case "java":          
           formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
+          //TODO: Can edit output
           output = await runJava(java_import() + code + formatted);
           result.push(output == 'true')
           break;
