@@ -1,13 +1,13 @@
 const SessionSchema = require('../models/Session');
 
 const getSession = async (req, res) => {
-    if (!(req.body.sessionid)) {
+    if (!(req.params.id)) {
         return res.status(400).json({ 'message': 'No session ID provided!' });
     }
 
-    const session = await SessionSchema.findOne({ sessionid: req.body.sessionid }).exec();
+    const session = await SessionSchema.findOne({ sessionid: req.params.id });
 
-    return res.status(200).json(JSON.stringify(session))
+    return res.status(200).json(session)
 }
 
 const createSession = async (req, res) => {

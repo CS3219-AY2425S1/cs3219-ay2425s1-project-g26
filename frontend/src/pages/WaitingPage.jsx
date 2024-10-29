@@ -43,6 +43,42 @@ const WaitingPage = () => {
     }
   }, [navigate, userPref, loading]); 
 
+  const handleCreateSession = async (sessionId) => {
+    const match = await fetch(
+      `http://localhost:8082/matches/${sessionId}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        body: {
+          sessionId: sessionId
+        }
+      });
+      
+      const matchData = match.body
+
+      if (matchData) {
+        const result = await fetch(
+          `http://localhost:8084/sessions/${sessionId}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: {
+              sessionId: sessionId,
+              userid1: matchData.user1Id,
+              username1: matchData.user1Name,
+              userid2: matchData.user2Id,
+              username2: matchData.user2Name
+            }
+          }
+        )
+      if (result.ok) {
+        return true;
+      } else {
+        return false
+      }
+    }
+  }
+
   const createMatchRequest = async (userPref) => {
     console.log("MATCHINGG");
     localStorage.removeItem('startTime');
@@ -65,6 +101,9 @@ const WaitingPage = () => {
           setMatchFound(true);
           setMatchData(response.data);
           updateMatchedStatus(response.data);
+          if (response.data.userNo === 1) {
+            handleCreateSession(response.data.sessionId)
+          }
 
           clearInterval(intervalId);
           clearTimeout(timeoutId);
