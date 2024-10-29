@@ -73,7 +73,7 @@ def get_response(query):
 def prompt_formatter(query) -> str:    
     base_prompt = """Please answer the query.
                     Please keep your answer as short as possible.
-                    Your name is RAESA. You can refer to your name when answering the question.
+                    Your name is Raesa. You can refer to your name when answering the question.                    
                     User query: {query}
                     Answer:"""
 

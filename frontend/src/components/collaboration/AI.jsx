@@ -46,8 +46,8 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         
         const replacedChunk = cleanedChunk
           .replace(/\/s/g, ' ')
-          .replace(/\n/g, '<br />')
-          .replace(/\/n/g, '<br />');
+          .replace(/\\n/g, '<br />');
+          
 
         aiMessage += replacedChunk;
         
