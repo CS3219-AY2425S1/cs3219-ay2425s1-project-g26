@@ -42,12 +42,21 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
       const newHeight = canvas.offsetHeight;
 
       if (canvas.width !== newWidth || canvas.height !== newHeight) {
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-
         if (context) {
-          context.fillStyle = '#fff';
-          context.fillRect(0, 0, canvas.width, canvas.height);
+          const imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+
+          context.putImageData(imgData, 0, 0);
+        } else {
+          canvas.width = newWidth;
+          canvas.height = newHeight;
+
+          if (context) {
+            context.fillStyle = '#fff';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+          }
         }
       }
     }
@@ -57,7 +66,7 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
     setCanvasSize();
     window.addEventListener('resize', setCanvasSize);
     return () => window.removeEventListener('resize', setCanvasSize);
-  }, [canvasRef]);
+  }, [canvasRef, context]);
 
   const startDrawing = (e) => {
     setIsDrawing(true);
@@ -77,7 +86,7 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
   };
 
   const draw = (e) => {
-    if (!isDrawing) return;
+    if (!isDrawing || !context) return;
     const { offsetX, offsetY } = e.nativeEvent;
 
     context.strokeStyle = color;

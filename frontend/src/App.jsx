@@ -12,7 +12,7 @@ import ConfirmTokenPage from "./pages/ConfirmTokenPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CollaborationPage from "./pages/CollaborationPage"; 
 import SummaryPage from "./pages/SummaryPage";
-import backgroundImage from "./assets/images/darker.jpg"; 
+import backgroundImage from "./assets/images/background.jpg"; 
 import "./styles/App.css"; 
 
 const App = () => {
