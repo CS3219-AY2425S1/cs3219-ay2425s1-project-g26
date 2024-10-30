@@ -12,10 +12,10 @@ const getQuestionOnMatch = async (req, res) => {
         return res.status(400).json({ 'message': 'Category (array) and complexity (string) are required!' });
     }
 
-    const questions = await QuestionSchema.find();  
-    filteredQuestions = questions.filter(question => req?.body.complexity == question.complexity 
-        && req?.body.category.some(cat => question.category.includes(cat)) );
-    
+    const questions = await QuestionSchema.find();
+    filteredQuestions = questions.filter(question => req?.body.complexity == question.complexity
+        && req?.body.category.some(cat => question.category.includes(cat)));
+
     if (filteredQuestions.length == 0) {
         return res.status(400).json({ 'message': 'No quetions with the criteria is found!' });
     }
@@ -28,7 +28,7 @@ const getQuestionsByID = async (req, res) => {
         return res.status(400).json({ 'message': 'questions (Array) field is required!' });
     }
 
-    const questions = await QuestionSchema.find();  
+    const questions = await QuestionSchema.find();
     filteredQuestions = questions.filter(question => req?.body.questions.includes(question.id));
     res.json(filteredQuestions);
 }
@@ -42,8 +42,8 @@ const createQuestion = async (req, res) => {
     let categoryArray = req?.body?.category;
     if (typeof req?.body?.category === 'string') {
         categoryArray = req?.body?.category.split(',')
-        .map(item => item.trim()) // Trim spaces
-        .filter(item => item != ""); // Filter out empty strings explicitly
+            .map(item => item.trim()) // Trim spaces
+            .filter(item => item != ""); // Filter out empty strings explicitly
     }
 
     // Check for duplicate questions by title and description
@@ -60,7 +60,7 @@ const createQuestion = async (req, res) => {
             category: categoryArray,
             complexity: req.body.complexity
         });
-        
+
         console.log(`Question: ${req.body.title} created in the database.`)
         return res.status(201).json(result);
     } catch (err) {
@@ -68,58 +68,72 @@ const createQuestion = async (req, res) => {
     }
 }
 
+const addTestCase = async (req, res) => {
+    try {
+        const questionId = req.body.id;
+        const question = await QuestionSchema.findOne({ _id: questionId }).exec();
+        if (req.body?.testcase) question.testcase = req.body.testcase;
+        const updatedQuestion = await question.save();
+        return res.status(200).json(updatedQuestion);
+        
+    } catch (error) {
+        console.error('Error updating question:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
 const updateQuestion = async (req, res) => {
-  try {
+    try {
 
-    // to reflect the update successfully in database and UI, params.id / body._id can be used
-    const questionId = req.body._id;
-    console.log('Received questionId:', questionId);
+        // to reflect the update successfully in database and UI, params.id / body._id can be used
+        const questionId = req.body._id;
+        console.log('Received questionId:', questionId);
 
-    if (!questionId) {
-        return res.status(400).json({ 'message': 'Question ID is required.' });
+        if (!questionId) {
+            return res.status(400).json({ 'message': 'Question ID is required.' });
+        }
+
+        const question = await QuestionSchema.findOne({ _id: questionId }).exec();
+
+        if (!question) {
+            return res.status(401).json({ "message": `No question matches ID ${questionId}.` });
+        }
+
+        // Check for duplicate titles
+        const currentTitle = await QuestionSchema.findById(req.body._id, 'title').exec()
+        const duplicateTitleCheck = (await QuestionSchema.countDocuments({ title: req.body.title }) > 1) || (await QuestionSchema.countDocuments({ title: req.body.title }) == 1 && currentTitle.title != req.body.title)
+        if (duplicateTitleCheck) {
+            return res.status(409).json({ 'message': 'A question with this title already exists!' })
+        }
+
+        // Check for duplicate descriptions
+        const currentDescription = await QuestionSchema.findById(req.body._id, 'description').exec()
+        const duplicateDescCheck = (await QuestionSchema.countDocuments({ description: req.body.description }) > 1) || (await QuestionSchema.countDocuments({ description: req.body.description }) == 1 && currentDescription.description != req.body.description)
+        if (duplicateDescCheck) {
+            return res.status(409).json({ 'message': 'A question with this description already exists!' })
+        }
+
+        // Convert category to an array if it's a comma-separated string
+        let categoryArray = req?.body?.category;
+        if (typeof req?.body?.category === 'string') {
+            categoryArray = req?.body?.category.split(',')
+                .map(item => item.trim()) // Trim spaces
+                .filter(item => item != ""); // Filter out empty strings explicitly
+        }
+
+        if (req.body?.title) question.title = req.body.title;
+        if (req.body?.description) question.description = req.body.description;
+        if (req.body?.category) question.category = categoryArray;
+        if (req.body?.complexity) question.complexity = req.body.complexity;
+
+        const updatedQuestion = await question.save();
+        console.log(`Question: ${question.title} has been successfully updated in the database.`)
+
+        return res.status(200).json(updatedQuestion);
+    } catch (error) {
+        console.error('Error updating question:', error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
-
-    const question = await QuestionSchema.findOne({ _id: questionId }).exec();
-
-    if (!question) {
-        return res.status(401).json({ "message": `No question matches ID ${ questionId}.` });
-    }
-
-    // Check for duplicate titles
-    const currentTitle = await QuestionSchema.findById(req.body._id, 'title').exec()
-    const duplicateTitleCheck = (await QuestionSchema.countDocuments({ title: req.body.title }) > 1) || (await QuestionSchema.countDocuments({ title: req.body.title }) == 1 && currentTitle.title != req.body.title)
-    if (duplicateTitleCheck) {
-        return res.status(409).json({ 'message': 'A question with this title already exists!' })
-    }
-
-    // Check for duplicate descriptions
-    const currentDescription = await QuestionSchema.findById(req.body._id, 'description').exec()
-    const duplicateDescCheck = (await QuestionSchema.countDocuments({ description: req.body.description }) > 1) || (await QuestionSchema.countDocuments({ description: req.body.description }) == 1 && currentDescription.description != req.body.description)
-    if (duplicateDescCheck) {
-        return res.status(409).json({ 'message': 'A question with this description already exists!' })
-    }
-
-    // Convert category to an array if it's a comma-separated string
-    let categoryArray = req?.body?.category;
-    if (typeof req?.body?.category === 'string') {
-        categoryArray = req?.body?.category.split(',')
-        .map(item => item.trim()) // Trim spaces
-        .filter(item => item != ""); // Filter out empty strings explicitly
-    }
-
-    if (req.body?.title) question.title = req.body.title;
-    if (req.body?.description) question.description = req.body.description;
-    if (req.body?.category) question.category = categoryArray;
-    if (req.body?.complexity) question.complexity = req.body.complexity;
-
-    const updatedQuestion = await question.save();
-    console.log(`Question: ${question.title} has been successfully updated in the database.`)
-
-    return res.status(200).json(updatedQuestion);
-  } catch (error) {
-      console.error('Error updating question:', error);
-      return res.status(500).json({ message: 'Internal server error' });
-  }
 }
 
 const deleteQuestion = async (req, res) => {
@@ -160,5 +174,6 @@ module.exports = {
     deleteQuestion,
     getQuestion,
     getQuestionsByID,
-    getQuestionOnMatch
+    getQuestionOnMatch,
+    addTestCase
 }
