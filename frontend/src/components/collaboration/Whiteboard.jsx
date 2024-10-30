@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
-const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, savedCanvasData, sessionId }) => {
+const Whiteboard = ({ canvasRef, savedCanvasData, sessionId }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [context, setContext] = useState(null);
   const [socket, setSocket] = useState(null);
+  
+  // Fixed color options with names and hex values
+  const colorOptions = [
+    { name: 'Red', hex: '#FF0000' },
+    { name: 'Green', hex: '#00FF00' },
+    { name: 'Blue', hex: '#0000FF' },
+    { name: 'Yellow', hex: '#FFFF00' },
+    { name: 'Magenta', hex: '#FF00FF' }
+  ];
+  const [color, setColor] = useState(colorOptions[0].hex); // Default to the first color
+  
+  // Fixed line width options
+  const lineWidthOptions = [1, 5, 10, 15, 20];
+  const [lineWidth, setLineWidth] = useState(lineWidthOptions[0]); // Default to the first width
 
   useEffect(() => {
     const newSocket = io('http://localhost:8084');
@@ -157,25 +171,33 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
       <h3>Whiteboard</h3>
       <div style={{ marginBottom: '10px' }}>
         <label htmlFor="colorPicker">Color:</label>
-        <input
-          type="color"
+        <select
           id="colorPicker"
           value={color}
           onChange={(e) => setColor(e.target.value)}
           style={{ marginLeft: '10px' }}
-        />
+        >
+          {colorOptions.map(({ name, hex }) => (
+            <option key={hex} value={hex} style={{ backgroundColor: hex }}>
+              {name}
+            </option>
+          ))}
+        </select>
       </div>
       <div style={{ marginBottom: '10px' }}>
         <label htmlFor="lineWidth">Line Width:</label>
-        <input
-          type="number"
+        <select
           id="lineWidth"
           value={lineWidth}
-          min="1"
-          max="20"
-          onChange={(e) => setLineWidth(e.target.value)}
-          style={{ marginLeft: '10px', width: '60px' }}
-        />
+          onChange={(e) => setLineWidth(parseInt(e.target.value, 10))}
+          style={{ marginLeft: '10px' }}
+        >
+          {lineWidthOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
       </div>
       <div style={{ marginBottom: '10px' }}>
         <button onClick={clearCanvas} style={{ marginRight: '10px' }}>
@@ -185,7 +207,7 @@ const Whiteboard = ({ color, setColor, lineWidth, setLineWidth, canvasRef, saved
       <div style={{ marginTop: '20px', marginBottom: '10px' }}>
         <canvas
           ref={canvasRef}
-          style={{ border: '1px solid black', width: '100%', height: '300px' }}
+          style={{ border: '1px solid black', width: '100%', height: '400px' }}
           onMouseDown={startDrawing}
           onMouseUp={finishDrawing}
           onMouseMove={draw}

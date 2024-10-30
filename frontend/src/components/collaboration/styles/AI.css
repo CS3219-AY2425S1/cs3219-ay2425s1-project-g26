@@ -5,7 +5,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 560px;
+    /* height: 590px; */
+    height: calc(100vh - 250px);
 }
 
 .chat-window {
