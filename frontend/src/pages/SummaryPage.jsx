@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from "../AuthContext"; 
 import axios from 'axios';
+import withAuth from "../hoc/withAuth"; 
 
 const SummaryPage = () => {
   const navigate = useNavigate();
@@ -152,4 +153,5 @@ const styles = {
   },
 };
 
-export default SummaryPage;
+const WrappedSummaryPage = withAuth(SummaryPage);
+export default WrappedSummaryPage;

@@ -130,7 +130,10 @@ const CollaborationPage = () => {
     flexDirection: 'row',
     gap: '20px',
     marginTop: '70px',
+    width: '100%',
+    overflow: 'hidden',
   };
+
 
   const leftPaneStyle = {
     flex: 1,
@@ -140,7 +143,10 @@ const CollaborationPage = () => {
   const rightPaneStyle = {
     flex: 2,
     padding: '6px',
+    overflow: 'hidden',
+    maxWidth: '100%',
   };
+
 
   return (
     <div style={containerStyle}>
