@@ -23,7 +23,7 @@ app.use('/matches', require('./routes/matches'));
 mongoose.connection.once('open', () => {
     // Only listen to the port after connected to mongodb.
     console.log('connected to MongoDB');
-    app.listen(PORT, () => console.log(`Matching service running on port ${PORT}`));
+    app.listen(PORT, () => console.log(`Matching service is running on port ${PORT}`));
 });
 
 // Initialize RabbitMQ

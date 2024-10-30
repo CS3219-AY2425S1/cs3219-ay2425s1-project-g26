@@ -19,27 +19,45 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
     setInputValue(''); 
 
     try {
-      // Call the AI backend API
-      const response = await fetch('http://localhost:9680/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query: inputValue }),
+      let aiMessage = '';
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: aiMessage, sender: 'ai' },
+      ]);
+
+      const response = await fetch(`http://localhost:9680/stream?query=${encodeURIComponent(inputValue)}`, {
+        method: 'GET',
       });
 
       if (!response.ok) {
         throw new Error('Error with AI response');
       }
 
-      const data = await response.json();
-      const aiMessage = data.message;
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
 
-      // Add AI's message to the chat
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: aiMessage, sender: 'ai' },
-      ]);
+      while (!done) {
+        const { value, done: isDone } = await reader.read();
+        done = isDone;
+        const chunk = decoder.decode(value);
+
+        const cleanedChunk = chunk.replace(/^data:\s?/, '').trim();
+        
+        const replacedChunk = cleanedChunk
+          .replace(/\/s/g, ' ')
+          .replace(/\\n/g, '<br />');
+          
+
+        aiMessage += replacedChunk;
+        
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages];
+          updatedMessages[updatedMessages.length - 1] = { text: aiMessage, sender: 'ai' };
+          return updatedMessages;
+        });
+      }
+
     } catch (error) {
       console.error('Error:', error);
       setMessages((prevMessages) => [
@@ -52,12 +70,9 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   };
 
   const renderMessage = (text) => {
-    return text.split('\n').map((line, index) => (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    ));
+    return (
+      <span dangerouslySetInnerHTML={{ __html: text }} />
+    );
   };
 
   const handleKeyDown = (e) => {
@@ -85,7 +100,7 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
             textarea.style.height = '60px'; 
         }
     }
-}, [inputValue]);
+  }, [inputValue]);
 
   return (
     <div className="chat-container">
@@ -93,7 +108,8 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
       <div className="chat-window">
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> {renderMessage(msg.text)}
+            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> 
+            {renderMessage(msg.text)} 
           </div>
         ))}
         {loading && <div className="loading">Loading...</div>}

@@ -64,7 +64,8 @@ io.on('connection', (socket) => {
   });
 });
 
+const PORT = process.env.PORT || 8084;
 // Start the server
-server.listen(8084, () => {
-  console.log('collaboration service running on port 8084');
+server.listen(PORT, () => {
+    console.log(`Collaboration service is running on port ${PORT}`);
 });

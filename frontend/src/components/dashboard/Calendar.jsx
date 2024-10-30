@@ -6,14 +6,14 @@ const Calendar = ({
   currentYear,
   setCurrentMonth,
   setCurrentYear,
+  onlineDates,
 }) => {
   const [activeDays, setActiveDays] = useState(new Set());
 
   useEffect(() => {
-    const storedDays = localStorage.getItem("onlineDate");
-    const activeDaysArray = storedDays ? storedDays.split(",") : []; 
-    setActiveDays(new Set(activeDaysArray)); 
-  }, [currentMonth, currentYear]);
+    console.log("calender", onlineDates);
+    setActiveDays(new Set(onlineDates));
+  }, [currentMonth, currentYear, onlineDates]);
 
   const formatDate = (year, month, day) => {
     const paddedMonth = String(month + 1).padStart(2, "0");
@@ -50,8 +50,8 @@ const Calendar = ({
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const formattedDate = formatDate(currentYear, currentMonth, day); 
-      const isActive = activeDays.has(formattedDate); 
+      const formattedDate = formatDate(currentYear, currentMonth, day);
+      const isActive = activeDays.has(formattedDate);
       calendarDays.push(
         <div key={day} className={`calendar-day ${isActive ? "active" : ""}`}>
           {day}

@@ -31,7 +31,7 @@ const SignUp = () => {
         },
         body: JSON.stringify({ 
           username,
-          email,
+          email: email.toLowerCase(),
           password,
         }),
       });

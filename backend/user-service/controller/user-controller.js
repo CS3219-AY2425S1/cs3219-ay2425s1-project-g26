@@ -199,6 +199,7 @@ export async function getUser(req, res) {
     if (!user) {
       return res.status(404).json({ message: `User ${userId} not found` });
     } else {
+      await updateOnlineTime(user);
       return res.status(200).json({ message: `Found user`, data: formatUserResponse(user) });
     }
   } catch (err) {
@@ -301,6 +302,8 @@ export async function updateUserPrivilege(req, res) {
 
 export async function updateOnlineTime(user) {
   const currentDate = new Date(Date.now());
+  currentDate.setHours(currentDate.getHours() + 8);
+  console.log("current date", currentDate);
   const parsedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
 
   const onlineDate = user.onlineDate;
