@@ -101,7 +101,7 @@ const runJava = (code) => {
             fs.unlinkSync(filePath);
             fs.unlinkSync(path.join(__dirname, "Main.class")); // Clean up
             fs.unlinkSync(path.join(__dirname, "Solution.class")); // Clean up
-                        
+
             if (runError || stderr) {
               const errorMessage =
                 stderr || runError.message || "Unknown error";
@@ -156,43 +156,42 @@ app.post("/run-code", async (req, res) => {
 
     switch (language.toLowerCase()) {
       case "python":
-        //Test case available
-        if (isTestcaseAvailable) {
-          for (let i = 0; i < python_in.length; i++) {
-            formatted = python_tc(python_in[i], python_out[i]);
-            response = await runPython(code + formatted);
-            const split_response = response.split("\n").slice(-3, -1);
-            output.push(split_response[0]);
-            result.push(split_response[1] == 'True');
-          }
+        //Test case not available
+        if (!isTestcaseAvailable) {
+          output.push(await runPython(code));
           break;
         }
 
-        //Test case not available
-        output = await runPython(code);
+        for (let i = 0; i < python_in.length; i++) {
+          formatted = python_tc(python_in[i], python_out[i]);
+          response = await runPython(code + formatted);
+          const split_response = response.split("\n").slice(-3, -1);
+          output.push(split_response[0]);
+          result.push(split_response[1] == 'True');
+        }
         break;
 
       case "java":
-        //Test case available
-        if (isTestcaseAvailable) {
-          for (let i = 0; i < java_in.length; i++) {
-            formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
-            response = await runJava(java_import() + code + formatted);
-            
-            const split_response = response.split("\n").slice(-3, -1);
-            output.push(split_response[0]);
-            result.push(split_response[1] == 'True');
-          }
+        //Test case not available
+        if (!isTestcaseAvailable) {
+          output.push(await runJava(code));
           break;
         }
 
-        //Test case not available
-        output = await runJava(code);
+        for (let i = 0; i < java_in.length; i++) {
+          formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
+          response = await runJava(java_import() + code + formatted);
+
+          const split_response = response.split("\n").slice(-3, -1);
+          output.push(split_response[0]);
+          result.push(split_response[1] == 'True');
+        }
         break;
 
       case "javascript":
-        output = await runJavaScript(code);
+        output.push(await runJavaScript(code));
         break;
+
       default:
         return res.status(400).json({ error: "Unsupported language" });
     }

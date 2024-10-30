@@ -192,12 +192,20 @@ public class Main {
         <option value="python">Python</option>
         <option value="java">Java</option>
       </select>
+      <div style={{ height: '400px', overflow: 'hidden', position: 'relative' }}>
       <CodeMirror
         value={code}
         height="400px"
         extensions={[languageExtensions[language]]}
         onChange={handleCodeChange}
+        style={{ 
+          height: '100%', 
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          whiteSpace: 'pre-wrap'
+        }} 
       />
+      </div>
       <div style={{ marginTop: '20px', marginRight: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
       <button
@@ -254,8 +262,21 @@ public class Main {
 
       </div>
 
-      <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '4px', fontFamily: 'monospace', fontSize: '1rem', whiteSpace: 'pre', border: '1px solid #ddd', maxHeight: '200px', overflowY: 'auto', overflowX: 'auto' }}>
+      <div style={{ 
+        marginTop: '20px', 
+        padding: '10px', 
+        backgroundColor: '#f0f0f0', 
+        borderRadius: '4px', 
+        fontFamily: 'monospace', 
+        fontSize: '1rem', 
+        whiteSpace: 'pre', 
+        border: '1px solid #ddd', 
+        maxHeight: '150px', 
+        overflowY: 'auto', 
+        overflowX: 'auto' 
+      }}>
         <h3>Output:</h3>
+
         <pre>{output}</pre>
       </div>
       <Toaster richColors position="top-center" />
