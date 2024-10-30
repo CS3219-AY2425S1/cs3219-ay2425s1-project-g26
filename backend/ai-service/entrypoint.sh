@@ -9,7 +9,7 @@ pid=$!
 sleep 5
 
 echo "🔴 Retrieve model..."
-ollama pull wizardlm2:7b
+ollama pull llama3.2
 echo "🟢 Done!"
 
 # Wait for Ollama process to finish.
