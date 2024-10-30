@@ -9,28 +9,52 @@ import { basicSetup } from 'codemirror';
 
 const socket = io('http://localhost:8084');
 
-const CodePanel = ({ sessionId }) => {
-  const defaultCodes = {
-    javascript: `// JavaScript code
+const CodePanel = ({ question, sessionId }) => {
+  const testcase = question.testcase;
+  const isTestcaseAvailable = question.testcase.isAvailable;
+  let defaultCodes;
+
+  if (isTestcaseAvailable) {
+    defaultCodes = {
+      javascript: `// JavaScript code
 const example = "raesa";
 console.log(example);`,
+  
+      python: `# Python code
+def solution(${testcase.python.params}):
+    return ""
+    `,
 
-    python: `# Python code
+      java: `// Java code
+class Solution {
+  public static ${testcase.java.return_type} solution(${testcase.java.params}) {
+
+  }
+}`};
+  } else {
+    defaultCodes = {
+      javascript: `// JavaScript code
+const example = "raesa";
+console.log(example);`,
+  
+      python: `# Python code
 def main():
     example = "raesa"
     print(example)
 
 if __name__ == "__main__":
     main()`,
-
-    java: `// Java code
+  
+      java: `// Java code
 public class Main {
   public static void main(String[] args) {
     String example = "raesa";
     System.out.println(example);
   }
-}`,
-  };
+}`
+    };
+  }
+
 
   const [language, setLanguage] = useState('python');
   const [code, setCode] = useState(defaultCodes[language]);
@@ -162,14 +186,20 @@ public class Main {
     }
   };
 
+  const handleResetCode = async () => {
+    const newCode = defaultCodes[language];
+    handleCodeChange(newCode);
+  }
+
   const handleRunCode = async () => {
     setOutput('');
     setIsButtonDisabled(true);
 
     const requestBody = {
       code,
-      language,
-    };
+      language,     
+      testcase 
+    }; 
 
     try {
       const response = await fetch('http://localhost:8083/run-code', {
@@ -194,6 +224,27 @@ public class Main {
       }
 
       setOutput(result.output);
+
+      //TODO
+      //result.result returns a boolean array: [true, true] or [true, false]
+      console.log(result.output);
+      console.log(result.result);
+      return result;
+      
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    } finally {
+      setTimeout(() => setIsButtonDisabled(false), 2000);
+    }
+  };
+
+  const handleSubmitCode = async () => {
+    try {
+      console.log("HI");
+      const result = await handleRunCode();
+      console.log(result.result);
+      
+      //TODO: Send post req to past attempt svc once it's ready.
       
     } catch (error) {
       setOutput(`Error: ${error.message}`);
@@ -232,19 +283,39 @@ public class Main {
         <option value="java">Java</option>
       </select>
       <div style={{ height: '400px', overflow: 'hidden', position: 'relative' }}>
-        <CodeMirror
-          value={code}
-          height="100%"
-          extensions={[basicSetup, languageExtensions[language]]}
-          onChange={handleCodeChange}
-          style={{ 
-            height: '100%', 
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            whiteSpace: 'pre-wrap'
-          }} 
-        />
+
+      <CodeMirror
+        value={code}
+        height="400px"
+        extensions={[languageExtensions[language]]}
+        onChange={handleCodeChange}
+        style={{ 
+          height: '100%', 
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          whiteSpace: 'pre-wrap'
+        }} 
+      />
       </div>
+      <div style={{ marginTop: '20px', marginRight: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
+      <button
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#ccc',
+          color: 'black',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
+        onClick={handleResetCode}
+        disabled={isButtonDisabled}
+      >
+        Reset Answer
+      </button>
+
       <button
         style={{
           marginTop: '20px',
@@ -261,6 +332,25 @@ public class Main {
       >
         Run Code
       </button>
+      </div>
+      
+      <button
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: isButtonDisabled ? '#ccc' : '#1a3042',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
+        onClick={handleSubmitCode}
+        disabled={isButtonDisabled}
+      >
+        Finalise Submission
+      </button> 
+      </div>
       <div style={{ 
         marginTop: '20px', 
         padding: '10px', 
@@ -275,6 +365,7 @@ public class Main {
         overflowX: 'auto' 
       }}>
         <h3>Output:</h3>
+
         <pre>{output}</pre>
       </div>
       <Toaster richColors position="top-center" />

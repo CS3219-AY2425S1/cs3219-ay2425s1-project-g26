@@ -181,7 +181,7 @@ const CollaborationPage = () => {
         </div>
         {/* Right Pane with Code Panel */}
         <div style={rightPaneStyle}>
-          <CodePanel sessionId={sessionId} />
+          <CodePanel question={matchData.question} sessionId={sessionId}  />
         </div>
       </div>
     </div>
