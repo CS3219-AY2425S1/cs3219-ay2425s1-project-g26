@@ -66,8 +66,7 @@ const runPython = (code) => {
           return reject({ message: "Python Error", error: errorMessage });
         }
 
-        const split_output = stdout.split("\n");
-        resolve(split_output.slice(-3, -1));
+        resolve(stdout);
       }
     );
   });
@@ -112,8 +111,8 @@ const runJava = (code) => {
                 error: errorMessage,
               });
             }
-            const split_output = stdout.split("\n");
-            resolve(split_output.slice(-3, -1));
+            resolve(stdout);
+
           }
         );
       }
@@ -147,40 +146,59 @@ const runJavaScript = (code) => {
 
 app.post("/run-code", async (req, res) => {
   const { code, language, testcase } = req.body;
-
+  let output = [];
+  let result = [];
   try {
-    let output = [];
-    let result = [];
+    const isTestcaseAvailable = testcase.isAvailable;
     const python_in = testcase.python.input;
     const python_out = testcase.python.output;
     const java_params = testcase.python.params;
     const java_in = testcase.java.input;
     const java_out = testcase.java.output;
     const java_rt = testcase.java.return_type;
-    for (let i = 0; i < python_in.length; i++) {
 
-      switch (language.toLowerCase()) {
-        case "python":
-          formatted = python_tc(python_in[i], python_out[i]);
-          response = await runPython(code + formatted);
-          output.push(response[0]);
-          result.push(response[1] == 'True');
+    switch (language.toLowerCase()) {
+      case "python":
+        //Test case available
+        if (isTestcaseAvailable) {
+          for (let i = 0; i < python_in.length; i++) {
+            formatted = python_tc(python_in[i], python_out[i]);
+            response = await runPython(code + formatted);
+            const split_response = response.split("\n").slice(-3, -1);
+            output.push(split_response[0]);
+            result.push(split_response[1] == 'True');
+          }
           break;
-        case "java":
-          formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
-          response = await runJava(java_import() + code + formatted);
-          output.push(response[0]);
-          result.push(response[1] == 'True');
-          break;
-        case "javascript":
-          output = await runJavaScript(code);
-          break;
-        default:
-          return res.status(400).json({ error: "Unsupported language" });
-      }
+        }
+
+        //Test case not available
+        output = await runPython(code);
+        break;
+
+      case "java":
+        //Test case available
+        if (isTestcaseAvailable) {
+          for (let i = 0; i < java_in.length; i++) {
+            formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
+            response = await runJava(java_import() + code + formatted);
+            const split_response = response.split("\n").slice(-3, -1);
+            output.push(split_response[0]);
+            result.push(split_response[1] == 'True');
+            break;
+          }
+        }
+
+        //Test case not available
+        output = await runJava(code);
+        break;
+
+      case "javascript":
+        output = await runJavaScript(code);
+        break;
+      default:
+        return res.status(400).json({ error: "Unsupported language" });
     }
 
-    //output: 
     //result: {true, true}
     return res.status(200).json({ output, result });
   } catch (error) {
