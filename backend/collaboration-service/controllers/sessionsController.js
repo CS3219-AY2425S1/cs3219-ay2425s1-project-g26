@@ -30,7 +30,12 @@ const createSession = async (req, res) => {
                     userId: req.body.userid2,
                     username: req.body.username2
                 }
-            ]
+            ],
+            codeWindows: {
+                python: req.body.codeWindows.python,
+                java: req.body.codeWindows.java,
+                javascript: req.body.codeWindows.javascript
+            }
         });
         
         console.log(`Session ${req.body.id} data created in the database.`)
