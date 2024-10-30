@@ -183,7 +183,7 @@ app.post("/run-code", async (req, res) => {
 
           const split_response = response.split("\n").slice(-3, -1);
           output.push(split_response[0]);
-          result.push(split_response[1] == 'True');
+          result.push(split_response[1] == 'true');
         }
         break;
 
