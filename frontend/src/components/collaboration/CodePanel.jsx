@@ -121,7 +121,7 @@ public class Main {
 
   const handleResetCode = async () => {
     const newCode = defaultCodes[language];
-    setCode(newCode);
+    handleCodeChange(newCode);
   }
 
   const handleRunCode = async () => {
