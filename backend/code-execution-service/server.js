@@ -34,8 +34,7 @@ const java_tc = (params, input, output, return_type) => {
   } else {
     eval = `
     System.out.println(user_solution);
-    System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));
-    `;
+    System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));`;
   }
 
   return `
@@ -101,7 +100,8 @@ const runJava = (code) => {
           (runError, stdout, stderr) => {
             fs.unlinkSync(filePath);
             fs.unlinkSync(path.join(__dirname, "Main.class")); // Clean up
-
+            fs.unlinkSync(path.join(__dirname, "Solution.class")); // Clean up
+                        
             if (runError || stderr) {
               const errorMessage =
                 stderr || runError.message || "Unknown error";
@@ -112,7 +112,6 @@ const runJava = (code) => {
               });
             }
             resolve(stdout);
-
           }
         );
       }
@@ -141,8 +140,6 @@ const runJavaScript = (code) => {
     );
   });
 };
-
-//Submit -- Need code, language, tc, starting --> Return tc
 
 app.post("/run-code", async (req, res) => {
   const { code, language, testcase } = req.body;
@@ -181,11 +178,12 @@ app.post("/run-code", async (req, res) => {
           for (let i = 0; i < java_in.length; i++) {
             formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
             response = await runJava(java_import() + code + formatted);
+            
             const split_response = response.split("\n").slice(-3, -1);
             output.push(split_response[0]);
             result.push(split_response[1] == 'True');
-            break;
           }
+          break;
         }
 
         //Test case not available

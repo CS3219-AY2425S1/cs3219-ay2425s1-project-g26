@@ -21,7 +21,7 @@ console.log(example);`,
   
       python: `# Python code
 def solution(${testcase.python.params}):
-    return
+    return ""
     `,
 
       java: `// Java code
@@ -132,7 +132,7 @@ public class Main {
       code,
       language,     
       testcase 
-    };
+    }; 
 
     try {
       const response = await fetch('http://localhost:8083/run-code', {
@@ -154,6 +154,22 @@ public class Main {
       //result.result returns a boolean array: [true, true] or [true, false]
       console.log(result.output);
       console.log(result.result);
+      return result;
+      
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    } finally {
+      setTimeout(() => setIsButtonDisabled(false), 2000);
+    }
+  };
+
+  const handleSubmitCode = async () => {
+    try {
+      console.log("HI");
+      const result = await handleRunCode();
+      console.log(result.result);
+      
+      //TODO: Send post req to past attempt svc once it's ready.
       
     } catch (error) {
       setOutput(`Error: ${error.message}`);
@@ -223,15 +239,15 @@ public class Main {
         style={{
           marginTop: '20px',
           padding: '10px 20px',
-          backgroundColor: '#1a3042',
+          backgroundColor: isButtonDisabled ? '#ccc' : '#1a3042',
           color: 'white',
           border: 'none',
           borderRadius: '4px',
           cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
           fontSize: '1rem',
         }}
-        //onClick={handleRunCode}
-        disabled={true}
+        onClick={handleSubmitCode}
+        disabled={isButtonDisabled}
       >
         Finalise Submission
       </button> 
