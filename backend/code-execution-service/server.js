@@ -14,7 +14,9 @@ const EXECUTION_TIMEOUT = 5000;
 const python_tc = (input, output) => {
   return `
 if __name__ == "__main__":
-    print(solution(${input}) == ${output})`
+    user_solution = solution(${input})
+    print(user_solution)
+    print(user_solution == ${output})`
 }
 const java_import = () => {
   return `import java.util.*;
@@ -25,11 +27,17 @@ const java_tc = (params, input, output, return_type) => {
   const isArray = return_type.includes("[]");
   let eval;
   if (isArray) {
-    eval = `System.out.println(Arrays.equals(user_solution, tc_output));`
+    eval = `
+    System.out.println(Arrays.toString(user_solution));
+    System.out.println(Arrays.equals(user_solution, tc_output));`
+
   } else {
-    eval = `System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));`;
+    eval = `
+    System.out.println(user_solution);
+    System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));
+    `;
   }
-  
+
   return `
   public class Main {
     public static void main(String[] args) {
@@ -59,7 +67,7 @@ const runPython = (code) => {
         }
 
         const split_output = stdout.split("\n");
-        resolve(split_output[split_output.length - 2]);
+        resolve(split_output.slice(-3, -1));
       }
     );
   });
@@ -105,7 +113,7 @@ const runJava = (code) => {
               });
             }
             const split_output = stdout.split("\n");
-            resolve(split_output[split_output.length - 2]);
+            resolve(split_output.slice(-3, -1));
           }
         );
       }
@@ -141,7 +149,7 @@ app.post("/run-code", async (req, res) => {
   const { code, language, testcase } = req.body;
 
   try {
-    let output;
+    let output = [];
     let result = [];
     const python_in = testcase.python.input;
     const python_out = testcase.python.output;
@@ -150,19 +158,19 @@ app.post("/run-code", async (req, res) => {
     const java_out = testcase.java.output;
     const java_rt = testcase.java.return_type;
     for (let i = 0; i < python_in.length; i++) {
-      
+
       switch (language.toLowerCase()) {
         case "python":
           formatted = python_tc(python_in[i], python_out[i]);
-          output = await runPython(code + formatted);
-          //TODO: Can edit output
-          result.push(output == 'True')
+          response = await runPython(code + formatted);
+          output.push(response[0]);
+          result.push(response[1] == 'True');
           break;
-        case "java":          
+        case "java":
           formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
-          //TODO: Can edit output
-          output = await runJava(java_import() + code + formatted);
-          result.push(output == 'true')
+          response = await runJava(java_import() + code + formatted);
+          output.push(response[0]);
+          result.push(response[1] == 'True');
           break;
         case "javascript":
           output = await runJavaScript(code);
@@ -172,7 +180,8 @@ app.post("/run-code", async (req, res) => {
       }
     }
 
-    //result: {true, true, false}
+    //output: 
+    //result: {true, true}
     return res.status(200).json({ output, result });
   } catch (error) {
     console.error("Error running code:", error.error);

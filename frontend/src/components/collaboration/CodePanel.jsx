@@ -152,9 +152,8 @@ public class Main {
 
       //TODO
       //result.result returns a boolean array: [true, true] or [true, false]
-      //Determines the result pass or fail vs the testcases.
-      //Have some kind of widget to show them!
-      console.log(result.result)
+      console.log(result.output);
+      console.log(result.result);
       
     } catch (error) {
       setOutput(`Error: ${error.message}`);
