@@ -54,20 +54,20 @@ const WaitingPage = () => {
     if (isTestcaseAvailable) {
       defaultCodes = {
         javascript: `// JavaScript code
-  const example = "raesa";
-  console.log(example);`,
+const example = "raesa";
+console.log(example);`,
     
         python: `# Python code
-  def solution(${testcase.python.params}):
-      return ""
+def solution(${testcase.python.params}):
+  return ""
       `,
 
         java: `// Java code
-  class Solution {
-    public static ${testcase.java.return_type} solution(${testcase.java.params}) {
+class Solution {
+  public static ${testcase.java.return_type} solution(${testcase.java.params}) {
 
-    }
-  }`};
+  }
+}`};
     } else {
       defaultCodes = {
         javascript: `// JavaScript code
