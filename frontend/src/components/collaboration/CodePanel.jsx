@@ -61,18 +61,71 @@ public class Main {
   const [output, setOutput] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
-  useEffect(() => {
-    const codeState = JSON.parse(localStorage.getItem('codeState'));
-    if (codeState) {
-      setCode(codeState);
+  const handleLoadCode = async (language, sessionId) => {
+
+    const session = await fetch(
+      `http://localhost:8084/sessions/${sessionId}`, 
+      {
+        method: "GET",
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+         },
+      }
+    ).then(response => response.json())
+    .then((data) => {
+      console.log(data);
+      if (language === 'python') {
+        setCode(data.codeWindows.python);
+      } else if (language === 'java') {
+        setCode(data.codeWindows.java);
+      } else if (language === 'javascript') {
+        setCode(data.codeWindows.javascript);
+      }
+    });
+  }
+
+  const handleUpdateSessionData = async (sessionId, data) => {
+    const updateData = {
+      sessionid: sessionId
     }
+
+    if (data.newAttempt) {
+      updateData.newAttempt = data.newAttempt;
+    }
+    if (data.language && data.code) {
+      updateData.language = data.language;
+      updateData.code = data.code;
+    }
+
+    console.log(updateData);
+    const response = await fetch(
+      `http://localhost:8084/sessions/${sessionId}`, 
+      {
+        method: "PATCH",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+
+    if (response.ok) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  useEffect(() => {
+    handleLoadCode('python', sessionId);
   }, []);
 
   useEffect(() => {
     socket.emit('join', sessionId);
 
-    socket.on('codeUpdate', (newCode) => {
-      setCode(newCode);
+
+    socket.on('codeUpdate', data => {
+      if (language == data.language) {
+        setCode(data.code)
+      }
     });
 
     socket.on('languageUpdate', (newLanguage, newCode) => {
@@ -83,6 +136,7 @@ public class Main {
 
     socket.on('partnerLeft', () => {
       toast.info('Your partner has ended the session.');
+      localStorage.setItem('partnerLeft', true);
     });
 
     return () => {
@@ -94,8 +148,12 @@ public class Main {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      localStorage.setItem('codeState', JSON.stringify(code));
-    }, 3000);
+      const data = {
+        language: language,
+        code: code
+      }
+      handleUpdateSessionData(sessionId, data);
+    }, 1000);
 
     return () => {
       clearTimeout(handler);
@@ -104,19 +162,27 @@ public class Main {
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
-    const newCode = defaultCodes[selectedLanguage];
     setLanguage(selectedLanguage);
-    setCode(newCode);
+    handleLoadCode(selectedLanguage, sessionId);
+
+    // Re-register event
+    socket.off('codeUpdate');
+    socket.on('codeUpdate', data => {
+      if (selectedLanguage == data.language) {
+        setCode(data.code)
+      }
+    });
     setOutput('');
+    /*  Swapping language on one side should not change it on another
     if (socket) {
       socket.emit('languageChange', sessionId, selectedLanguage, newCode);
-    }
+    } */
   };
 
   const handleCodeChange = (value) => {
     setCode(value);
     if (socket) {
-      socket.emit('codeChange', sessionId, value);
+      socket.emit('codeChange', sessionId, value, language);
     }
   };
 
@@ -139,9 +205,17 @@ public class Main {
       const response = await fetch('http://localhost:8083/run-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(requestBody)
       });
 
+      const dataUpdate = {
+        newAttempt: {
+          language: language,
+          content: code,
+          testCases: [] //Insert Test Case Implementation here.
+        }
+      }
+      const update = handleUpdateSessionData(sessionId, dataUpdate);
       const result = await response.json();
 
       if (!response.ok) { // if http status >= 400
