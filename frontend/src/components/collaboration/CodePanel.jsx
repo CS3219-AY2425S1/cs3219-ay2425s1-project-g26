@@ -5,6 +5,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { Toaster, toast } from 'sonner';
+import { basicSetup } from 'codemirror';
 
 const socket = io('http://localhost:8084');
 
@@ -185,14 +186,30 @@ public class Main {
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', height: '100%', position: 'relative' }}>
+    <div style={{ 
+      backgroundColor: '#fff', 
+      padding: '20px', 
+      borderRadius: '8px', 
+      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', 
+      height: '100%', 
+      position: 'relative', 
+      overflow: 'hidden'
+    }}>
       <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a3042' }}>Code</h2>
-      <select style={{ position: 'absolute', top: '10px', right: '20px', padding: '5px', fontSize: '1rem', fontFamily: 'monospace' }} value={language} onChange={handleLanguageChange}>
+      <select style={{ 
+        position: 'absolute', 
+        top: '10px', 
+        right: '20px', 
+        padding: '5px', 
+        fontSize: '1rem', 
+        fontFamily: 'monospace' 
+      }} value={language} onChange={handleLanguageChange}>
         <option value="javascript">JavaScript</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
       </select>
       <div style={{ height: '400px', overflow: 'hidden', position: 'relative' }}>
+
       <CodeMirror
         value={code}
         height="400px"
@@ -259,9 +276,7 @@ public class Main {
       >
         Finalise Submission
       </button> 
-
       </div>
-
       <div style={{ 
         marginTop: '20px', 
         padding: '10px', 

@@ -4,6 +4,7 @@ import './styles/AI.css';
 const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   const [loading, setLoading] = useState(false); 
   const textareaRef = useRef(null);
+  const chatWindowRef = useRef(null);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -48,7 +49,6 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
           .replace(/\/s/g, ' ')
           .replace(/\\n/g, '<br />');
           
-
         aiMessage += replacedChunk;
         
         setMessages((prevMessages) => {
@@ -93,19 +93,26 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-        textarea.style.height = 'auto';
-        textarea.style.height = `${Math.max(textarea.scrollHeight, 60)}px`;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.max(textarea.scrollHeight, 60)}px`;
 
-        if (inputValue === '') {
-            textarea.style.height = '60px'; 
-        }
+      if (inputValue === '') {
+        textarea.style.height = '60px'; 
+      }
     }
   }, [inputValue]);
+
+  useEffect(() => {
+    const chatWindow = chatWindowRef.current;
+    if (chatWindow) {
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <div className="chat-container">
       <h3>Chat with Raesa</h3>
-      <div className="chat-window">
+      <div className="chat-window" ref={chatWindowRef}> 
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
             <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> 
