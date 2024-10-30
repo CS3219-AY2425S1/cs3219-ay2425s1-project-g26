@@ -100,7 +100,6 @@ const runJava = (code) => {
           (runError, stdout, stderr) => {
             fs.unlinkSync(filePath);
             fs.unlinkSync(path.join(__dirname, "Main.class")); // Clean up
-            fs.unlinkSync(path.join(__dirname, "Solution.class")); // Clean up
 
             if (runError || stderr) {
               const errorMessage =
