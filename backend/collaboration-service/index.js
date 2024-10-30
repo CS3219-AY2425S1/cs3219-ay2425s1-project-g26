@@ -43,8 +43,12 @@ io.on('connection', (socket) => {
   });
 
   // When a user changes the code in the window, update it for all users in the same room
-  socket.on("codeChange", (sessionId, code) => {
-    socket.to(sessionId).emit("codeUpdate", code);
+  socket.on("codeChange", (sessionId, code, language) => {
+    const data = {
+      code: code,
+      language: language
+    }
+    socket.to(sessionId).emit("codeUpdate", data);
   });
 
   // When the code language is changed, change it for all users in the same room (this function might have to be changed)

@@ -63,6 +63,18 @@ const CollaborationPage = () => {
   const handleConfirmEndSession = () => {
     socket.emit('endSession', sessionId);
     localStorage.removeItem('startTime');
+    if (localStorage.getItem('partnerLeft')) {
+      console.log("Deleting Session Data")
+      fetch(`http://localhost:8084/sessions/${sessionId}`,
+        {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionid: sessionId
+        })
+        }
+      )
+    }
     navigate('/summary', { state: { matchData, secondsElapsed } });
   };
 

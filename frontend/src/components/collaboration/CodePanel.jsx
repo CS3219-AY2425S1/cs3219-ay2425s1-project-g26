@@ -48,7 +48,7 @@ public class Main {
           'Accept': 'application/json'
          },
       }
-    )
+    ).then(response => response.json())
     .then((data) => {
       console.log(data);
       if (language === 'python') {
@@ -80,7 +80,7 @@ public class Main {
       {
         method: "PATCH",
         headers: { 'Content-Type': 'application/json' },
-        body: updateData
+        body: JSON.stringify(updateData)
       });
 
     if (response.ok) {
@@ -98,8 +98,10 @@ public class Main {
     socket.emit('join', sessionId);
 
 
-    socket.on('codeUpdate', (newCode) => {
-      setCode(newCode);
+    socket.on('codeUpdate', data => {
+      if (language == data.language) {
+        setCode(data.code)
+      }
     });
 
     socket.on('languageUpdate', (newLanguage, newCode) => {
@@ -110,6 +112,7 @@ public class Main {
 
     socket.on('partnerLeft', () => {
       toast.info('Your partner has ended the session.');
+      localStorage.setItem('partnerLeft', true);
     });
 
     return () => {
@@ -126,7 +129,7 @@ public class Main {
         code: code
       }
       handleUpdateSessionData(sessionId, data);
-    }, 3000);
+    }, 1000);
 
     return () => {
       clearTimeout(handler);
@@ -135,9 +138,16 @@ public class Main {
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
-    const newCode = handleLoadCode(selectedLanguage, sessionId);
     setLanguage(selectedLanguage);
-    setCode(newCode);
+    handleLoadCode(selectedLanguage, sessionId);
+
+    // Re-register event
+    socket.off('codeUpdate');
+    socket.on('codeUpdate', data => {
+      if (selectedLanguage == data.language) {
+        setCode(data.code)
+      }
+    });
     setOutput('');
     /*  Swapping language on one side should not change it on another
     if (socket) {
@@ -148,7 +158,7 @@ public class Main {
   const handleCodeChange = (value) => {
     setCode(value);
     if (socket) {
-      socket.emit('codeChange', sessionId, value);
+      socket.emit('codeChange', sessionId, value, language);
     }
   };
 
@@ -165,7 +175,7 @@ public class Main {
       const response = await fetch('http://localhost:8083/run-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(requestBody)
       });
 
       const dataUpdate = {
