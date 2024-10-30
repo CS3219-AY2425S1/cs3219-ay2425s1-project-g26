@@ -36,6 +36,7 @@ const createMatchRequest = async (req, res) => {
             complexity: matchedResult.complexity,
             sessionId: matchedResult.sessionId,
             question: {},
+            userNo: 0
         };
 
         if (matchedResult.matched) {
@@ -63,10 +64,12 @@ const createMatchRequest = async (req, res) => {
                 MatchController.createMatch(matchedResult, user1Name, user2Name);
                 responseResult.matchedUserId = matchedResult.user2;
                 responseResult.matchedUserName = user2Name;
+                responseResult.userNo = 1
             } else {
                 //User 2 just updates result
                 responseResult.matchedUserId = matchedResult.user1;
                 responseResult.matchedUserName = user1Name;
+                responseResult.userNo = 2
             }
             console.log("Response to", responseResult.matchedUserId, ":", JSON.stringify(responseResult));
         } else {
