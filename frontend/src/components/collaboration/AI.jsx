@@ -47,7 +47,10 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         
         const replacedChunk = cleanedChunk
           .replace(/\/s/g, ' ')
-          .replace(/\\n/g, '<br />');
+          .replace(/\\n/g, '<br />')
+          .replace(/\\u003c/g, '<')
+          .replace(/\\u003e/g, '>')
+          .replace(/\\"/g, '"');
           
         aiMessage += replacedChunk;
         
@@ -115,7 +118,7 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
       <div className="chat-window" ref={chatWindowRef}> 
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
-            <strong>{msg.sender === 'user' ? 'You:' : 'Raesa:'}</strong> 
+            <strong>{msg.sender === 'user' ? 'You: ' : 'Raesa: '}</strong> 
             {renderMessage(msg.text)} 
           </div>
         ))}
