@@ -6,6 +6,7 @@ import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { Toaster, toast } from 'sonner';
 import { basicSetup } from 'codemirror';
+import TestCases from './TestCases';
 
 const socket = io('http://localhost:8084');
 
@@ -356,19 +357,24 @@ public class Main {
       <div style={{ 
         marginTop: '20px', 
         padding: '10px', 
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: isTestcaseAvailable ? 'transparent' : '#f0f0f0',
         borderRadius: '4px', 
-        fontFamily: 'monospace', 
+        fontFamily: isTestcaseAvailable ? '' : 'monospace', 
         fontSize: '1rem', 
         whiteSpace: 'pre', 
-        border: '1px solid #ddd', 
-        maxHeight: '150px', 
+        border: isTestcaseAvailable ? 'none' : '1px solid #ddd',
+        maxHeight: isTestcaseAvailable ? '' : '150px',
         overflowY: 'auto', 
         overflowX: 'auto' 
       }}>
-        <h3>Output:</h3>
-
-        <pre>{output}</pre>
+        {isTestcaseAvailable ? (
+          <TestCases testCases={testcase.python} />
+        ) : (
+          <>
+            <h3>Output:</h3>
+            <pre>{output}</pre>
+          </>
+        )}
       </div>
       <Toaster richColors position="top-center" />
     </div>
