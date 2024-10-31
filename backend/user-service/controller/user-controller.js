@@ -440,6 +440,49 @@ export async function updateUserMatchedStatus(req, res) {
   }
 }
 
+export async function updateUserHistory(req, res) {
+  try {
+    const { question, partner, startDateTime, attempt, timeTaken } = req.body;
+    console.log(req.body)
+    const userId = req.params.id;
+    console.log(userId)
+    if (!isValidObjectId(userId)) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    }
+    const user = await _findUserById(userId);
+    console.log(user)
+    if (!user) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    }
+
+    let rating;
+    if (attempt.testCases.length > 0) {
+      rating = (attempt.testCases.filter(Boolean).length * 100.0 / attempt.testCases.length).toFixed(1).concat('%');
+    } else {
+      rating = "-"
+    }
+    const historyData = {
+      question: question,
+      partner: partner,
+      startDateTime: startDateTime,
+      attempt: attempt,
+      timeTaken: timeTaken,
+      completion: rating,
+    }
+
+    user.history.push(historyData);
+    await user.save();
+
+    return res.status(200).json({
+      message: `Updated history for user ${userId}`,
+      data: formatUserResponse(user),
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unknown error when updating user matched status!" });
+  }
+}
+
 export function formatUserResponse(user) {
   return {
     id: user.id,
