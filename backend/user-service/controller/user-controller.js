@@ -492,6 +492,7 @@ export function formatUserResponse(user) {
     createdAt: user.createdAt,
     isMatched: user.isMatched,
     matchData: user.matchData,
+    history: user.history,
   };
 }
 

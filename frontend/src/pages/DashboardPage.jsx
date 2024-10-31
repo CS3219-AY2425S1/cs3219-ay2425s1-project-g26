@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Calendar from "../components/dashboard/Calendar";
 import SessionBox from "../components/dashboard/SessionBox";
 import ConfirmationModal from "../components/dashboard/ConfirmationModal";
+import History from "../components/dashboard/History";
 import withAuth from "../hoc/withAuth";
 import { useAuth } from "../AuthContext";
 import DropdownMenu from "../components/dashboard/DropdownMenu";
 import RandomChallenge from "../components/dashboard/RandomChallenge";
+import AttemptDetail from "../components/dashboard/AttemptDetail";
+import Dialog from "../components/question/Dialog";
 
 const DashboardPage = () => {
   const navigate = useNavigate();
@@ -19,6 +22,9 @@ const DashboardPage = () => {
   const [hasActiveSession, setHasActiveSession] = useState(false);
   const [matchedUsername, setMatchedUsername] = useState();
   const [onlineDates, setOnlineDates] = useState(new Set()); // New state for online dates
+  const [history, setHistory] = useState();
+  const [dialogForm, setDialogForm] = useState(null);
+  const dialogRef = useRef(null);
 
   const isAdmin = localStorage.getItem("isAdmin") === "true";
 
@@ -42,6 +48,28 @@ const DashboardPage = () => {
     setDropdownVisible(!dropdownVisible);
   };
 
+  const handleCloseDetail = () => {
+    setDialogForm(null);
+    toggleDialog();
+  };
+
+  function toggleDialog() {
+    if (!dialogRef.current) {
+      return;
+    }
+
+    dialogRef.current.hasAttribute("open")
+      ? dialogRef.current.close()
+      : dialogRef.current.showModal();
+  }
+
+  const handleViewHistory = async (attempt) => {
+    setDialogForm(
+      <AttemptDetail attempt={attempt} onClose={handleCloseDetail} />
+    );
+    toggleDialog();
+  };
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -62,6 +90,7 @@ const DashboardPage = () => {
         setHasActiveSession(data.data.isMatched);
         setMatchedUsername(data.data.matchData.matchedUserName);
         setOnlineDates(new Set(data.data.onlineDate)); // Update online dates
+        setHistory(data.data.history)
 
         localStorage.setItem('isMatched', JSON.stringify(data.data.isMatched));
         localStorage.setItem('matchData', JSON.stringify(data.data.matchData));
@@ -123,6 +152,15 @@ const DashboardPage = () => {
           buttonText={isAdmin ? "Manage Questions" : "View Questions"}
           buttonLink="/questions"
         />
+
+        <History
+          history={history}
+          onView={handleViewHistory}
+        />
+
+        <Dialog toggleDialog={toggleDialog} ref={dialogRef}>
+          {dialogForm}
+        </Dialog>
       </div>
 
       <div style={{ marginLeft: "20px", marginTop: "63px" }}>
