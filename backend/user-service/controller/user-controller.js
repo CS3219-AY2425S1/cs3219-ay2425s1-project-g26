@@ -443,14 +443,11 @@ export async function updateUserMatchedStatus(req, res) {
 export async function updateUserHistory(req, res) {
   try {
     const { question, partner, startDateTime, attempt, timeTaken } = req.body;
-    console.log(req.body)
     const userId = req.params.id;
-    console.log(userId)
     if (!isValidObjectId(userId)) {
       return res.status(404).json({ message: `User ${userId} not found` });
     }
     const user = await _findUserById(userId);
-    console.log(user)
     if (!user) {
       return res.status(404).json({ message: `User ${userId} not found` });
     }
