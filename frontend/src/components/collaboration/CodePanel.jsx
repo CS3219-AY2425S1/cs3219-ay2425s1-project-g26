@@ -208,14 +208,6 @@ public class Main {
         body: JSON.stringify(requestBody)
       });
 
-      const dataUpdate = {
-        newAttempt: {
-          language: language,
-          content: code,
-          testCases: [] //Insert Test Case Implementation here.
-        }
-      }
-      const update = handleUpdateSessionData(sessionId, dataUpdate);
       const result = await response.json();
 
       if (!response.ok) { // if http status >= 400
@@ -225,10 +217,20 @@ public class Main {
 
       setOutput(result.output);
 
-      //TODO
       //result.result returns a boolean array: [true, true] or [true, false]
       console.log(result.output);
       console.log(result.result);
+
+      // Update past attempt data
+      const dataUpdate = {
+        newAttempt: {
+          language: language,
+          content: code,
+          testCases: result.result
+        }
+      }
+      const update = handleUpdateSessionData(sessionId, dataUpdate);
+
       return result;
       
     } catch (error) {
