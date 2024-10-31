@@ -21,7 +21,8 @@ const SessionBox = ({ headerText, sessionText, buttonText, buttonLink }) => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: '20px' 
+        marginBottom: '20px', 
+        // marginTop: '80px',
       }}
     >
       <h2 style={{ margin: "0 0 10px 0" }}>{headerText}</h2>
