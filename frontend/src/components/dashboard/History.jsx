@@ -15,6 +15,7 @@ const History = ({ history, onView }) => {
             <th style={{ border: "1px solid #ddd", padding: "8px" }}>Difficulty</th>
             <th style={{ border: "1px solid #ddd", padding: "4px" }}>Attempted On</th>
             <th style={{ border: "1px solid #ddd", padding: "4px" }}>Time Taken</th>
+            <th style={{ border: "1px solid #ddd", padding: "4px" }}>Completion</th>
             <th style={{ border: "1px solid #ddd", padding: "4px" }}>Details</th>
             </tr>
         </thead>
@@ -26,6 +27,7 @@ const History = ({ history, onView }) => {
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}> {attempt.question.complexity} </td>
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}> {attempt.startDateTime} </td>
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}> {attempt.timeTaken} </td>
+                <td style={{ border: "1px solid #ddd", padding: "8px" }}> {attempt.completion} </td>
                 <td style={{ border: "1px solid #ddd", padding: "8px" }}> <button onClick={() => onView(attempt)}>View</button> </td>
                 
             </tr>
