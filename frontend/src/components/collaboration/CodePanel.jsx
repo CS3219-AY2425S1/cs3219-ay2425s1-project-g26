@@ -60,7 +60,7 @@ public class Main {
   const [language, setLanguage] = useState('python');
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
-  const [caseResults, setCaseResults] = useState();
+  const [caseResults, setCaseResults] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleLoadCode = async (language, sessionId) => {
@@ -370,7 +370,7 @@ public class Main {
         overflowX: 'auto' 
       }}>
         {isTestcaseAvailable ? (
-          <TestCases testCases={testcase.python} output={output} result={caseResults} />
+          <TestCases testCases={testcase.python} output={output} results={caseResults} />
         ) : (
           <>
             <h3>Output:</h3>
