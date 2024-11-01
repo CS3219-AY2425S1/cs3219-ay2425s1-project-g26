@@ -3,9 +3,8 @@ import TestCasesTabs from './TestCasesTabs';
 import TestResultsTabs from './TestResultsTabs';
 import './styles/testcases.css'; 
 
-const TestCases = ({ testCases, output, results }) => {
+const TestCases = ({ testCases, output, results, hasError }) => {
   const [activeTab, setActiveTab] = useState(0);
-  console.log('inital' + output);
 
   return (
     <div className='test-case-container'>
@@ -31,6 +30,7 @@ const TestCases = ({ testCases, output, results }) => {
             testCases={testCases}
             output={output}
             results={results}
+            hasError={hasError}
           />
         )}
       </div>

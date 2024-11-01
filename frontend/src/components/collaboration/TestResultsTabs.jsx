@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import TestResultsTab from './TestResultTab';
 
-const TestResultsTabs = ({ testCases, output, results }) => {
+const TestResultsTabs = ({ testCases, output, results, hasError }) => {
   const [activeTab, setActiveTab] = useState(0);
   const params = testCases.params;
   const inputs = testCases.input;
@@ -30,9 +30,10 @@ const TestResultsTabs = ({ testCases, output, results }) => {
           <TestResultsTab
             params={params} 
             input={inputs[activeTab]} 
-            output={output[activeTab]}
+            output={hasError ? output : output[activeTab]}
             expected={expected[activeTab]} 
             result={results[activeTab]} 
+            hasError={hasError}
           />
         </>
       )}

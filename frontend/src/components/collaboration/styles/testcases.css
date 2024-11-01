@@ -50,7 +50,8 @@
   font-weight: bold;
 }
 
-.test-case-container .wrong-text {
+.test-case-container .wrong-text,
+.test-case-container .error-text {
   color: crimson;
   font-weight: bold;
 }
@@ -65,6 +66,12 @@
   color: #f5f5f5;
   background-color: crimson;
   font-weight: bold;
+}
+
+.test-case-container .output-error {
+  background-color: #fff0ef;
+  color: #f63636;
+  font-size: 0.8rem;
 }
 
 .test-case-container .cases-headers .accepted-tab.active-tab {

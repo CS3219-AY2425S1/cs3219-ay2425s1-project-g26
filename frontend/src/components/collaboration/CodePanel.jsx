@@ -61,6 +61,7 @@ public class Main {
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
   const [caseResults, setCaseResults] = useState([]);
+  const [hasError, setHasError] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleLoadCode = async (language, sessionId) => {
@@ -215,11 +216,13 @@ public class Main {
       if (!response.ok) { // if http status >= 400
         setOutput(`Error: ${result.error || 'Unknown error'}\nDetails: ${result.details || 'No additional details'}`);
         setCaseResults([]);
+        setHasError(true);
         return; 
       }
 
       setOutput(result.output);
       setCaseResults(result.result);
+      setHasError(false);
 
       //result.result returns a boolean array: [true, true] or [true, false]
       console.log(result.output);
@@ -371,7 +374,7 @@ public class Main {
         overflowX: 'auto', 
       }}>
         {isTestcaseAvailable ? (
-          <TestCases testCases={testcase.python} output={output} results={caseResults} />
+          <TestCases testCases={testcase.python} output={output} results={caseResults} hasError={hasError} />
         ) : (
           <>
             <h3>Output:</h3>
