@@ -59,6 +59,10 @@ io.on('connection', (socket) => {
     socket.to(sessionId).emit("clearCanvas");
   });
 
+  socket.on('sendMessage', (message) => {
+    socket.to(message.sessionId).emit('receiveMessage', message);
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });

@@ -1,12 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import io from 'socket.io-client';
 
 const Chat = ({ sessionId, userId }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [username, setUsername] = useState('');
+  const [socket, setSocket] = useState(null);
 
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:8084');
+    setSocket(newSocket);
+    console.log('set socket');
+    newSocket.emit('join', sessionId);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [sessionId]);
 
   // Fetch messages from the server
   useEffect(() => {
@@ -41,6 +54,21 @@ const Chat = ({ sessionId, userId }) => {
     fetchUsername();
   }, [userId]);
 
+  useEffect(() => {
+    if (socket) {
+      socket.on('receiveMessage', (message) => {
+        console.log('received');
+        setMessages((prevMessages) => [...prevMessages, message]);
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('receiveMessage');
+      }
+    };
+  }, [socket]);
+
   // Handle sending a new message
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -57,19 +85,37 @@ const Chat = ({ sessionId, userId }) => {
         { userId: newMessage.userId, username: newMessage.username, message: inputValue, timeSent: new Date() },
       ]);
       setInputValue('');
-      textareaRef.current.focus();
+      if (socket) {
+        socket.emit('sendMessage', { sessionId, ...newMessage });
+      }
+      // textareaRef.current.focus();
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
 
   return (
+    <div>
+      <h3>Chat</h3>
       <div>
-        <h3>Chat Component</h3>
-        <p>This is the Chat tab content.</p>
+        {messages.map((msg, index) => (
+          <div key={index}>
+            <div>{msg.username}</div> 
+            <div>{msg.message}</div>
+          </div>
+        ))}
       </div>
-    );
-  };
+      <form onSubmit={handleSendMessage}>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+        <button>Send</button>
+      </form>
+    </div>
+  );
+};
 
 export default Chat;
 
