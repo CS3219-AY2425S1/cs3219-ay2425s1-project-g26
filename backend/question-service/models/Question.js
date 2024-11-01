@@ -16,6 +16,44 @@ const questionSchema = new mongoose.Schema({
     complexity: {
         type: String,
         required: true
+    },
+    testcase: {
+        isAvailable: {
+            type: Boolean,
+            default: false
+        },
+        python: {
+            params: {
+                type: String,
+                default: ""
+            },
+            input: {
+                type: Array,
+                default: []
+            },
+            output: {
+                type: Array,
+                default: []
+            }
+        },
+        java: {
+            params: {
+                type: String,
+                default: ""
+            },
+            input: {
+                type: Array,
+                default: []
+            },
+            output: {
+                type: Array,
+                default: []
+            },
+            return_type: {
+                type: String,
+                default: ""
+            },
+        }
     }
 })
 

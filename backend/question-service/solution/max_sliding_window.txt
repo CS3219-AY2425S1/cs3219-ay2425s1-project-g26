@@ -1,0 +1,48 @@
+def solution(nums, k):
+  if k == 1:
+      return nums
+  
+  n = len(nums)
+  result = []
+  suffix = [0] * k
+  
+  for i in range(k, n + 1, k):
+      suffix[0] = nums[i - 1] 
+      for j in range(1, k):
+          suffix[j] = max(suffix[j - 1], nums[i - j - 1])
+      cmax = -float("inf")
+      for idx in range(k):
+          result.append(max(cmax, suffix[k - idx - 1]))
+          if i + idx >= n: break
+          cmax = max(cmax, nums[i + idx])
+  
+  return result    
+
+
+
+// Java code
+class Solution {
+  public static int[] solution(int[] nums, int k) {
+  // assume nums is not null
+  int n = nums.length;
+  if (n == 0 || k == 0) {
+    return new int[0];
+  }
+  
+  int numOfWindow = n - k + 1;
+  int[] result = new int[numOfWindow]; // number of windows
+  
+  for (int start = 0; start < numOfWindow; ++start) {
+    int end = start + k - 1;
+    int maxVal = nums[start];
+    for (int i = start + 1; i <= end; ++i) {
+      if (nums[i] > maxVal) { // update
+        maxVal = nums[i];
+      }
+    }
+    result[start] = maxVal;
+  }
+  
+  return result;
+  }
+}   

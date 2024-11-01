@@ -4,6 +4,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import withAuth from "../hoc/withAuth";
 import axios from 'axios';
 import { useAuth } from "../AuthContext"; 
+import { python } from '@codemirror/lang-python';
+import { javascript } from '@codemirror/lang-javascript';
+
 
 const WaitingPage = () => {
   const { accessToken } = useAuth();
@@ -43,6 +46,89 @@ const WaitingPage = () => {
     }
   }, [navigate, userPref, loading]); 
 
+  const handleCreateSession = async (sessionId, question) => {
+    const testcase = question.testcase;
+    const isTestcaseAvailable = question.testcase.isAvailable;
+    let defaultCodes;
+
+    if (isTestcaseAvailable) {
+      defaultCodes = {
+        javascript: `// JavaScript code
+const example = "raesa";
+console.log(example);`,
+    
+        python: `# Python code
+def solution(${testcase.python.params}):
+  return ""
+      `,
+
+        java: `// Java code
+class Solution {
+  public static ${testcase.java.return_type} solution(${testcase.java.params}) {
+
+  }
+}`};
+    } else {
+      defaultCodes = {
+        javascript: `// JavaScript code
+  const example = "raesa";
+  console.log(example);`,
+    
+        python: `# Python code
+  def main():
+      example = "raesa"
+      print(example)
+
+  if __name__ == "__main__":
+      main()`,
+    
+        java: `// Java code
+  public class Main {
+    public static void main(String[] args) {
+      String example = "raesa";
+      System.out.println(example);
+    }
+  }`
+      };
+    }
+
+    console.log(`Attempting to create session ${sessionId}`)
+    const match = await fetch(
+      `http://localhost:8082/matches/${sessionId}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }).then(response => response.json())
+      .then(
+        async matchData => {
+        console.log(matchData)
+        const result = await fetch(
+          `http://localhost:8084/sessions/${sessionId}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionid: sessionId,
+              userid1: matchData.user1Id,
+              username1: matchData.user1Name,
+              userid2: matchData.user2Id,
+              username2: matchData.user2Name,
+              codeWindows: {
+                python: defaultCodes.python,
+                java: defaultCodes.java,
+                javascript: defaultCodes.javascript
+              }
+            })
+          })
+          if (result.ok) {
+            return true;
+          } else {
+            return false
+          }
+        });
+      return match 
+      }
+
   const createMatchRequest = async (userPref) => {
     console.log("MATCHINGG");
     localStorage.removeItem('startTime');
@@ -65,7 +151,9 @@ const WaitingPage = () => {
           setMatchFound(true);
           setMatchData(response.data);
           updateMatchedStatus(response.data);
-
+          if (response.data.userNo === 1) {
+            handleCreateSession(response.data.sessionId, response.data.question);
+          }
           clearInterval(intervalId);
           clearTimeout(timeoutId);
           setLoading(false);
