@@ -6,13 +6,19 @@ const Calendar = ({
   currentYear,
   setCurrentMonth,
   setCurrentYear,
-  onlineDates,
+  onlineDates = new Set(),
 }) => {
   const [activeDays, setActiveDays] = useState(new Set());
 
   useEffect(() => {
-    console.log("calender", onlineDates);
-    setActiveDays(new Set(onlineDates));
+    console.log("calendar", onlineDates);
+    
+    const formattedOnlineDates = Array.from(onlineDates).map(date => {
+      const [year, month, day] = date.split("-");
+      return formatDate(parseInt(year), parseInt(month) - 1, parseInt(day));
+    });
+    
+    setActiveDays(new Set(formattedOnlineDates));
   }, [currentMonth, currentYear, onlineDates]);
 
   const formatDate = (year, month, day) => {
