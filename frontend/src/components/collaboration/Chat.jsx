@@ -7,8 +7,7 @@ const Chat = ({ sessionId, userId }) => {
   const [inputValue, setInputValue] = useState('');
   const [username, setUsername] = useState('');
   const [socket, setSocket] = useState(null);
-
-  const textareaRef = useRef(null);
+  const chatWindowRef = useRef(null);
 
   useEffect(() => {
     const newSocket = io('http://localhost:8084');
@@ -56,7 +55,6 @@ const Chat = ({ sessionId, userId }) => {
   useEffect(() => {
     if (socket) {
       socket.on('receiveMessage', (message) => {
-        console.log('received');
         setMessages((prevMessages) => [...prevMessages, message]);
       });
     }
@@ -75,8 +73,6 @@ const Chat = ({ sessionId, userId }) => {
 
     const newMessage = { userId, username, message: inputValue };
 
-    console.log(newMessage)
-
     try {
       await axios.post(`http://localhost:8085/chats/${sessionId}`, newMessage);
       setMessages((prevMessages) => [
@@ -92,10 +88,17 @@ const Chat = ({ sessionId, userId }) => {
     }
   };
 
+  useEffect(() => {
+    const chatWindow = chatWindowRef.current;
+    if (chatWindow) {
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+  }, [messages]);
+
   return (
     <div className='chat-container'>
       <h3>Chat</h3>
-      <div className='chat-window'>
+      <div className='chat-window' ref={chatWindowRef}>
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.userId === userId ? 'user' : 'partner'}`}>
             <strong>{msg.userId === userId ? 'You' : msg.username}: </strong> 
@@ -118,4 +121,3 @@ const Chat = ({ sessionId, userId }) => {
 };
 
 export default Chat;
-
