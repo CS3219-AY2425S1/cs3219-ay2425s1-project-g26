@@ -6,7 +6,7 @@ const ConfirmationModal = ({ show, onConfirm, onCancel }) => {
   return (
     <div style={styles.modalOverlay}>
       <div style={styles.modal}>
-        <h3 style={styles.modalTitle}>Are you sure you want to end session?</h3>
+        <h3 style={styles.modalTitle}>Are you sure you want to leave the session?</h3>
         <div style={styles.modalButtons}>
           <button onClick={onConfirm} style={{ ...styles.button, ...styles.confirmButton }}>
             Yes

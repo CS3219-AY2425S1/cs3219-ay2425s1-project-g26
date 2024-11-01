@@ -6,6 +6,7 @@ import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
 import { useAuth } from "../AuthContext";
+import { Toaster } from 'sonner';
 
 const socket = io('http://localhost:8084');
 
@@ -154,7 +155,7 @@ const CollaborationPage = () => {
           e.target.style.color = '#1a3042';
         }}
       >
-        End Session
+        Leave Session
       </button>
 
       {/* Confirmation Modal */}
@@ -175,6 +176,7 @@ const CollaborationPage = () => {
           <CodePanel sessionId={sessionId} />
         </div>
       </div>
+      <Toaster closeButton richColors position="top-center" />
     </div>
   );
 };
