@@ -6,7 +6,6 @@ import io from 'socket.io-client';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
-import { useAuth } from "../AuthContext";
 import { Toaster } from 'sonner';
 
 const socket = io('http://localhost:8084');
@@ -31,8 +30,6 @@ const CollaborationPage = () => {
       setSecondsElapsed(elapsed);
     }
   };
-
-  const { userId } = useAuth();
 
   useEffect(() => {
     const savedStartTime = localStorage.getItem('startTime');
