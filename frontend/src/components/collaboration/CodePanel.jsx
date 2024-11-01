@@ -214,6 +214,7 @@ public class Main {
 
       if (!response.ok) { // if http status >= 400
         setOutput(`Error: ${result.error || 'Unknown error'}\nDetails: ${result.details || 'No additional details'}`);
+        setCaseResults([]);
         return; 
       }
 
