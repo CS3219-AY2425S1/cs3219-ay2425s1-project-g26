@@ -6,6 +6,8 @@ import io from 'socket.io-client';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
+import { useAuth } from "../AuthContext";
+import { Toaster } from 'sonner';
 
 const socket = io('http://localhost:8084');
 
@@ -29,6 +31,8 @@ const CollaborationPage = () => {
       setSecondsElapsed(elapsed);
     }
   };
+
+  const { userId } = useAuth();
 
   useEffect(() => {
     const savedStartTime = localStorage.getItem('startTime');
@@ -238,7 +242,7 @@ const CollaborationPage = () => {
           e.target.style.color = '#1a3042';
         }}
       >
-        End Session
+        Leave Session
       </button>
 
       {/* Confirmation Modal */}
@@ -252,13 +256,14 @@ const CollaborationPage = () => {
       <div style={contentContainerStyle}>
         {/* Left Pane with Tabs */}
         <div style={leftPaneStyle}>
-          <Tabs question={matchData.question} sessionId={sessionId} />
+          <Tabs question={matchData.question} sessionId={sessionId} userId={userId} />
         </div>
         {/* Right Pane with Code Panel */}
         <div style={rightPaneStyle}>
           <CodePanel question={matchData.question} sessionId={sessionId}  />
         </div>
       </div>
+      <Toaster closeButton richColors position="top-center" />
     </div>
   );
 };

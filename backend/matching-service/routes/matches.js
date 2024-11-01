@@ -11,6 +11,8 @@ router.get('/', matchController.getAllMatches);
 // Get match based on ID
 router.get('/:id', matchController.getMatchById);
 
+router.get('/session/:sessionId', matchController.getMatchBySessionId);
+
 
 // Match requests routes.
 

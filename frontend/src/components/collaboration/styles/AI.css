@@ -33,7 +33,8 @@
     background-color: #d1e7dd;
 }
 
-.message.ai {
+.message.ai,
+.message.partner {
     align-self: flex-start;
     background-color: #e2e3e5;
 }
@@ -60,6 +61,10 @@
     max-height: 200px;
     overflow: auto;
     transition: height 0.2s;
+}
+
+.message-input::placeholder {
+    color: #999;
 }
 
 .message-input:focus {

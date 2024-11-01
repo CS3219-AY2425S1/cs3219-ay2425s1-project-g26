@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import axios from 'axios';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 import { basicSetup } from 'codemirror';
 import TestCases from './TestCases';
 
@@ -139,8 +140,9 @@ public class Main {
     });
 
     socket.on('partnerLeft', () => {
-      toast.info('Your partner has ended the session.');
+      toast.info('Your partner has left the session.', { duration: Infinity });
       localStorage.setItem('partnerLeft', true);
+      handleSendLeaveMessage();
     });
 
     return () => {
@@ -163,6 +165,23 @@ public class Main {
       clearTimeout(handler);
     };
   }, [code]);
+
+  const handleSendLeaveMessage = async () => {
+    const leaveMessage = {
+      userId: "system",
+      username: "System",
+      message: "Your partner has left the session.",
+    };
+
+    try {
+      await axios.post(`http://localhost:8085/chats/${sessionId}`, leaveMessage);
+      if (socket) {
+        socket.emit("sendMessage", { sessionId, ...leaveMessage });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
@@ -360,7 +379,6 @@ public class Main {
           </>
         )}
       </div>
-      <Toaster richColors position="top-center" />
     </div>
   );
 };
