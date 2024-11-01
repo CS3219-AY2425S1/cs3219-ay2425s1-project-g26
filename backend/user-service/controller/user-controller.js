@@ -442,6 +442,7 @@ export async function updateUserMatchedStatus(req, res) {
 
 export async function updateUserHistory(req, res) {
   try {
+
     const { question, partner, startDateTime, attempt, timeTaken } = req.body;
     const userId = req.params.id;
     if (!isValidObjectId(userId)) {
@@ -458,6 +459,7 @@ export async function updateUserHistory(req, res) {
     } else {
       rating = "-"
     }
+
     const historyData = {
       question: question,
       partner: partner,

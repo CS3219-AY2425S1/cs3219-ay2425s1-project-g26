@@ -88,9 +88,8 @@ const CollaborationPage = () => {
         }
       }
     }
-
     if (testCases == 0) {
-      bestAttempt = attempts.slice[-1];
+      bestAttempt = attempts[attempts.length - 1];
     }
     return bestAttempt
   };
