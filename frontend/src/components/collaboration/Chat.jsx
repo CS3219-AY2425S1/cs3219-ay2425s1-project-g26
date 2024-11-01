@@ -13,7 +13,6 @@ const Chat = ({ sessionId, userId }) => {
   useEffect(() => {
     const newSocket = io('http://localhost:8084');
     setSocket(newSocket);
-    console.log('set socket');
     newSocket.emit('join', sessionId);
 
     return () => {
@@ -88,30 +87,31 @@ const Chat = ({ sessionId, userId }) => {
       if (socket) {
         socket.emit('sendMessage', { sessionId, ...newMessage });
       }
-      // textareaRef.current.focus();
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
 
   return (
-    <div>
+    <div className='chat-container'>
       <h3>Chat</h3>
-      <div>
+      <div className='chat-window'>
         {messages.map((msg, index) => (
-          <div key={index}>
-            <div>{msg.username}</div> 
-            <div>{msg.message}</div>
+          <div key={index} className={`message ${msg.userId === userId ? 'user' : 'partner'}`}>
+            <strong>{msg.userId === userId ? 'You' : msg.username}: </strong> 
+            {msg.message}
           </div>
         ))}
       </div>
-      <form onSubmit={handleSendMessage}>
+      <form onSubmit={handleSendMessage} className='message-form' >
         <input
+          className='message-input'
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
+          placeholder='Type your message here...'
         />
-        <button>Send</button>
+        <button className='send-button'>Send</button>
       </form>
     </div>
   );
