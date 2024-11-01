@@ -3,8 +3,8 @@ import React from 'react';
 const TestCaseTab = ({ params, input }) => {
   return (
     <div>
-      <h4>{params} =</h4>
-      {input}
+      <pre className='case-key'>{params} =</pre>
+      <pre className='case-value'>{input}</pre>
     </div>
   );
 };

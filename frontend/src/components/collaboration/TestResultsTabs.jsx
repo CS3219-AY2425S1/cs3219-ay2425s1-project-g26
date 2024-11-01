@@ -13,9 +13,13 @@ const TestResultsTabs = ({ testCases, output, results }) => {
         <p>You must run your code first</p>
       ) : (
         <>
-          <div style={{ display: 'flex', cursor: 'pointer', gap: '1rem' }}>
+          <div className='cases-headers'>
             {inputs.map((_, index) => (
               <div
+              className={
+                `test-tab ${activeTab === index ? 'active-tab' : ''} 
+                ${results[index] ? 'accepted-tab' : 'wrong-tab'}`
+              } 
                 key={index}
                 onClick={() => setActiveTab(index)}
               >
@@ -26,7 +30,7 @@ const TestResultsTabs = ({ testCases, output, results }) => {
           <TestResultsTab
             params={params} 
             input={inputs[activeTab]} 
-            output={output} // Pass the updated output
+            output={output[activeTab]}
             expected={expected[activeTab]} 
             result={results[activeTab]} 
           />

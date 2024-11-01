@@ -8,9 +8,13 @@ const TestCasesTabs = ({ testCases }) => {
 
   return (
     <div>
-      <div style={{ display: "flex", cursor: "pointer", gap: "1rem" }}>
+      <div className='cases-headers'>
         {inputs.map((_, index) => (
-          <div key={index} onClick={() => setActiveTab(index)}>
+          <div 
+            key={index} 
+            className={`test-tab ${activeTab === index ? 'active-tab' : ''}`} 
+            onClick={() => setActiveTab(index)}
+          >
             Case {index + 1}
           </div>
         ))}

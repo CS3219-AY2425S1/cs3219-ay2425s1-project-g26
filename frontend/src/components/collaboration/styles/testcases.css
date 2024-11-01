@@ -1,0 +1,76 @@
+.test-case-container {
+  border-radius: 0.5rem;
+  margin: -10px;
+}
+  
+.test-case-container > .test-headers {
+  display: flex;
+  width: 100%;
+  background-color: rgb(240, 240, 240);
+}
+
+.test-case-container .test-tab {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.3s;
+}
+
+.test-case-container .active-tab {
+  background-color: rgb(224, 224, 224);
+  font-weight: bold;
+}
+
+.test-case-container .cases-container {
+  padding: 1rem;
+  overflow: auto;
+  max-height: 250px;
+}
+
+.test-case-container .cases-headers {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.test-case-container .case-key {
+  color: #3c3c4399;
+  font-size: 0.9em;
+}
+
+.test-case-container .case-value {
+  background-color: #e9e9e9;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.test-case-container .accepted-text {
+  color: green;
+  font-weight: bold;
+}
+
+.test-case-container .wrong-text {
+  color: crimson;
+  font-weight: bold;
+}
+
+.test-case-container .cases-headers .accepted-tab {
+  color: #f5f5f5;
+  background-color: green;
+  font-weight: bold;
+}
+
+.test-case-container .cases-headers .wrong-tab {
+  color: #f5f5f5;
+  background-color: crimson;
+  font-weight: bold;
+}
+
+.test-case-container .cases-headers .accepted-tab.active-tab {
+  background-color: rgb(0, 96, 0);
+}
+
+.test-case-container .cases-headers .wrong-tab.active-tab {
+  background-color: rgb(171, 16, 47);
+}

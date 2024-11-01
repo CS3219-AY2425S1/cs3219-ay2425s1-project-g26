@@ -359,7 +359,7 @@ public class Main {
       <div style={{ 
         marginTop: '20px', 
         padding: '10px', 
-        backgroundColor: isTestcaseAvailable ? 'transparent' : '#f0f0f0',
+        backgroundColor: isTestcaseAvailable ? '#f9f9f9' : '#f0f0f0',
         borderRadius: '4px', 
         fontFamily: isTestcaseAvailable ? '' : 'monospace', 
         fontSize: '1rem', 
@@ -367,7 +367,7 @@ public class Main {
         border: isTestcaseAvailable ? 'none' : '1px solid #ddd',
         maxHeight: isTestcaseAvailable ? '' : '150px',
         overflowY: 'auto', 
-        overflowX: 'auto' 
+        overflowX: 'auto', 
       }}>
         {isTestcaseAvailable ? (
           <TestCases testCases={testcase.python} output={output} results={caseResults} />
