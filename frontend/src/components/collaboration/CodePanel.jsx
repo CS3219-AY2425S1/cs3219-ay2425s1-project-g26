@@ -6,6 +6,7 @@ import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { Toaster, toast } from 'sonner';
 import { basicSetup } from 'codemirror';
+import TestCases from './TestCases';
 
 const CodePanel = ({ question, sessionId, socket }) => {
   const testcase = question.testcase;
@@ -57,6 +58,9 @@ public class Main {
   const [language, setLanguage] = useState('python');
   const [code, setCode] = useState(defaultCodes[language]);
   const [output, setOutput] = useState('');
+  const [caseResults, setCaseResults] = useState([]);
+  const [hasError, setHasError] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleLoadCode = async (language, sessionId) => {
@@ -207,10 +211,16 @@ public class Main {
 
       if (!response.ok) { // if http status >= 400
         setOutput(`Error: ${result.error || 'Unknown error'}\nDetails: ${result.details || 'No additional details'}`);
+        setCaseResults([]);
+        setHasError(true);
+        setActiveTab(1);
         return; 
       }
 
       setOutput(result.output);
+      setCaseResults(result.result);
+      setHasError(false);
+      setActiveTab(1);
 
       //result.result returns a boolean array: [true, true] or [true, false]
       console.log(result.output);
@@ -227,20 +237,6 @@ public class Main {
       const update = handleUpdateSessionData(sessionId, dataUpdate);
 
       return result;
-      
-    } catch (error) {
-      setOutput(`Error: ${error.message}`);
-    } finally {
-      setTimeout(() => setIsButtonDisabled(false), 2000);
-    }
-  };
-
-  const handleSubmitCode = async () => {
-    try {
-      const result = await handleRunCode();
-      console.log(result.result);
-      
-      //TODO: Send post req to past attempt svc once it's ready.
       
     } catch (error) {
       setOutput(`Error: ${error.message}`);
@@ -329,40 +325,35 @@ public class Main {
         Run Code
       </button>
       </div>
-      
-      <button
-        style={{
-          marginTop: '20px',
-          padding: '10px 20px',
-          backgroundColor: isButtonDisabled ? '#ccc' : '#1a3042',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
-          fontSize: '1rem',
-        }}
-        onClick={handleSubmitCode}
-        disabled={isButtonDisabled}
-      >
-        Finalise Submission
-      </button> 
       </div>
       <div style={{ 
         marginTop: '20px', 
         padding: '10px', 
-        backgroundColor: '#f0f0f0', 
+        backgroundColor: isTestcaseAvailable ? '#f9f9f9' : '#f0f0f0',
         borderRadius: '4px', 
-        fontFamily: 'monospace', 
+        fontFamily: isTestcaseAvailable ? '' : 'monospace', 
         fontSize: '1rem', 
         whiteSpace: 'pre', 
-        border: '1px solid #ddd', 
-        maxHeight: '150px', 
+        border: isTestcaseAvailable ? 'none' : '1px solid #ddd',
+        maxHeight: isTestcaseAvailable ? '' : '150px',
         overflowY: 'auto', 
-        overflowX: 'auto' 
+        overflowX: 'auto', 
       }}>
-        <h3>Output:</h3>
-
-        <pre>{output}</pre>
+        {isTestcaseAvailable ? (
+          <TestCases 
+            testCases={testcase.python} 
+            output={output} 
+            results={caseResults} 
+            hasError={hasError} 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+        ) : (
+          <>
+            <h3>Output:</h3>
+            <pre>{output}</pre>
+          </>
+        )}
       </div>
       <Toaster richColors position="top-center" />
     </div>

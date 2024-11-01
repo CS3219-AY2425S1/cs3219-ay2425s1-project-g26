@@ -34,6 +34,10 @@ const UserModelSchema = new Schema({
     type: Array,
     default: [], //Just store question id.
   },
+  history:{
+    type: Array,
+    default: [], // Store history details: Time of Attempt, Questions attempted, other user, attempt details
+  },
   onlineDate: {
     type: Array,
     default: [],

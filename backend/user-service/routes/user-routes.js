@@ -16,6 +16,7 @@ import {
   getPublicProfile,
   updateUserMatchedStatus,
   verifyPassword,
+  updateUserHistory,
 } from "../controller/user-controller.js";
 import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middleware/basic-access-control.js";
 
@@ -49,6 +50,9 @@ router.get("/questions/:id", verifyAccessToken, verifyIsOwnerOrAdmin, getQuestio
 
 //Save completed questions by id
 router.patch("/questions/:id", verifyAccessToken, verifyIsOwnerOrAdmin, addQuestionToUser);
+
+//Save question to history
+router.patch("/history/:id", verifyAccessToken, verifyIsOwnerOrAdmin, updateUserHistory);
 
 // Route to send password reset email
 router.post("/forgot-password", sendPasswordResetEmail);
