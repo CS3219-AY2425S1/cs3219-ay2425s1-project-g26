@@ -62,6 +62,7 @@ public class Main {
   const [output, setOutput] = useState('');
   const [caseResults, setCaseResults] = useState([]);
   const [hasError, setHasError] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleLoadCode = async (language, sessionId) => {
@@ -217,12 +218,14 @@ public class Main {
         setOutput(`Error: ${result.error || 'Unknown error'}\nDetails: ${result.details || 'No additional details'}`);
         setCaseResults([]);
         setHasError(true);
+        setActiveTab(1);
         return; 
       }
 
       setOutput(result.output);
       setCaseResults(result.result);
       setHasError(false);
+      setActiveTab(1);
 
       //result.result returns a boolean array: [true, true] or [true, false]
       console.log(result.output);
@@ -374,7 +377,14 @@ public class Main {
         overflowX: 'auto', 
       }}>
         {isTestcaseAvailable ? (
-          <TestCases testCases={testcase.python} output={output} results={caseResults} hasError={hasError} />
+          <TestCases 
+            testCases={testcase.python} 
+            output={output} 
+            results={caseResults} 
+            hasError={hasError} 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
         ) : (
           <>
             <h3>Output:</h3>

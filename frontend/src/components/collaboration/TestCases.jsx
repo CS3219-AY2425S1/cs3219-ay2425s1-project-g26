@@ -3,9 +3,7 @@ import TestCasesTabs from './TestCasesTabs';
 import TestResultsTabs from './TestResultsTabs';
 import './styles/testcases.css'; 
 
-const TestCases = ({ testCases, output, results, hasError }) => {
-  const [activeTab, setActiveTab] = useState(0);
-
+const TestCases = ({ testCases, output, results, hasError, activeTab, setActiveTab }) => {
   return (
     <div className='test-case-container'>
       <div className='test-headers'>
