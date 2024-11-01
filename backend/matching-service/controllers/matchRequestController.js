@@ -61,7 +61,7 @@ const createMatchRequest = async (req, res) => {
 
             if (req.body.id == matchedResult.user1) {
                 //Only user1 save the data to the db
-                MatchController.createMatch(matchedResult, user1Name, user2Name);
+                await MatchController.createMatch(matchedResult, user1Name, user2Name);
                 responseResult.matchedUserId = matchedResult.user2;
                 responseResult.matchedUserName = user2Name;
                 responseResult.userNo = 1

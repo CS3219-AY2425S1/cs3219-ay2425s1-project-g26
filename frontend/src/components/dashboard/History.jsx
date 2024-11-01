@@ -1,7 +1,7 @@
 import React from "react";
 
 const History = ({ history, onView }) => {
-    const display = history && history.length > 0 ? history.slice(0, 10) : [];
+    const display = history && history.length > 0 ? history.toReversed().slice(0, 10) : [];
 
     return (
         <div style={{
