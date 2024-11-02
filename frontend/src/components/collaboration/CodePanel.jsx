@@ -9,9 +9,7 @@ import { toast } from 'sonner';
 import { basicSetup } from 'codemirror';
 import TestCases from './TestCases';
 
-const socket = io('http://localhost:8084');
-
-const CodePanel = ({ question, sessionId }) => {
+const CodePanel = ({ question, sessionId, socket }) => {
   const testcase = question.testcase;
   const isTestcaseAvailable = question.testcase.isAvailable;
   let defaultCodes;
@@ -79,7 +77,6 @@ public class Main {
       }
     ).then(response => response.json())
     .then((data) => {
-      console.log(data);
       if (language === 'python') {
         setCode(data.codeWindows.python);
       } else if (language === 'java') {
@@ -125,8 +122,6 @@ public class Main {
 
   useEffect(() => {
     socket.emit('join', sessionId);
-
-
     socket.on('codeUpdate', data => {
       if (language == data.language) {
         setCode(data.code)

@@ -253,11 +253,11 @@ const CollaborationPage = () => {
       <div style={contentContainerStyle}>
         {/* Left Pane with Tabs */}
         <div style={leftPaneStyle}>
-          <Tabs question={matchData.question} sessionId={sessionId} userId={userId} />
+          <Tabs question={matchData.question} sessionId={sessionId} socket={socket} userId={userId} />
         </div>
         {/* Right Pane with Code Panel */}
         <div style={rightPaneStyle}>
-          <CodePanel question={matchData.question} sessionId={sessionId}  />
+          <CodePanel question={matchData.question} sessionId={sessionId} socket={socket}  />
         </div>
       </div>
       <Toaster closeButton richColors position="top-center" />

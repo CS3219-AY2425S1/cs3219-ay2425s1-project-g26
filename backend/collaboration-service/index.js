@@ -31,6 +31,8 @@ app.use(express.json());
 app.use('/sessions', require('./routes/sessions'));
 
 const sessions = {}; // Store active sessions
+let wb_data = []; //Store active wb data (lines)
+let drawing_data = [] //Store active drawing data
 
 // Socket connects to server
 io.on('connection', (socket) => {
@@ -62,22 +64,32 @@ io.on('connection', (socket) => {
     socket.to(sessionId).emit("partnerLeft");
   });
 
+
   // whiteboard stuff
+  socket.on('getDrawing', (callback) => {
+    callback({ wb_data });
+  });
+
   socket.on("startDrawing", (sessionId, startX, startY, color, lineWidth) => {
     socket
       .to(sessionId)
-      .emit("beginDrawing", { startX, startY, color, lineWidth });
+      .emit("beginDrawing", { startX, startY, color, lineWidth });  
+    wb_data.push([startX, startY, color, lineWidth]);
   });
 
   socket.on("drawing", (sessionId, x, y) => {
+    drawing_data.push([x, y]);
     socket.to(sessionId).emit("drawingUpdate", { x, y });
   });
 
   socket.on("endDrawing", (sessionId) => {
+    wb_data[wb_data.length - 1].push(drawing_data);
+    drawing_data = [];
     socket.to(sessionId).emit("finishDrawing");
   });
 
   socket.on("clearWhiteboard", (sessionId) => {
+    wb_data = [];
     socket.to(sessionId).emit("clearCanvas");
   });
 

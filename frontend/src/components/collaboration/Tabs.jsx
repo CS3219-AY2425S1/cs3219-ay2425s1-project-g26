@@ -5,7 +5,7 @@ import Chat from './Chat';
 import AI from './AI';
 import Whiteboard from './Whiteboard';
 
-const Tabs = ({ question, sessionId, userId }) => {
+const Tabs = ({ question, sessionId, socket, userId }) => {
   const [selectedTab, setSelectedTab] = useState('Question');
   const [aiMessages, setAiMessages] = useState([]);
   const [aiInputValue, setAiInputValue] = useState('');
@@ -101,6 +101,7 @@ const Tabs = ({ question, sessionId, userId }) => {
             canvasRef={canvasRef}
             savedCanvasData={savedCanvasData}
             sessionId={sessionId}
+            currSocket={socket}
           />
         );
       default:
