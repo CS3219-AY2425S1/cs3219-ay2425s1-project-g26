@@ -23,6 +23,14 @@ const SignUp = () => {
       return;
     }
 
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
+    if (!passwordPattern.test(password)) {
+      setErrorMessage('Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
+      setIsLoading(false);
+      return;
+    }
+
+
     try {
       const response = await fetch('http://localhost:8081/users', {
         method: 'POST',

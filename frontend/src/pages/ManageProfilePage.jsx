@@ -23,6 +23,8 @@ const ManageProfilePage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
   // Fetch user data on mount
   useEffect(() => {
     const fetchUserData = async () => {
@@ -104,6 +106,12 @@ const ManageProfilePage = () => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
+
+    // Validate password
+    if (!passwordPattern.test(newPassword)) {
+      toast.error('Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
+      return;
+    }
 
     if (newPassword && newPassword !== confirmPassword) {
       return toast.error("New password and confirmation do not match.");
