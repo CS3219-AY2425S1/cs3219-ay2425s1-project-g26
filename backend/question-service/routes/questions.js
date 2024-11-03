@@ -9,8 +9,8 @@ router.post('/ids', verifyUser, questionsController.getQuestionsByID);
 //Get question based on a category and complexity
 router.post('/specific', verifyUser, questionsController.getQuestionOnMatch);
 
-//Temporary Hack for sk (TODO/TOREMOVE). To change to only admin access.
-router.patch('/', questionsController.addTestCase)
+//Update testcases.
+router.patch('/', verifyAdmin, questionsController.addTestCase)
 
 router.get('/', verifyUser, questionsController.getAllQuestions)
 router.post('/', verifyAdmin, questionsController.createQuestion)

@@ -97,4 +97,48 @@ const deleteSession = async (req, res) => {
     return res.status(200).json({ 'message': `Session ${sessionid} data deleted.` });
 }
 
-module.exports = {getSession, createSession, updateSession, deleteSession};
+const getWhiteboard = async (sessionid) => {
+
+    if (!sessionid) {
+        return [];
+    }
+
+    const session = await SessionSchema.findOne({ sessionid: sessionid });
+
+    if (!session || !session.whiteboard) {
+        return [];
+    }
+    return session.whiteboard;
+}
+
+
+const saveWhiteboard = async (sessionid, whiteboardData) => {
+    if (!sessionid) {
+        return false;
+    }    
+
+    const session = await SessionSchema.findOne({ sessionid: sessionid }).exec();
+    
+    if (whiteboardData) session.whiteboard.push(whiteboardData);
+    const updatedSession = await session.save();
+    return updatedSession;
+}
+
+const clearWhiteboard = async (sessionid) => {
+    if (!sessionid) {
+        return false;
+    }    
+
+    const session = await SessionSchema.findOne({ sessionid: sessionid }).exec();
+    
+    if (!session) {
+        return false;
+    }
+    session.whiteboard = [];
+    const updatedSession = await session.save();
+    return updatedSession;
+}
+
+
+
+module.exports = {getSession, createSession, updateSession, deleteSession, getWhiteboard, saveWhiteboard, clearWhiteboard};

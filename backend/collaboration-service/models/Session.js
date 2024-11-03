@@ -54,7 +54,11 @@ const sessionSchema = new mongoose.Schema({
             userId: String,
             username: String
         }
-    ]
+    ],
+    whiteboard: {
+        type: Array,
+        default: []
+    },
 })
 
 module.exports = mongoose.model("sessions", sessionSchema);
