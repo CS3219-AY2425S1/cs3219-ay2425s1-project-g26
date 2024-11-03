@@ -14,7 +14,7 @@ const SessionBox = ({ headerText, sessionText, buttonText, buttonLink }) => {
         backgroundColor: "#fff",
         padding: "20px",
         width: "350px",
-        height: "200px",
+        height: "210px",
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         marginRight: "20px",
         display: 'flex',
