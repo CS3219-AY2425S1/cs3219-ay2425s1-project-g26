@@ -3,6 +3,9 @@ import { useState } from "react";
 
 const AttemptDetail = ({ attempt, onClose }) => {
   const [isHovered, setIsHovered] = useState(false);
+  if (attempt.attempt.content === "") {
+    attempt.attempt.content = "No attempts were made.";
+  }
 
   return (
     <div
