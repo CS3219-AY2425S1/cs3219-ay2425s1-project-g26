@@ -59,6 +59,10 @@ const AttemptDetail = ({ attempt, onClose }) => {
         <p style={{ lineHeight: "1.6", color: "#444", whiteSpace: "pre-wrap" }}>
           {attempt.attempt.content}
         </p>
+        <p style={{ marginBottom: "5px", fontWeight: "bold", color: "#555" }}>
+          Test Cases Passed:{" "}
+          <span style={{ fontWeight: "normal" }}>{`${attempt.attempt.testCases.filter(Boolean).length}/${attempt.attempt.testCases.length}`}</span>
+        </p>
       </div>
 
       <div
