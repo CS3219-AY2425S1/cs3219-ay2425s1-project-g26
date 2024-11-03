@@ -81,7 +81,7 @@ const Tabs = ({ question, sessionId, socket, userId }) => {
       case 'Question':
         return <Question question={question} />;
       case 'Chat':
-        return <Chat sessionId={sessionId} userId={userId} />;
+        return <Chat sessionId={sessionId} userId={userId} currSocket={socket}/>;
       case 'AI':
         return (
           <AI

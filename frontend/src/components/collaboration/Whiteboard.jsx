@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
 
 const Whiteboard = ({ canvasRef, savedCanvasData, sessionId, currSocket }) => {
   const [isDrawing, setIsDrawing] = useState(false);
@@ -27,8 +26,8 @@ const Whiteboard = ({ canvasRef, savedCanvasData, sessionId, currSocket }) => {
       ctx.fillStyle = '#fff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       setContext(ctx);
-      socket.emit('getDrawing', (response) => {
-        initalDrawing(ctx, response.wb_data);
+      socket.emit('getDrawing', sessionId, (response) => {
+        initalDrawing(ctx, response.data);
     });
   }
   }, [canvasRef, context]);

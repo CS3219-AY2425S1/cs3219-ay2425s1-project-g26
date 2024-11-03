@@ -4,6 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { databaseConn } = require('./config/db');
 const mongoose = require('mongoose');
+const { getWhiteboard, saveWhiteboard, clearWhiteboard } = require('./controllers/sessionsController');
 
 const PORT = process.env.PORT || 8084;
 
@@ -31,8 +32,8 @@ app.use(express.json());
 app.use('/sessions', require('./routes/sessions'));
 
 const sessions = {}; // Store active sessions
-let wb_data = []; //Store active wb data (lines)
-let drawing_data = [] //Store active drawing data
+let whiteboardData = []; //Store whiteboard line data
+let drawingData = [] //Store whiteboard stroke data
 
 // Socket connects to server
 io.on('connection', (socket) => {
@@ -65,31 +66,34 @@ io.on('connection', (socket) => {
   });
 
 
-  // whiteboard stuff
-  socket.on('getDrawing', (callback) => {
-    callback({ wb_data });
+  // Whiteboard scokets
+  socket.on('getDrawing', async (sessionId, callback) => {
+    const data = await getWhiteboard(sessionId);
+    callback({ data });
   });
 
   socket.on("startDrawing", (sessionId, startX, startY, color, lineWidth) => {
     socket
       .to(sessionId)
-      .emit("beginDrawing", { startX, startY, color, lineWidth });  
-    wb_data.push([startX, startY, color, lineWidth]);
+      .emit("beginDrawing", { startX, startY, color, lineWidth });
+    whiteboardData.push(startX, startY, color, lineWidth);
   });
 
   socket.on("drawing", (sessionId, x, y) => {
-    drawing_data.push([x, y]);
+    drawingData.push([x, y]);
     socket.to(sessionId).emit("drawingUpdate", { x, y });
   });
 
   socket.on("endDrawing", (sessionId) => {
-    wb_data[wb_data.length - 1].push(drawing_data);
-    drawing_data = [];
+    whiteboardData.push(drawingData);
+    saveWhiteboard(sessionId, whiteboardData);
+    drawingData = [];
+    whiteboardData = [];
     socket.to(sessionId).emit("finishDrawing");
   });
 
   socket.on("clearWhiteboard", (sessionId) => {
-    wb_data = [];
+    clearWhiteboard(sessionId);
     socket.to(sessionId).emit("clearCanvas");
   });
 
@@ -97,16 +101,8 @@ io.on('connection', (socket) => {
     socket.to(message.sessionId).emit('receiveMessage', message);
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
 });
 
-/*
-// Start the server
-server.listen(8084, () => {
-  console.log('collaboration service running on port 8084');
-});*/
 // Mongodb connection log
 mongoose.connection.once('open', () => {
   // Only listen to the port after connected to mongodb.

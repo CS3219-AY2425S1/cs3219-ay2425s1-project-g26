@@ -1,23 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import io from 'socket.io-client';
 
-const Chat = ({ sessionId, userId }) => {
+const Chat = ({ sessionId, userId , currSocket }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [username, setUsername] = useState('');
-  const [socket, setSocket] = useState(null);
+  const socket = currSocket;
   const chatWindowRef = useRef(null);
-
-  useEffect(() => {
-    const newSocket = io('http://localhost:8084');
-    setSocket(newSocket);
-    newSocket.emit('join', sessionId);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [sessionId]);
 
   // Fetch messages from the server
   useEffect(() => {

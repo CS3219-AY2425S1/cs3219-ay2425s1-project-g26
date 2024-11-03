@@ -46,7 +46,6 @@ services:
       # - ./backend/ai-service:/backend/ai-service
     ports:
       - "11434:11434"
-
     # entrypoint: ["/bin/sh", "/backend/ai-service/entrypoint.sh"]
 
   rabbitmq:
