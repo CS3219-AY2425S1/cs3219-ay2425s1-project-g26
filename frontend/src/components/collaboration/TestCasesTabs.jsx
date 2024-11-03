@@ -7,7 +7,7 @@ const TestCasesTabs = ({ testCases }) => {
   const inputs = testCases.input;
 
   return (
-    <div>
+    <div style={{ paddingBottom: '20px' }}> 
       <div className='cases-headers'>
         {inputs.map((_, index) => (
           <div 
@@ -20,6 +20,7 @@ const TestCasesTabs = ({ testCases }) => {
         ))}
       </div>
       <TestCaseTab params={params} input={inputs[activeTab]} />
+      <div style={{ height: '70px' }} /> 
     </div>
   );
 };

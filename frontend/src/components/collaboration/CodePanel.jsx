@@ -308,8 +308,8 @@ public class Main {
         }} 
       />
       </div>
-      <div style={{ marginTop: '20px', marginRight: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ marginTop: '20px', display: 'flex', gap: '20px' }}>
+      <div style={{ marginTop: '0px', marginRight: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginTop: '0px', display: 'flex', gap: '20px' }}>
       <button
         style={{
           marginTop: '20px',

@@ -8,7 +8,7 @@ const TestResultsTabs = ({ testCases, output, results, hasError }) => {
   const expected = testCases.output;
 
   return (
-    <div>
+    <div style={{ paddingBottom: '20px' }}> {/* Add space at the bottom here */}
       {output === '' ? (
         <p>You must run your code first</p>
       ) : (
@@ -16,10 +16,8 @@ const TestResultsTabs = ({ testCases, output, results, hasError }) => {
           <div className='cases-headers'>
             {inputs.map((_, index) => (
               <div
-              className={
-                `test-tab ${activeTab === index ? 'active-tab' : ''} 
-                ${results[index] ? 'accepted-tab' : 'wrong-tab'}`
-              } 
+                className={`test-tab ${activeTab === index ? 'active-tab' : ''} 
+                ${results[index] ? 'accepted-tab' : 'wrong-tab'}`}
                 key={index}
                 onClick={() => setActiveTab(index)}
               >
@@ -37,6 +35,7 @@ const TestResultsTabs = ({ testCases, output, results, hasError }) => {
           />
         </>
       )}
+      <div style={{ height: '80px' }} /> 
     </div>
   );
 };
