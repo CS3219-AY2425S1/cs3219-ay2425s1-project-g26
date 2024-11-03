@@ -341,7 +341,7 @@ class Solution {
               <strong>Complexity:</strong> {`${matchData.complexity.charAt(0).toUpperCase()}${matchData.complexity.slice(1)}`}
             </p>
             <p style={subMessageStyle}>
-              <strong>Category:</strong> {matchData.category.join(', ')}
+              <strong>Category:</strong> {matchData.category[0]}
             </p>
             <p style={subMessageStyle}>Starting the collaboration room in {countdown} seconds...</p> {/* Display countdown */}
           </div>

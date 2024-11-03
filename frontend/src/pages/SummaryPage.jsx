@@ -18,10 +18,6 @@ const SummaryPage = () => {
     navigate('/dashboard'); 
   };
 
-  const handleNavigateToCollaboration = () => {
-    navigate('/collaboration'); 
-  };
-
   useEffect(() => {
     localStorage.removeItem('isMatched');
     localStorage.removeItem('matchData');
@@ -80,19 +76,6 @@ const SummaryPage = () => {
         >
           Go to Dashboard
         </button>
-
-        {/* <button
-          style={{
-            ...styles.button,
-            backgroundColor: hoverCollaboration ? '#1a3042' : '#fff', 
-            color: hoverCollaboration ? '#fff' : '#1a3042',
-          }}
-          onClick={handleNavigateToCollaboration}
-          onMouseEnter={() => setHoverCollaboration(true)}
-          onMouseLeave={() => setHoverCollaboration(false)}
-        >
-          Back to Collaboration
-        </button> */}
       </div>
     </div>
   );
