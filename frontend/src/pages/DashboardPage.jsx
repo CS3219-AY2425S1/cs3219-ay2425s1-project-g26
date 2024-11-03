@@ -179,7 +179,7 @@ const DashboardPage = () => {
                     )
                   : (
                       <>
-                        No active session.
+                        You have no active sessions.
                         <br />
                         Ready for more?
                       </>

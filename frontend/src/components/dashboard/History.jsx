@@ -45,7 +45,11 @@ const History = ({ history, onView }) => {
                                     transition: "background-color 0.3s",
                                 }}>
                                     <td style={{ padding: "12px", color: "#333" }}>{attempt.question.title}</td>
-                                    <td style={{ padding: "12px", color: "#333" }}>{attempt.question.category.toString()}</td>
+                                    <td style={{ padding: "12px", color: "#333" }}>
+                                        {Array.isArray(attempt.question.category) 
+                                            ? attempt.question.category.join(", ") 
+                                            : attempt.question.category.toString()}
+                                        </td>
                                     <td style={{ padding: "12px", color: "#333" }}>{attempt.question.complexity}</td>
                                     <td style={{ padding: "12px", color: "#333" }}>{attempt.startDateTime}</td>
                                     <td style={{ padding: "12px", color: "#333" }}>{attempt.timeTaken}</td>
