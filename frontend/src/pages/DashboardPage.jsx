@@ -170,13 +170,24 @@ const DashboardPage = () => {
               headerText="Current Active Session"
               sessionText={
                 hasActiveSession
-                  ? `Current active session with @${matchedUsername}`
-                  : "No active session. Ready for more?"
+                  ? (
+                      <>
+                        Current active session with
+                        <br />
+                        <strong>@{matchedUsername}</strong>
+                      </>
+                    )
+                  : (
+                      <>
+                        No active session.
+                        <br />
+                        Ready for more?
+                      </>
+                    )
               }
               buttonText={hasActiveSession ? "Rejoin Session" : "New Question"}
               buttonLink="/new-session"
             />
-
             <SessionBox
               headerText="Go to Question Page"
               sessionText={
