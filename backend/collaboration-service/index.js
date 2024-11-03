@@ -4,7 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const { databaseConn } = require('./config/db');
 const mongoose = require('mongoose');
-const { getWhiteboard, saveWhiteboard,clearWhiteboard} = require('./controllers/sessionsController');
+const { getWhiteboard, saveWhiteboard, clearWhiteboard } = require('./controllers/sessionsController');
 
 const PORT = process.env.PORT || 8084;
 
@@ -67,7 +67,7 @@ io.on('connection', (socket) => {
 
 
   // Whiteboard scokets
-  socket.on('getDrawing', async (sessionId, callback) =>  {
+  socket.on('getDrawing', async (sessionId, callback) => {
     const data = await getWhiteboard(sessionId);
     callback({ data });
   });
@@ -75,8 +75,8 @@ io.on('connection', (socket) => {
   socket.on("startDrawing", (sessionId, startX, startY, color, lineWidth) => {
     socket
       .to(sessionId)
-      .emit("beginDrawing", { startX, startY, color, lineWidth });  
-      whiteboardData.push(startX, startY, color, lineWidth);
+      .emit("beginDrawing", { startX, startY, color, lineWidth });
+    whiteboardData.push(startX, startY, color, lineWidth);
   });
 
   socket.on("drawing", (sessionId, x, y) => {
