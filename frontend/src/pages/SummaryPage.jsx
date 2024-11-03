@@ -59,8 +59,12 @@ const SummaryPage = () => {
       
       <div style={styles.summaryCard}>
         <div style={styles.summaryRow}><span>Time Elapsed:</span> {formatTime(secondsElapsed)}</div>
+        <div style={styles.summaryRow}><span>Partner&apos;s Username:</span> {matchData.matchedUserName || "N/A"}</div>
         <div style={styles.summaryRow}><span>Question Title:</span> {question.title || "N/A"}</div>
         <div style={styles.summaryRow}><span>Complexity:</span> {question.complexity || "N/A"}</div>
+        <div style={styles.summaryRow}>
+          <span>Complexity:</span> {Array.isArray(question.category) ? question.category.join(', ') : question.category || "N/A"}
+        </div>
       </div>
 
       <div style={styles.buttonContainer}>
