@@ -41,7 +41,7 @@ const createMatchRequest = async (req, res) => {
 
         if (matchedResult.matched) {
 
-            const usernames = await getUsername(matchedResult.user1, matchedResult.user2);
+            const usernames = await getUsername(accessToken, matchedResult.user1, matchedResult.user2);
             
             if (!usernames) {
                 return res.status(400).json({message: "Error fetching usernames."});
@@ -100,9 +100,13 @@ const cancelMatchRequest = async (req, res) => {
 }
 
 
- const getUsername = async (user1Id, user2Id) => {
+ const getUsername = async (accessToken, user1Id, user2Id) => {
     try {
-        const response = await axios.get('http://user-service:8081/users/public');
+        const response = await axios.get('http://user-service:8081/users/public', {
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
 
         if (!response) {
             return false;

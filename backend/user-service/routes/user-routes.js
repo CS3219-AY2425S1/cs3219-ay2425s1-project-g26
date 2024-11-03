@@ -22,10 +22,10 @@ import { verifyAccessToken, verifyIsAdmin, verifyIsOwnerOrAdmin } from "../middl
 
 const router = express.Router();
 
-//Get public profile (all and id)
-router.get("/public", getPublicProfile);
+//Get public profile
+router.get("/public", verifyAccessToken, getPublicProfile);
 
-//Get active users only
+//Get all active users only
 router.get("/active", verifyAccessToken, verifyIsAdmin, getAllActiveUsers);
 
 //Get all users

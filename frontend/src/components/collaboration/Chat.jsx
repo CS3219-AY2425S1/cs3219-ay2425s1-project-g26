@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { useAuth } from "../../AuthContext";
 
 const Chat = ({ sessionId, userId , currSocket }) => {
   const [messages, setMessages] = useState([]);
@@ -7,6 +8,8 @@ const Chat = ({ sessionId, userId , currSocket }) => {
   const [username, setUsername] = useState('');
   const socket = currSocket;
   const chatWindowRef = useRef(null);
+  const { accessToken } = useAuth();
+
 
   // Fetch messages from the server
   useEffect(() => {
@@ -26,7 +29,12 @@ const Chat = ({ sessionId, userId , currSocket }) => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await axios.get(`http://localhost:8081/users/public`);
+        const response = await axios.get(`http://localhost:8081/users/public`, {
+          headers: {
+              Authorization: `Bearer ${accessToken}`
+          }
+      });
+      
         const user = response.data.data.find((user) => user.id === userId);
         if (user) {
           setUsername(user.username);
