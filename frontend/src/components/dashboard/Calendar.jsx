@@ -46,8 +46,14 @@ const Calendar = ({
   };
 
   const renderCalendar = () => {
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const calendarDays = [];
+    const startDayIndex = firstDay === 0 ? 6 : firstDay - 1;
+
+    for (let i = 0; i < startDayIndex; i++) {
+      calendarDays.push(<div className="empty-day" key={`empty-${i}`}></div>);
+    }
 
     for (let day = 1; day <= daysInMonth; day++) {
       const formattedDate = formatDate(currentYear, currentMonth, day);
