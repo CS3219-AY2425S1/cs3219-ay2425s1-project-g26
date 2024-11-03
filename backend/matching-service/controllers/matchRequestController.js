@@ -47,8 +47,10 @@ const createMatchRequest = async (req, res) => {
                 return res.status(400).json({message: "Error fetching usernames."});
             }
 
+            // Only select the first category.
+            matchedResult.category = [matchedResult.category[0]];            
             const question = await getQuestion(accessToken, matchedResult.category, matchedResult.complexity);
-
+            
             if (!question) {
                 return res.status(400).json({message: "Error fetching the question."});
             }
