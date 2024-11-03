@@ -63,7 +63,7 @@ const SummaryPage = () => {
         <div style={styles.summaryRow}><span>Question Title:</span> {question.title || "N/A"}</div>
         <div style={styles.summaryRow}><span>Complexity:</span> {question.complexity || "N/A"}</div>
         <div style={styles.summaryRow}>
-          <span>Complexity:</span> {Array.isArray(question.category) ? question.category.join(', ') : question.category || "N/A"}
+          <span>Category:</span> {Array.isArray(question.category) ? question.category.join(', ') : question.category || "N/A"}
         </div>
       </div>
 
