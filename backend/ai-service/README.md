@@ -20,4 +20,4 @@ The endpoints could be access from http://localhost:9680.
 | Endpoint               | Request Type | Body Fields | Description |
 |-------------------------| ------------ |  ---------- |-------------|
 | /               | `GET` | * | Health check. |
-| /stream/{query} | `GET` | * | Returns the language model response in a stream.   |
+| /stream | `POST` | query: `str`<br>question: `json` | Returns the language model response in a stream.   |
