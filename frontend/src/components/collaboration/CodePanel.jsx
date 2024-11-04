@@ -354,7 +354,7 @@ public class Main {
         fontSize: '1rem', 
         whiteSpace: 'pre', 
         border: isTestcaseAvailable ? 'none' : '1px solid #ddd',
-        maxHeight: isTestcaseAvailable ? '' : '150px',
+        maxHeight: isTestcaseAvailable ? '' : '200px',
         overflowY: 'auto', 
         overflowX: 'auto', 
       }}>
