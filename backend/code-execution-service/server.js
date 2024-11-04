@@ -9,35 +9,35 @@ app.use(express.json());
 
 const EXECUTION_TIMEOUT = 5000;
 
-const python_tc = (input, output) => {
+const pythonTestcase = (input, output) => {
   return `
 if __name__ == "__main__":
-    user_solution = solution(${input})
-    print(user_solution)
-    print(user_solution == ${output})`;
+    userSolution = solution(${input})
+    print(userSolution)
+    print(userSolution == ${output})`;
 };
 
-const java_import = `import java.util.*;\n`;
+const javaImport = `import java.util.*;\n`;
 
-const java_tc = (params, input, output, return_type) => {
-  const isArray = return_type.includes("[]");
+const javaTestcase = (parameter, input, output, returnType) => {
+  const isArray = returnType.includes("[]");
   let eval;
   if (isArray) {
     eval = `
-    System.out.println(Arrays.toString(user_solution));
-    System.out.println(Arrays.equals(user_solution, tc_output));`;
+    System.out.println(Arrays.toString(userSolution));
+    System.out.println(Arrays.equals(userSolution, testcaseOutput));`;
   } else {
     eval = `
-    System.out.println(user_solution);
-    System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));`;
+    System.out.println(userSolution);
+    System.out.println(String.valueOf(userSolution).equals(String.valueOf(testcaseOutput)));`;
   }
 
   return `
   public class Main {
     public static void main(String[] args) {
       ${input}
-      ${return_type} user_solution = Solution.solution(${params});
-      ${return_type} tc_output = ${output};
+      ${returnType} userSolution = Solution.solution(${parameter});
+      ${returnType} testcaseOutput = ${output};
       ${eval}
     }
   }`;
@@ -47,7 +47,7 @@ const runInDocker = (language, code) => {
   return new Promise((resolve, reject) => {
     const dockerImage =
       language === "python"
-        ? "python:3.13"
+        ? "python:3.12.7-slim"
         : language === "java"
         ? "openjdk:17"
         : "node:18";
@@ -98,7 +98,6 @@ const runInDocker = (language, code) => {
             ? stdout.slice(jshellIntroEndIndex + "jshell> ".length).trim()
             : stdout;
       }
-
       console.log(
         `${language.charAt(0).toUpperCase() + language.slice(1)} Output:`,
         cleanStdout
@@ -120,12 +119,12 @@ app.post("/run-code", async (req, res) => {
   let result = [];
   try {
     const isTestcaseAvailable = testcase.isAvailable;
-    const python_in = testcase.python.input;
-    const python_out = testcase.python.output;
-    const java_params = testcase.java.params;
-    const java_in = testcase.java.input;
-    const java_out = testcase.java.output;
-    const java_rt = testcase.java.return_type;
+    const pythonInput = testcase.python.input;
+    const pythonOutput = testcase.python.output;
+    const parameter = testcase.python.params;
+    const javaInput = testcase.java.input;
+    const javaOutput = testcase.java.output;
+    const javaReturnType = testcase.java.return_type;
 
     switch (language.toLowerCase()) {
       case "python":
@@ -134,33 +133,32 @@ app.post("/run-code", async (req, res) => {
           break;
         }
 
-        for (let i = 0; i < python_in.length; i++) {
-          const formatted = python_tc(python_in[i], python_out[i]);
+        for (let i = 0; i < pythonInput.length; i++) {
+          const formatted = pythonTestcase(pythonInput[i], pythonOutput[i]);
           const response = await runPython((code + formatted).replace(/'/g, "\""));
-          const split_response = response.split("\n").slice(-3, -1);
-          output.push(split_response[0]);
-          result.push(split_response[1] === "True");
+          const splitResponse = response.split("\n").slice(-3, -1);
+          output.push(splitResponse[0]);
+          result.push(splitResponse[1] === "True");
         }
         break;
 
       case "java":
         if (!isTestcaseAvailable) {
-          output.push(await runJava(code));
+          output.push(await runJava(code.replace(/'/g, "\'")));
           break;
         }
 
-        for (let i = 0; i < java_in.length; i++) {
-          const formatted = java_tc(
-            java_params,
-            java_in[i],
-            java_out[i],
-            java_rt
+        for (let i = 0; i < javaInput.length; i++) {
+          const formatted = javaTestcase(
+            parameter,
+            javaInput[i],
+            javaOutput[i],
+            javaReturnType
           );
-          // console.log(java_import + code + formatted);
-          const response = await runJava(java_import + code + formatted);          
-          const split_response = response.split("\n").slice(-3, -1);
-          output.push(split_response[0]);
-          result.push(split_response[1] === "true");
+          const response = await runJava((javaImport + code + formatted).replace(/'/g, "\\'"));
+          const splitResponse = response.split("\n").slice(-2);
+          output.push(splitResponse[0]);
+          result.push(splitResponse[1] === "true");
         }
         break;
 
