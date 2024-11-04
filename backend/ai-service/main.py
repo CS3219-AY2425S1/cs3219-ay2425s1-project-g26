@@ -44,7 +44,7 @@ async def stream(request: Request) -> Dict[str, str]:
     if not (query and question):
         raise HTTPException(
             status_code=400,
-            detail="Query and question must be provided in body.",
+            message="Query and question must be provided in body.",
         )
     print("Received a query:", query)
 
