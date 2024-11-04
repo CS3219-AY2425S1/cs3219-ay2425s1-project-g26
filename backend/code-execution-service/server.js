@@ -91,7 +91,21 @@ const runInDocker = (language, code) => {
           error: cleanErrorMessage,
         });
       }
-      resolve(stdout);
+
+      let cleanStdout = stdout;
+      if (language === "java") {
+        const jshellIntroEndIndex = stdout.indexOf("jshell> ");
+        cleanStdout =
+          jshellIntroEndIndex !== -1
+            ? stdout.slice(jshellIntroEndIndex + "jshell> ".length).trim()
+            : stdout;
+      }
+
+      console.log(
+        `${language.charAt(0).toUpperCase() + language.slice(1)} Output:`,
+        cleanStdout
+      );
+      resolve(cleanStdout);
     });
   });
 };
