@@ -122,7 +122,13 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
             {renderMessage(msg.text)} 
           </div>
         ))}
-        {loading && <div className="loading">Loading...</div>}
+        {loading && (
+          <div className="loading">
+            Loading... <br />
+            Raesa might need some time to think, <br />
+            please be patient.
+          </div>
+        )}
       </div>
       <form onSubmit={handleSendMessage} className="message-form">
         <textarea
