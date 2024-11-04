@@ -63,27 +63,32 @@ const runInDocker = (language, code) => {
 
     const command = `
       echo '${code}' > ${fileName} &&
-      docker run --rm -v $(pwd):/usr/src/app -w /usr/src/app ${dockerImage} 
+      docker run --rm -v $(pwd):/usr/src/app -v /tmp/.java:/root/.java -w /usr/src/app ${dockerImage} 
       ${
         language === "python"
           ? "python code.py"
           : language === "java"
-          ? "javac Main.java && java Main"
+          ? "javac Main.java && java -Djava.util.prefs.systemRoot=/root/.java -Djava.util.prefs.userRoot=/root/.java -classpath . Main"
           : "node code.js"
       }`;
 
     exec(command, (error, stdout, stderr) => {
       if (error || stderr) {
         const errorMessage = stderr || error.message || "Unknown error";
+        const cleanErrorMessage = errorMessage
+          .split("\n")
+          .filter((line) => !line.includes("INFO:"))
+          .join("\n");
+
         console.error(
           `${language.charAt(0).toUpperCase() + language.slice(1)} Error:`,
-          errorMessage
+          cleanErrorMessage
         );
         return reject({
           message: `${
             language.charAt(0).toUpperCase() + language.slice(1)
           } Error`,
-          error: errorMessage,
+          error: cleanErrorMessage,
         });
       }
       resolve(stdout);
