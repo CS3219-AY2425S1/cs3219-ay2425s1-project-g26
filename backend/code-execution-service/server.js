@@ -54,20 +54,20 @@ const runInDocker = (language, code) => {
 
     const fileName =
       language === "python"
-        ? "code.py"
+        ? "solution.py"
         : language === "java"
         ? "Main.java"
-        : "code.js";
+        : "solution.js";
 
     const command = `
       echo '${code}' > ${fileName} &&
       docker run --rm -v $(pwd):/usr/src/app -v /tmp/.java:/root/.java -w /usr/src/app ${dockerImage} 
       ${
         language === "python"
-          ? "python code.py"
+          ? "python solution.py"
           : language === "java"
           ? "javac Main.java && java -Djava.util.prefs.systemRoot=/root/.java -Djava.util.prefs.userRoot=/root/.java -classpath . Main" 
-          : "node code.js"
+          : "node solution.js"
       }`;
 
     exec(command, (error, stdout, stderr) => {
@@ -144,7 +144,7 @@ app.post("/run-code", async (req, res) => {
 
       case "java":
         if (!isTestcaseAvailable) {
-          output.push(await runJava(code.replace(/'/g, "\'")));
+          output.push(await runJava(code));
           break;
         }
 
@@ -155,7 +155,7 @@ app.post("/run-code", async (req, res) => {
             javaOutput[i],
             javaReturnType
           );
-          const response = await runJava((javaImport + code + formatted).replace(/'/g, "\\'"));
+          const response = await runJava(javaImport + code + formatted);
           const splitResponse = response.split("\n").slice(-2);
           output.push(splitResponse[0]);
           result.push(splitResponse[1] === "true");
