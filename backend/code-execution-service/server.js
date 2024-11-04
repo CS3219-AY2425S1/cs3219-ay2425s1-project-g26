@@ -17,9 +17,7 @@ if __name__ == "__main__":
     print(user_solution == ${output})`;
 };
 
-const java_import = () => {
-  return `import java.util.*;\n`;
-};
+const java_import = `import java.util.*;\n`;
 
 const java_tc = (params, input, output, return_type) => {
   const isArray = return_type.includes("[]");
@@ -68,7 +66,7 @@ const runInDocker = (language, code) => {
         language === "python"
           ? "python code.py"
           : language === "java"
-          ? "javac Main.java && java -Djava.util.prefs.systemRoot=/root/.java -Djava.util.prefs.userRoot=/root/.java -classpath . Main"
+          ? "javac Main.java && java -Djava.util.prefs.systemRoot=/root/.java -Djava.util.prefs.userRoot=/root/.java -classpath . Main" 
           : "node code.js"
       }`;
 
@@ -132,13 +130,13 @@ app.post("/run-code", async (req, res) => {
     switch (language.toLowerCase()) {
       case "python":
         if (!isTestcaseAvailable) {
-          output.push(await runPython(code));
+          output.push(await runPython(code.replace(/'/g, "\"")));
           break;
         }
 
         for (let i = 0; i < python_in.length; i++) {
           const formatted = python_tc(python_in[i], python_out[i]);
-          const response = await runPython(code + formatted);
+          const response = await runPython((code + formatted).replace(/'/g, "\""));
           const split_response = response.split("\n").slice(-3, -1);
           output.push(split_response[0]);
           result.push(split_response[1] === "True");
@@ -158,7 +156,8 @@ app.post("/run-code", async (req, res) => {
             java_out[i],
             java_rt
           );
-          const response = await runJava(java_import() + code + formatted);
+          // console.log(java_import + code + formatted);
+          const response = await runJava(java_import + code + formatted);          
           const split_response = response.split("\n").slice(-3, -1);
           output.push(split_response[0]);
           result.push(split_response[1] === "true");
