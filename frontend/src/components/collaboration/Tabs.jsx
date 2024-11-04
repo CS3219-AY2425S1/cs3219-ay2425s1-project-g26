@@ -89,6 +89,7 @@ const Tabs = ({ question, sessionId, socket, userId }) => {
             setMessages={setAiMessages}
             inputValue={aiInputValue}
             setInputValue={setAiInputValue}
+            question={question}
           />
         );
       case 'Whiteboard':

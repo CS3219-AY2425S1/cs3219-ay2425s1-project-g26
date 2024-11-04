@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './styles/AI.css'; 
 
-const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
+const AI = ({ messages, setMessages, inputValue, setInputValue, question }) => {
   const [loading, setLoading] = useState(false); 
   const textareaRef = useRef(null);
   const chatWindowRef = useRef(null);
@@ -26,8 +26,12 @@ const AI = ({ messages, setMessages, inputValue, setInputValue }) => {
         { text: aiMessage, sender: 'ai' },
       ]);
 
-      const response = await fetch(`http://localhost:9680/stream?query=${encodeURIComponent(inputValue)}`, {
-        method: 'GET',
+      const response = await fetch(`http://localhost:9680/stream`, {
+        method: 'POST',
+        body: JSON.stringify({
+          query: inputValue,
+          question,
+        }),
       });
 
       if (!response.ok) {
