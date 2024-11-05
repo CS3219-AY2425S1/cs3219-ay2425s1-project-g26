@@ -30,13 +30,15 @@
 
 .message.user {
     align-self: flex-end;
-    background-color: #d1e7dd;
+    background-color: #b3e5fc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .message.ai,
 .message.partner {
     align-self: flex-start;
-    background-color: #e2e3e5;
+    background-color: #ffe0b2;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .loading {
@@ -53,7 +55,7 @@
 .message-input {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #007bff;
     border-radius: 5px;
     outline: none;
     resize: none;
