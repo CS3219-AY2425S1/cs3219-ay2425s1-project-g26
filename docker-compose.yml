@@ -33,7 +33,7 @@ services:
 
   ai-service:
     build:
-       context: ./backend/ai-service
+      context: ./backend/ai-service
     ports:
       - "9680:9680"
     depends_on:
@@ -43,10 +43,8 @@ services:
     image: ollama/ollama:0.3.14
     volumes:
       - ollama:/root/.ollama
-      # - ./backend/ai-service:/backend/ai-service
     ports:
       - "11434:11434"
-    # entrypoint: ["/bin/sh", "/backend/ai-service/entrypoint.sh"]
 
   rabbitmq:
     image: "rabbitmq:3-management"
@@ -56,13 +54,16 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-    # attach: false
 
   code-execution-service:
     build:
       context: ./backend/code-execution-service
     ports:
       - "8083:8083"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
 
   collaboration-service:
     build:

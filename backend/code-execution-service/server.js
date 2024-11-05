@@ -1,7 +1,5 @@
 const express = require("express");
 const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
 const cors = require("cors");
 
 const app = express();
@@ -11,134 +9,109 @@ app.use(express.json());
 
 const EXECUTION_TIMEOUT = 5000;
 
-const python_tc = (input, output) => {
+const pythonTestcase = (input, output) => {
   return `
 if __name__ == "__main__":
-    user_solution = solution(${input})
-    print(user_solution)
-    print(user_solution == ${output})`
-}
-const java_import = () => {
-  return `import java.util.*;
-  `
-}
+    userSolution = solution(${input})
+    print(userSolution)
+    print(userSolution == ${output})`;
+};
 
-const java_tc = (params, input, output, return_type) => {
-  const isArray = return_type.includes("[]");
+const javaImport = `import java.util.*;\n`;
+
+const javaTestcase = (parameter, input, output, returnType) => {
+  const isArray = returnType.includes("[]");
   let eval;
   if (isArray) {
     eval = `
-    System.out.println(Arrays.toString(user_solution));
-    System.out.println(Arrays.equals(user_solution, tc_output));`
-
+    System.out.println(Arrays.toString(userSolution));
+    System.out.println(Arrays.equals(userSolution, testcaseOutput));`;
   } else {
     eval = `
-    System.out.println(user_solution);
-    System.out.println(String.valueOf(user_solution).equals(String.valueOf(tc_output)));`;
+    System.out.println(userSolution);
+    System.out.println(String.valueOf(userSolution).equals(String.valueOf(testcaseOutput)));`;
   }
 
   return `
   public class Main {
     public static void main(String[] args) {
       ${input}
-      ${return_type} user_solution = Solution.solution(${params});
-      ${return_type} tc_output = ${output};
+      ${returnType} userSolution = Solution.solution(${parameter});
+      ${returnType} testcaseOutput = ${output};
       ${eval}
     }
-  }`
-}
-
-// Function to run Python code
-const runPython = (code) => {
-  return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, "script.py");
-    fs.writeFileSync(filePath, code); // Save code to a file
-
-    exec(
-      `python3 ${filePath}`,
-      { timeout: EXECUTION_TIMEOUT },
-      (error, stdout, stderr) => {
-        fs.unlinkSync(filePath); // Clean up
-        if (error || stderr) {
-          const errorMessage = stderr || error.message || "Unknown error";
-          console.error("Python Error:", errorMessage);
-          return reject({ message: "Python Error", error: errorMessage });
-        }
-
-        resolve(stdout);
-      }
-    );
-  });
+  }`;
 };
 
-// Function to run Java code
-const runJava = (code) => {
+const runInDocker = (language, code) => {
   return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, "Main.java");
-    fs.writeFileSync(filePath, code); // Save code to a file
+    const dockerImage =
+      language === "python"
+        ? "python:3.12.7-slim"
+        : language === "java"
+        ? "openjdk:17"
+        : "node:18";
 
-    // Compile the Java code
-    exec(
-      `javac ${filePath}`,
-      { timeout: EXECUTION_TIMEOUT },
-      (compileError, compileStdout, compileStderr) => {
-        if (compileError || compileStderr) {
-          fs.unlinkSync(filePath); // Clean up
-          const errorMessage =
-            compileStderr || compileError.message || "Unknown error";
-          console.error("Java Compilation Error:", errorMessage);
-          return reject({
-            message: "Java Compilation Error",
-            error: errorMessage,
-          });
-        }
+    const fileName =
+      language === "python"
+        ? "solution.py"
+        : language === "java"
+        ? "Main.java"
+        : "solution.js";
 
-        // Execute the Java program
-        exec(
-          `java -cp ${__dirname} Main`,
-          { timeout: EXECUTION_TIMEOUT },
-          (runError, stdout, stderr) => {
-            fs.unlinkSync(filePath);
-            fs.unlinkSync(path.join(__dirname, "Main.class")); // Clean up
+    const command = `
+      echo '${code}' > ${fileName} &&
+      docker run --rm -v $(pwd):/usr/src/app -v /tmp/.java:/root/.java -w /usr/src/app ${dockerImage} 
+      ${
+        language === "python"
+          ? "python solution.py"
+          : language === "java"
+          ? "javac Main.java && java -Djava.util.prefs.systemRoot=/root/.java -Djava.util.prefs.userRoot=/root/.java -classpath . Main" 
+          : "node solution.js"
+      }`;
 
-            if (runError || stderr) {
-              const errorMessage =
-                stderr || runError.message || "Unknown error";
-              console.error("Java Runtime Error:", errorMessage);
-              return reject({
-                message: "Java Runtime Error",
-                error: errorMessage,
-              });
-            }
-            resolve(stdout);
-          }
+    exec(command, (error, stdout, stderr) => {
+      if (error || stderr) {
+        const errorMessage = stderr || error.message || "Unknown error";
+        const cleanErrorMessage = errorMessage
+          .split("\n")
+          .filter((line) => !line.includes("INFO:"))
+          .join("\n");
+
+        console.error(
+          `${language.charAt(0).toUpperCase() + language.slice(1)} Error:`,
+          cleanErrorMessage
         );
+        return reject({
+          message: `${
+            language.charAt(0).toUpperCase() + language.slice(1)
+          } Error`,
+          error: cleanErrorMessage,
+        });
       }
-    );
+
+      let cleanStdout = stdout;
+      if (language === "java") {
+        const jshellIntroEndIndex = stdout.indexOf("jshell> ");
+        cleanStdout =
+          jshellIntroEndIndex !== -1
+            ? stdout.slice(jshellIntroEndIndex + "jshell> ".length).trim()
+            : stdout;
+      }
+      console.log(
+        `${language.charAt(0).toUpperCase() + language.slice(1)} Output:`,
+        cleanStdout
+      );
+      resolve(cleanStdout);
+    });
   });
 };
 
-// Function to run JavaScript code
-const runJavaScript = (code) => {
-  return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, "script.js");
-    fs.writeFileSync(filePath, code); // Save code to a file
+const runPython = (code) => runInDocker("python", code);
 
-    exec(
-      `node ${filePath}`,
-      { timeout: EXECUTION_TIMEOUT },
-      (error, stdout, stderr) => {
-        fs.unlinkSync(filePath); // Clean up
-        if (error || stderr) {
-          const errorMessage = stderr || error.message || "Unknown error";
-          console.error("JavaScript Error:", errorMessage);
-          return reject({ message: "JavaScript Error", error: errorMessage });
-        }
-        resolve(stdout);
-      }
-    );
-  });
-};
+const runJava = (code) => runInDocker("java", code);
+
+const runJavaScript = (code) => runInDocker("javascript", code);
 
 app.post("/run-code", async (req, res) => {
   const { code, language, testcase } = req.body;
@@ -146,44 +119,46 @@ app.post("/run-code", async (req, res) => {
   let result = [];
   try {
     const isTestcaseAvailable = testcase.isAvailable;
-    const python_in = testcase.python.input;
-    const python_out = testcase.python.output;
-    const java_params = testcase.python.params;
-    const java_in = testcase.java.input;
-    const java_out = testcase.java.output;
-    const java_rt = testcase.java.return_type;
+    const pythonInput = testcase.python.input;
+    const pythonOutput = testcase.python.output;
+    const parameter = testcase.python.params;
+    const javaInput = testcase.java.input;
+    const javaOutput = testcase.java.output;
+    const javaReturnType = testcase.java.return_type;
 
     switch (language.toLowerCase()) {
       case "python":
-        //Test case not available
         if (!isTestcaseAvailable) {
-          output.push(await runPython(code));
+          output.push(await runPython(code.replace(/'/g, "\"")));
           break;
         }
 
-        for (let i = 0; i < python_in.length; i++) {
-          formatted = python_tc(python_in[i], python_out[i]);
-          response = await runPython(code + formatted);
-          const split_response = response.split("\n").slice(-3, -1);
-          output.push(split_response[0]);
-          result.push(split_response[1] == 'True');
+        for (let i = 0; i < pythonInput.length; i++) {
+          const formatted = pythonTestcase(pythonInput[i], pythonOutput[i]);
+          const response = await runPython((code + formatted).replace(/'/g, "\""));
+          const splitResponse = response.split("\n").slice(-3, -1);
+          output.push(splitResponse[0]);
+          result.push(splitResponse[1] === "True");
         }
         break;
 
       case "java":
-        //Test case not available
         if (!isTestcaseAvailable) {
           output.push(await runJava(code));
           break;
         }
 
-        for (let i = 0; i < java_in.length; i++) {
-          formatted = java_tc(java_params, java_in[i], java_out[i], java_rt);
-          response = await runJava(java_import() + code + formatted);
-
-          const split_response = response.split("\n").slice(-3, -1);
-          output.push(split_response[0]);
-          result.push(split_response[1] == 'true');
+        for (let i = 0; i < javaInput.length; i++) {
+          const formatted = javaTestcase(
+            parameter,
+            javaInput[i],
+            javaOutput[i],
+            javaReturnType
+          );
+          const response = await runJava(javaImport + code + formatted);
+          const splitResponse = response.split("\n").slice(-2);
+          output.push(splitResponse[0]);
+          result.push(splitResponse[1] === "true");
         }
         break;
 
@@ -195,7 +170,6 @@ app.post("/run-code", async (req, res) => {
         return res.status(400).json({ error: "Unsupported language" });
     }
 
-    //result: {true, true}
     return res.status(200).json({ output, result });
   } catch (error) {
     console.error("Error running code:", error.error);
