@@ -49,7 +49,7 @@ const runInDocker = (language, code) => {
   return new Promise((resolve, reject) => {
     const dockerImage =
       language === "python"
-        ? "python:3.13"
+        ? "python:3.12.7-slim"
         : language === "java"
         ? "openjdk:17"
         : "node:18";
