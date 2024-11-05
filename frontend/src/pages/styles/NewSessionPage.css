@@ -13,6 +13,8 @@
     border: none;
     border-radius: 1rem;
     margin: 2rem 5%;
+    width: "170px";
+    height: "50px";
 }
 
 .session-selection {

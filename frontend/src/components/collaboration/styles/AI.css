@@ -94,3 +94,9 @@
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+.timestamp {
+    margin-left: 8px;
+    font-size: 0.65em;
+    color: gray;
+}

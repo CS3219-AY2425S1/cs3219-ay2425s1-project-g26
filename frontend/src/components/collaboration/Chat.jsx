@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from "../../AuthContext";
 
-const Chat = ({ sessionId, userId , currSocket }) => {
+const Chat = ({ sessionId, userId, currSocket }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [username, setUsername] = useState('');
   const socket = currSocket;
   const chatWindowRef = useRef(null);
   const { accessToken } = useAuth();
-
 
   // Fetch messages from the server
   useEffect(() => {
@@ -92,18 +91,24 @@ const Chat = ({ sessionId, userId , currSocket }) => {
     }
   }, [messages]);
 
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   return (
     <div className='chat-container'>
       <h3>Chat</h3>
       <div className='chat-window' ref={chatWindowRef}>
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.userId === userId ? 'user' : 'partner'}`}>
-            <strong>{msg.userId === userId ? 'You' : msg.username}: </strong> 
+            <strong>{msg.userId === userId ? 'You' : msg.username}: </strong>
             {msg.message}
+            <span className='timestamp'>{msg.timeSent ? formatTimestamp(msg.timeSent) : ''}</span>
           </div>
         ))}
       </div>
-      <form onSubmit={handleSendMessage} className='message-form' >
+      <form onSubmit={handleSendMessage} className='message-form'>
         <input
           className='message-input'
           type="text"
