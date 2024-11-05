@@ -5,6 +5,7 @@ const TestCasesTabs = ({ testCases }) => {
   const [activeTab, setActiveTab] = useState(0);
   const params = testCases.params;
   const inputs = testCases.input;
+  const expected = testCases.output;
 
   return (
     <div style={{ paddingBottom: '20px' }}> 
@@ -19,7 +20,7 @@ const TestCasesTabs = ({ testCases }) => {
           </div>
         ))}
       </div>
-      <TestCaseTab params={params} input={inputs[activeTab]} />
+      <TestCaseTab params={params} input={inputs[activeTab]} expected={expected[activeTab]} />
       <div style={{ height: '70px' }} /> 
     </div>
   );
