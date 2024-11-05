@@ -100,3 +100,51 @@
     font-size: 0.65em;
     color: gray;
 }
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.dot-animation {
+    display: inline-flex;
+    margin-left: 5px;
+}
+
+.dot-animation span {
+    display: inline-block;
+    animation: blink 1.4s infinite both;
+}
+
+.dot-animation span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.dot-animation span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.dot-animation span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        opacity: 0;
+    }
+
+    30%,
+    60%,
+    90% {
+        opacity: 1;
+    }
+}

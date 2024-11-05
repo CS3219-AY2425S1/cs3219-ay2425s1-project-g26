@@ -128,9 +128,12 @@ const AI = ({ messages, setMessages, inputValue, setInputValue, question }) => {
         ))}
         {loading && (
           <div className="loading">
-            Loading... <br />
-            Raesa might need some time to think, <br />
-            please be patient.
+            <span>Raesa is thinking</span>
+            <span className="dot-animation">
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+            </span>
           </div>
         )}
       </div>
