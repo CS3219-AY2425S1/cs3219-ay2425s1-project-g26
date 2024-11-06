@@ -289,9 +289,9 @@ public class Main {
         fontSize: '1rem', 
         fontFamily: 'monospace' 
       }} value={language} onChange={handleLanguageChange}>
-        <option value="javascript">JavaScript</option>
         <option value="python">Python</option>
         <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
       </select>
       <div style={{ height: '400px', overflow: 'hidden', position: 'relative' }}>
 

@@ -67,14 +67,33 @@ const History = ({ history, onView }) => {
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
             fontFamily: "Figtree",
         }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h2 style={{ textAlign: "center", fontSize: "20px", color: "#333", marginBottom: "20px" }}>Attempt History</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ textAlign: "center", fontSize: "20px", color: "#000", marginLeft: "5px", marginBottom: "20px" }}>
+                    Attempt History
+                </h2>
                 <input
-                    style = {{ marginBottom: "20px", paddingLeft: "4px" }}
+                    style={{
+                        padding: "8px 12px",
+                        fontSize: "16px",
+                        borderRadius: "8px",
+                        border: "1px solid #ccc",
+                        outline: "none",
+                        marginBottom: "20px",
+                        transition: "border-color 0.3s, box-shadow 0.3s",
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)"
+                    }}
                     type='text'
                     placeholder="Filter"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
+                    onFocus={(e) => {
+                        e.target.style.borderColor = "#3498db";
+                        e.target.style.boxShadow = "0 0 6px rgba(52, 152, 219, 0.3)";
+                    }}
+                    onBlur={(e) => {
+                        e.target.style.borderColor = "#ccc";
+                        e.target.style.boxShadow = "0 2px 4px rgba(0, 0, 0, 0.1)";
+                    }}
                 />
             </div>
             <div style={{
