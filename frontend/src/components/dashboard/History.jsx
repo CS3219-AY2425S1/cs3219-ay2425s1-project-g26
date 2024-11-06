@@ -52,6 +52,12 @@ const History = ({ history, onView }) => {
         handleFilterInput(searchInput)
     }, [searchInput])
 
+    useEffect(() => {
+        if (Array.isArray(history)) {
+            setDisplayedHistory(defaultDisplay);  // Reset to full history when 'history' prop changes
+        }
+    }, [history]);
+    
     return (
         <div style={{
             width: "100%",
