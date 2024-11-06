@@ -59,7 +59,7 @@ const AttemptDetail = ({ attempt, onClose }) => {
           Language:{" "}
           <span style={{ fontWeight: "normal" }}>{attempt.attempt.language}</span>
         </p>
-        <p style={{ color: "#444", whiteSpace: "pre-wrap", background: "#eee", padding: "0.5rem", "border-radius": "4px", maxWidth: "62ch", marginBottom: "5px" }}>
+        <p style={{ color: "#444", whiteSpace: "pre-wrap", background: "#eee", padding: "0.5rem", "borderRadius": "4px", maxWidth: "62ch", marginBottom: "5px" }}>
           <code style={{textAlign: "left", whiteSpace: "pre", lineHeight: "1", wordSpacing: "normal" }}>{attempt.attempt.content}</code>
         </p>
         <p style={{ marginBottom: "5px", fontWeight: "bold", color: "#555" }}>
