@@ -59,10 +59,22 @@ io.on('connection', (socket) => {
     socket.to(sessionId).emit("languageUpdate", newLanguage, newCode);
   });
 
-  // When a user leaves a session, notify everyone in the room
+  // When a user leaves a session, prompt the other user for confirmation
   socket.on("endSession", (sessionId) => {
-    console.log(`User ended the session in room: ${sessionId}`);
-    socket.to(sessionId).emit("partnerLeft");
+    console.log(`User request to end the session in room: ${sessionId}`);
+    // Notify other user and ask if they also want to end the session
+    socket.to(sessionId).emit("confirmEndSession");
+  });
+
+  // Handle the other user's response to the session end prompt
+  socket.on("responseEndSession", (sessionId, response) => {
+    if (response === 'yes') {
+      // If the other user agrees to end the session, notify both users
+      io.in(sessionId).emit("endSessionBoth");
+    } else {
+      // If the other user wants to continue, notify the first user
+      socket.to(sessionId).emit("userContinues");
+    }
   });
 
 

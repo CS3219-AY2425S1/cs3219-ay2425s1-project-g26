@@ -6,7 +6,8 @@ import io from 'socket.io-client';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
-import { Toaster } from 'sonner';
+import ConfirmationModal2 from '../components/collaboration/ConfirmationModal2';
+import { Toaster, toast } from 'sonner';
 
 const socket = io('http://localhost:8084');
 
@@ -19,6 +20,8 @@ const CollaborationPage = () => {
   const location = useLocation();
   const { matchData } = location.state || { matchData: {} };
   const sessionId = matchData.sessionId;
+
+  const [isOtherUserPrompted, setIsOtherUserPrompted] = useState(false);
 
   const updateElapsedTime = () => {
     const savedStartTime = localStorage.getItem('startTime');
@@ -60,7 +63,8 @@ const CollaborationPage = () => {
   }, []);
 
   const handleEndSession = () => {
-    setShowModal(true); 
+    setShowModal(true);
+    socket.emit('confirmEndSession', sessionId); // Emit the event to User 2
   };
 
   const findBestAttempt = (attempts) => {
@@ -109,6 +113,48 @@ const CollaborationPage = () => {
 
   const handleConfirmEndSession = () => {
     socket.emit('endSession', sessionId);
+    setShowModal(false);
+  };
+
+  const handleCancelEndSession = () => {
+    setShowModal(false);
+  };
+
+  const handleUser2Response = (response) => {
+    setIsOtherUserPrompted(false);
+    if (response) {
+      // Emit confirmation if other user agrees
+      socket.emit('responseEndSession', sessionId, 'yes');
+    } else {
+      // Emit cancellation if other user disagrees
+      socket.emit('responseEndSession', sessionId, 'no');
+    }
+  };
+
+  useEffect(() => {
+    socket.on('confirmEndSession', () => {
+      if (!isOtherUserPrompted) {
+        setIsOtherUserPrompted(true);
+      }
+    });
+
+    socket.on('endSessionBoth', () => {
+      endSessionAndNavigate();
+    });
+
+    socket.on('userContinues', () => {
+      toast.info('Your partner has chosen to continue the session.', { duration: 10000 }); // display for 10s
+    });
+
+    return () => {
+      socket.off('confirmEndSession');
+      socket.off('endSessionBoth');
+      socket.off('userContinues');
+    };
+  }, [sessionId, isOtherUserPrompted]);
+
+  const endSessionAndNavigate = () => {
+//     socket.emit('endSession', sessionId);
     const currentSavedTime = localStorage.getItem('startTime')
     const attempts = fetch(`http://localhost:8084/sessions/${sessionId}`,
       {
@@ -152,11 +198,6 @@ const CollaborationPage = () => {
     }
     localStorage.removeItem('startTime');
     navigate('/summary', { state: { matchData, secondsElapsed } });
-  };
-
-
-  const handleCancelEndSession = () => {
-    setShowModal(false); 
   };
 
   const formatTime = (seconds) => {
@@ -248,6 +289,15 @@ const CollaborationPage = () => {
         onConfirm={handleConfirmEndSession}
         onCancel={handleCancelEndSession}
       />
+
+      {/* Other user's confirmation modal */}
+      <ConfirmationModal2
+        show={isOtherUserPrompted}
+        message="Your partner wants to end the session. Do you agree?"
+        onConfirm={() => handleUser2Response(true)}
+        onCancel={() => handleUser2Response(false)}
+      />
+
 
       {/* Main Content Section */}
       <div style={contentContainerStyle}>
