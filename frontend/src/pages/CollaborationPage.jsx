@@ -6,7 +6,8 @@ import io from 'socket.io-client';
 import Tabs from '../components/collaboration/Tabs';
 import CodePanel from '../components/collaboration/CodePanel';
 import ConfirmationModal from '../components/collaboration/ConfirmationModal';
-import { Toaster } from 'sonner';
+import ConfirmationModal2 from '../components/collaboration/ConfirmationModal2';
+import { Toaster, toast } from 'sonner';
 
 const socket = io('http://localhost:8084');
 
@@ -19,6 +20,8 @@ const CollaborationPage = () => {
   const location = useLocation();
   const { matchData } = location.state || { matchData: {} };
   const sessionId = matchData.sessionId;
+
+  const [isOtherUserPrompted, setIsOtherUserPrompted] = useState(false);
 
   const updateElapsedTime = () => {
     const savedStartTime = localStorage.getItem('startTime');
@@ -60,7 +63,8 @@ const CollaborationPage = () => {
   }, []);
 
   const handleEndSession = () => {
-    setShowModal(true); 
+    setShowModal(true);
+    socket.emit('confirmEndSession', sessionId, secondsElapsed);
   };
 
   const findBestAttempt = (attempts) => {
@@ -108,20 +112,63 @@ const CollaborationPage = () => {
   }
 
   const handleConfirmEndSession = () => {
-    socket.emit('endSession', sessionId);
-    const currentSavedTime = localStorage.getItem('startTime')
-    const attempts = fetch(`http://localhost:8084/sessions/${sessionId}`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+    socket.emit('endSession', sessionId, secondsElapsed);
+    setShowModal(false);
+  };
+
+  const handleCancelEndSession = () => {
+    setShowModal(false);
+  };
+
+  const handleUser2Response = (response) => {
+    setIsOtherUserPrompted(false);
+    if (response) {
+      // Emit confirmation if other user agrees
+      socket.emit('responseEndSession', sessionId, 'yes', secondsElapsed);
+    } else {
+      // Emit cancellation if other user disagrees
+      socket.emit('responseEndSession', sessionId, 'no');
+    }
+  };
+
+  useEffect(() => {
+    socket.on('confirmEndSession', (elapsedTime) => {
+      if (!isOtherUserPrompted) {
+        setIsOtherUserPrompted(true);
+        setSecondsElapsed(elapsedTime);
       }
-    ).then((attempts) => attempts.json())
-    .then((attempts) => findBestAttempt(attempts.pastAttempts))
-    .then((bestAttempt) => {
-      const attemptDate = new Date(parseInt(currentSavedTime, 10) * 1000);
-      //Save history data
-      fetch(`http://localhost:8081/users/history/${userId}`,
-        {
+    });
+
+    socket.on('endSessionBoth', (elapsedTime) => {
+      endSessionAndNavigate(elapsedTime);
+    });
+
+    socket.on('userContinues', () => {
+      toast.info('Your partner has chosen to continue the session.', { duration: 10000 }); // display for 10s
+    });
+
+    return () => {
+      socket.off('confirmEndSession');
+      socket.off('endSessionBoth');
+      socket.off('userContinues');
+    };
+  }, [sessionId, isOtherUserPrompted]);
+
+  const endSessionAndNavigate = (elapsedTime) => {
+    //     socket.emit('endSession', sessionId);
+    const formattedElapsedTime = formatTime(elapsedTime);
+    localStorage.removeItem('startTime');
+    
+    fetch(`http://localhost:8084/sessions/${sessionId}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((data) => findBestAttempt(data.pastAttempts))
+      .then((bestAttempt) => {
+        const attemptDate = new Date(Date.now() - elapsedTime * 1000);
+
+        return fetch(`http://localhost:8081/users/history/${userId}`, {
           method: 'PATCH',
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -132,31 +179,20 @@ const CollaborationPage = () => {
             partner: matchData.matchedUserName,
             startDateTime: attemptDate.toLocaleString('en-SG', {timeZone: 'Asia/Singapore'}),
             attempt: bestAttempt,
-            timeTaken: formatTimeTaken(),
-          })
-        }
-      )
-    })
-    if (localStorage.getItem('partnerLeft')) {
-      localStorage.removeItem('partnerLeft')
-      console.log("Deleting Session Data")
-      fetch(`http://localhost:8084/sessions/${sessionId}`,
-        {
+            timeTaken: formattedElapsedTime,
+          }),
+        });
+      })
+      .then(() => {
+        fetch(`http://localhost:8084/sessions/${sessionId}`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sessionid: sessionId
-          })
-        }
-      )
-    }
-    localStorage.removeItem('startTime');
-    navigate('/summary', { state: { matchData, secondsElapsed } });
-  };
+          body: JSON.stringify({ sessionid: sessionId }),
+        });
 
-
-  const handleCancelEndSession = () => {
-    setShowModal(false); 
+        navigate('/summary', { state: { matchData, secondsElapsed: elapsedTime } });
+      })
+      .catch((error) => console.error("Error ending session:", error));
   };
 
   const formatTime = (seconds) => {
@@ -165,79 +201,14 @@ const CollaborationPage = () => {
     return `${minutes}:${remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds}`;
   };
 
-  const containerStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    height: '100vh',
-    padding: '20px',
-    position: 'relative',
-    background: 'none',
-  };
-
-  const timerStyle = {
-    position: 'absolute',
-    top: '20px',
-    left: '20px',
-    fontSize: '1.5rem',
-    fontWeight: 'bold',
-    color: '#fff',
-  };
-
-  const buttonStyle = {
-    position: 'absolute',
-    top: '20px',
-    right: '20px',
-    padding: '10px 20px',
-    backgroundColor: '#fff',
-    color: '#1a3042',
-    border: '2px solid #1a3042',
-    borderRadius: '15px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    fontFamily: 'Figtree',
-    transition: 'background-color 0.3s ease, color 0.3s ease',
-    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-  };
-
-  const contentContainerStyle = {
-    display: 'flex',
-    flex: 1,
-    flexDirection: 'row',
-    gap: '20px',
-    marginTop: '70px',
-    width: '100%',
-    overflow: 'hidden',
-  };
-
-
-  const leftPaneStyle = {
-    flex: 1,
-    padding: '6px',
-  };
-
-  const rightPaneStyle = {
-    flex: 2,
-    padding: '6px',
-    overflow: 'hidden',
-    maxWidth: '100%',
-  };
-
-
   return (
-    <div style={containerStyle}>
-      <div style={timerStyle}>Time Elapsed: {formatTime(secondsElapsed)}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100vh', padding: '20px', position: 'relative' }}>
+      <div style={{ position: 'absolute', top: '20px', left: '20px', fontSize: '1.5rem', fontWeight: 'bold', color: '#fff' }}>
+        Time Elapsed: {formatTime(secondsElapsed)}
+      </div>
       <button
         onClick={handleEndSession}
-        style={buttonStyle}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = '#1a3042';
-          e.target.style.color = '#fff';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = '#fff';
-          e.target.style.color = '#1a3042';
-        }}
+        style={{ position: 'absolute', top: '20px', right: '20px', padding: '10px 20px', backgroundColor: '#fff', color: '#1a3042', border: '2px solid #1a3042', borderRadius: '15px', cursor: 'pointer' }}
       >
         Leave Session
       </button>
@@ -249,15 +220,23 @@ const CollaborationPage = () => {
         onCancel={handleCancelEndSession}
       />
 
+      {/* Other user's confirmation modal */}
+      <ConfirmationModal2
+        show={isOtherUserPrompted}
+        message="Your partner wants to end the session. Do you agree?"
+        onConfirm={() => handleUser2Response(true)}
+        onCancel={() => handleUser2Response(false)}
+      />
+
       {/* Main Content Section */}
-      <div style={contentContainerStyle}>
+      <div style={{ display: 'flex', flex: 1, flexDirection: 'row', gap: '20px', marginTop: '70px', width: '100%', height: '700px' }}>
         {/* Left Pane with Tabs */}
-        <div style={leftPaneStyle}>
+        <div style={{ flex: 1, padding: '6px' }}>
           <Tabs question={matchData.question} sessionId={sessionId} socket={socket} userId={userId} />
         </div>
         {/* Right Pane with Code Panel */}
-        <div style={rightPaneStyle}>
-          <CodePanel question={matchData.question} sessionId={sessionId} socket={socket}  />
+        <div style={{ flex: 2, padding: '6px', overflow: 'hidden' }}>
+          <CodePanel question={matchData.question} sessionId={sessionId} socket={socket} />
         </div>
       </div>
       <Toaster closeButton richColors position="top-center" />

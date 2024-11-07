@@ -134,16 +134,9 @@ public class Main {
       setOutput('');
     });
 
-    socket.on('partnerLeft', () => {
-      toast.info('Your partner has left the session.', { duration: Infinity });
-      localStorage.setItem('partnerLeft', true);
-      handleSendLeaveMessage();
-    });
-
     return () => {
       socket.off('codeUpdate');
       socket.off('languageUpdate');
-      socket.off('partnerLeft');
     };
   }, [sessionId]);
 
@@ -160,23 +153,6 @@ public class Main {
       clearTimeout(handler);
     };
   }, [code]);
-
-  const handleSendLeaveMessage = async () => {
-    const leaveMessage = {
-      userId: "system",
-      username: "System",
-      message: "Your partner has left the session.",
-    };
-
-    try {
-      await axios.post(`http://localhost:8085/chats/${sessionId}`, leaveMessage);
-      if (socket) {
-        socket.emit("sendMessage", { sessionId, ...leaveMessage });
-      }
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
 
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
