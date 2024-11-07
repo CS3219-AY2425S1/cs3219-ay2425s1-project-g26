@@ -8,6 +8,7 @@ import { java } from '@codemirror/lang-java';
 import { toast } from 'sonner';
 import { basicSetup } from 'codemirror';
 import TestCases from './TestCases';
+import { useAuth } from '../../AuthContext';
 
 const CodePanel = ({ question, sessionId, socket }) => {
   const testcase = question.testcase;
@@ -63,6 +64,32 @@ public class Main {
   const [hasError, setHasError] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [username, setUsername] = useState('');
+  const { userId, accessToken } = useAuth();
+
+  // Fetch the username based on userId (for change code)
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8081/users/public`, {
+          headers: {
+              Authorization: `Bearer ${accessToken}`
+          }
+      });
+
+        const user = response.data.data.find((user) => user.id === userId);
+        if (user) {
+          setUsername(user.username);
+        } else {
+          console.error('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching username:', error);
+      }
+    };
+
+    fetchUsername();
+  }, [userId]);
 
   const handleLoadCode = async (language, sessionId) => {
 
@@ -178,6 +205,23 @@ public class Main {
     }
   };
 
+  const handleSendCodeChangeMessage = async (language) => {
+      const leaveMessage = {
+        userId: "system",
+        username: "system",
+        message: `${username} has change to ${language}.`,
+      };
+
+      try {
+        await axios.post(`http://localhost:8085/chats/${sessionId}`, leaveMessage);
+        if (socket) {
+          socket.emit("sendMessage", { sessionId, ...leaveMessage });
+        }
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    };
+
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
     setLanguage(selectedLanguage);
@@ -191,6 +235,8 @@ public class Main {
       }
     });
     setOutput('');
+    handleSendCodeChangeMessage(selectedLanguage);
+
     /*  Swapping language on one side should not change it on another
     if (socket) {
       socket.emit('languageChange', sessionId, selectedLanguage, newCode);
