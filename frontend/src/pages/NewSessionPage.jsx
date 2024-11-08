@@ -12,6 +12,7 @@ const NewSessionPage = () => {
   const [topicsArray, setTopicsArray] = useState([]);
   const [targetTopicsArray, setTargetTopicsArray] = useState([]);
   const [selectedTopics, setSelectedTopics] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   const getHeaders = () => {
     return {
@@ -41,6 +42,7 @@ const NewSessionPage = () => {
         }
         const data = await response.json();
         getTopics(data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching questions:", error);
       }
@@ -138,11 +140,11 @@ const NewSessionPage = () => {
                 <div className="difficulty-selection">
                     <p>Select a Difficulty Level:</p>
                     <div className="options">
-                      <input type="radio" id="Easy" name="complexity" value="Easy" onChange={handleDifficultyChange} />
+                      <input type="radio" id="Easy" name="complexity" value="Easy" onChange={handleDifficultyChange} disabled={isLoading} />
                       <label className="radio-label" htmlFor="Easy">Easy</label>
-                      <input type="radio" id="Medium" name="complexity" value="Medium" onChange={handleDifficultyChange} />
+                      <input type="radio" id="Medium" name="complexity" value="Medium" onChange={handleDifficultyChange} disabled={isLoading} />
                       <label className="radio-label" htmlFor="Medium">Medium</label>
-                      <input type="radio" id="Hard" name="complexity" value="Hard" onChange={handleDifficultyChange} />
+                      <input type="radio" id="Hard" name="complexity" value="Hard" onChange={handleDifficultyChange} disabled={isLoading} />
                       <label className="radio-label" htmlFor="Hard">Hard</label>
                     </div>
                 </div>
