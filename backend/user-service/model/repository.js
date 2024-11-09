@@ -6,7 +6,7 @@ export async function connectToDB() {
   const user = process.env.MONGODB_USERNAME;
   const password = process.env.MONGODB_PASSWORD;
   const url = process.env.MONGODB_ENDPOINT;
-  const dbName = process.env.MONGODB_DB;
+  const dbName = process.env.USER_DB;
 
   const DATABASE_URI = `mongodb+srv://${user}:${password}@${url}/${dbName}?retryWrites=true&w=majority&appName=PeerPrep`
 
