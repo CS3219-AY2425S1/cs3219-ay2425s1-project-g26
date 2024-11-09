@@ -9,7 +9,6 @@ const SummaryPage = () => {
   const location = useLocation();
   const { accessToken, userId } = useAuth();
   const [hoverDashboard, setHoverDashboard] = useState(false);
-  const [hoverCollaboration, setHoverCollaboration] = useState(false);
 
   const { matchData = {}, secondsElapsed = 0 } = location.state || {};
   const { question = {} } = matchData;
