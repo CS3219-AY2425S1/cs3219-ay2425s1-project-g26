@@ -147,7 +147,7 @@ public class Main {
         code: code
       }
       handleUpdateSessionData(sessionId, data);
-    }, 1000);
+    }, 500);
 
     return () => {
       clearTimeout(handler);
