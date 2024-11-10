@@ -185,7 +185,7 @@ public class Main {
       const leaveMessage = {
         userId: "system",
         username: "system",
-        message: `${username} has change to ${language}.`,
+        message: `User @${username} switched their language to ${language}.`,
       };
 
       try {
