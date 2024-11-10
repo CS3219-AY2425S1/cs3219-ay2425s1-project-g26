@@ -72,6 +72,11 @@ const updateSession = async (req, res) => {
             });
         };
 
+        if (req.body?.partnerLeft) {
+            console.log("Partner has left.");
+            session.partnerLeft = req.body.partnerLeft;
+        };
+
         const updatedSession = await session.save();
         return res.status(200).json(updatedSession);
     } catch (err) {

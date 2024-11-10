@@ -111,6 +111,10 @@ public class Main {
       } else if (language === 'javascript') {
         setCode(data.codeWindows.javascript);
       }
+
+      if (data.partnerLeft) {
+        localStorage.setItem('partnerLeft', true);
+      }
     });
   }
 
@@ -144,7 +148,11 @@ public class Main {
   }
 
   useEffect(() => {
-    handleLoadCode('python', sessionId);
+    handleLoadCode('python', sessionId).then(() => {
+      if (localStorage.getItem('partnerLeft')) {
+        toast.info('Your partner has left the session.', { duration: Infinity });
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -162,9 +170,8 @@ public class Main {
     });
 
     socket.on('partnerLeft', () => {
-      toast.info('Your partner has left the session.', { autoClose: false });
+      toast.info('Your partner has left the session.', { duration: Infinity });
       localStorage.setItem('partnerLeft', true);
-      handleSendLeaveMessage();
     });
 
     return () => {
@@ -224,23 +231,6 @@ public class Main {
     if (socket) {
       socket.emit('languageChange', sessionId, selectedLanguage, newCode);
     } */
-  };
-
-  const handleSendLeaveMessage = async () => {
-    const leaveMessage = {
-      userId: "system",
-      username: "System",
-      message: "Your partner has left the session.",
-    };
-
-    try {
-      await axios.post(`http://localhost:8085/chats/${sessionId}`, leaveMessage);
-      if (socket) {
-        socket.emit("sendMessage", { sessionId, ...leaveMessage });
-      }
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
   };
 
   const handleCodeChange = (value) => {
