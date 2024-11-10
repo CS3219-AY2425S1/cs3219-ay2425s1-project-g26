@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import withAuth from "../hoc/withAuth";
 import { useAuth } from '../AuthContext';
 import io from 'socket.io-client';
@@ -64,7 +65,26 @@ const CollaborationPage = () => {
 
   const handleEndSession = () => {
     setShowModal(true);
+    /*  Feature Disabled
     socket.emit('confirmEndSession', sessionId, secondsElapsed);
+    */
+  };
+
+  const handleSendLeaveMessage = async () => {
+    const leaveMessage = {
+      userId: "system",
+      username: "System",
+      message: "Your partner has left the session.",
+    };
+
+    try {
+      await axios.post(`http://localhost:8085/chats/${sessionId}`, leaveMessage);
+      if (socket) {
+        socket.emit("sendMessage", { sessionId, ...leaveMessage });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   const findBestAttempt = (attempts) => {
@@ -99,6 +119,7 @@ const CollaborationPage = () => {
     return bestAttempt
   };
 
+  /*  Unused - replaced with better method
   const formatTimeTaken = () => {
     const hours = Math.floor(secondsElapsed / 3600);
     const minutes = Math.floor((secondsElapsed % 3600) / 60);
@@ -109,17 +130,20 @@ const CollaborationPage = () => {
     } else {
       return `${minutes}:${seconds}`;
     }
-  }
+  }*/
 
   const handleConfirmEndSession = () => {
-    socket.emit('endSession', sessionId, secondsElapsed);
+    console.log("Attempt to leave session.")
     setShowModal(false);
+    endSessionAndNavigate(secondsElapsed);
+    socket.emit('endSession', sessionId, secondsElapsed);
   };
 
   const handleCancelEndSession = () => {
     setShowModal(false);
   };
 
+  /*  Disabled - feature disabled
   const handleUser2Response = (response) => {
     setIsOtherUserPrompted(false);
     if (response) {
@@ -129,20 +153,25 @@ const CollaborationPage = () => {
       // Emit cancellation if other user disagrees
       socket.emit('responseEndSession', sessionId, 'no');
     }
-  };
+  };*/
 
+  /*  Disabled - feature disabled
   useEffect(() => {
     socket.on('confirmEndSession', (elapsedTime) => {
+      
       if (!isOtherUserPrompted) {
         setIsOtherUserPrompted(true);
         setSecondsElapsed(elapsedTime);
       }
+      toast.info('Your partner has left the session.', { autoClose: false }); // User has to close notification manually
     });
 
+    
     socket.on('endSessionBoth', (elapsedTime) => {
       endSessionAndNavigate(elapsedTime);
     });
 
+    
     socket.on('userContinues', () => {
       toast.info('Your partner has chosen to continue the session.', { duration: 10000 }); // display for 10s
     });
@@ -152,12 +181,14 @@ const CollaborationPage = () => {
       socket.off('endSessionBoth');
       socket.off('userContinues');
     };
-  }, [sessionId, isOtherUserPrompted]);
+  }, [sessionId, isOtherUserPrompted]);*/
 
   const endSessionAndNavigate = (elapsedTime) => {
     //     socket.emit('endSession', sessionId);
     const formattedElapsedTime = formatTime(elapsedTime);
     localStorage.removeItem('startTime');
+
+    handleSendLeaveMessage()
     
     fetch(`http://localhost:8084/sessions/${sessionId}`, {
       method: 'GET',
@@ -184,12 +215,24 @@ const CollaborationPage = () => {
         });
       })
       .then(() => {
-        fetch(`http://localhost:8084/sessions/${sessionId}`, {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionid: sessionId }),
-        });
-
+        if (localStorage.getItem('partnerLeft')) {
+          try {
+            fetch(`http://localhost:8084/sessions/${sessionId}`, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ sessionid: sessionId }),
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          fetch(`http://localhost:8084/sessions/${sessionId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionid: sessionId, partnerLeft: true }),
+          });
+        }
+        localStorage.removeItem('partnerLeft');
         navigate('/summary', { state: { matchData, secondsElapsed: elapsedTime } });
       })
       .catch((error) => console.error("Error ending session:", error));
@@ -219,14 +262,14 @@ const CollaborationPage = () => {
         onConfirm={handleConfirmEndSession}
         onCancel={handleCancelEndSession}
       />
-
-      {/* Other user's confirmation modal */}
+      
+      {/* Other user's confirmation modal 
       <ConfirmationModal2
         show={isOtherUserPrompted}
         message="Your partner wants to end the session. Do you agree?"
         onConfirm={() => handleUser2Response(true)}
         onCancel={() => handleUser2Response(false)}
-      />
+      />*/}
 
       {/* Main Content Section */}
       <div style={{ display: 'flex', flex: 1, flexDirection: 'row', gap: '20px', marginTop: '70px', width: '100%', height: '700px' }}>

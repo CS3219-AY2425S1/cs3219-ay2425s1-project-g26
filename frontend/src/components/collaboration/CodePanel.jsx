@@ -111,6 +111,10 @@ public class Main {
       } else if (language === 'javascript') {
         setCode(data.codeWindows.javascript);
       }
+
+      if (data.partnerLeft) {
+        localStorage.setItem('partnerLeft', true);
+      }
     });
   }
 
@@ -144,7 +148,11 @@ public class Main {
   }
 
   useEffect(() => {
-    handleLoadCode('python', sessionId);
+    handleLoadCode('python', sessionId).then(() => {
+      if (localStorage.getItem('partnerLeft')) {
+        toast.info('Your partner has left the session.', { duration: Infinity });
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -161,9 +169,15 @@ public class Main {
       setOutput('');
     });
 
+    socket.on('partnerLeft', () => {
+      toast.info('Your partner has left the session.', { duration: Infinity });
+      localStorage.setItem('partnerLeft', true);
+    });
+
     return () => {
       socket.off('codeUpdate');
       socket.off('languageUpdate');
+      socket.off('partnerLeft');
     };
   }, [sessionId]);
 
@@ -184,8 +198,8 @@ public class Main {
   const handleSendCodeChangeMessage = async (language) => {
       const leaveMessage = {
         userId: "system",
-        username: "system",
-        message: `${username} has change to ${language}.`,
+        username: "System",
+        message: `User @${username} switched their language to ${language}.`,
       };
 
       try {

@@ -59,6 +59,10 @@ const sessionSchema = new mongoose.Schema({
         type: Array,
         default: []
     },
+    partnerLeft: {
+        type: Boolean,
+        default: false
+    },
 })
 
 module.exports = mongoose.model("sessions", sessionSchema);

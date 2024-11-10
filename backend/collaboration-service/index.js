@@ -59,13 +59,24 @@ io.on('connection', (socket) => {
     socket.to(sessionId).emit("languageUpdate", newLanguage, newCode);
   });
 
+  // When a user leaves a session, alert the other user.
+  socket.on("endSession", (sessionId) => {
+    console.log(`User leaves session in room: ${sessionId}`);
+    socket.to(sessionId).emit("partnerLeft");
+    /*  Disabled
+    // Notify other user and ask if they also want to end the session
+    socket.to(sessionId).emit("confirmEndSession", elapsedTime);*/
+  })
+
+  /*
   // When a user leaves a session, prompt the other user for confirmation
   socket.on("endSession", (sessionId, elapsedTime) => {
     console.log(`User request to end the session in room: ${sessionId}`);
     // Notify other user and ask if they also want to end the session
     socket.to(sessionId).emit("confirmEndSession", elapsedTime);
-  });
+  });*/
 
+  /*  Disabled
   // Handle the other user's response to the session end prompt
   socket.on("responseEndSession", (sessionId, response, elapsedTime) => {
     if (response === "yes") {
@@ -75,7 +86,7 @@ io.on('connection', (socket) => {
       // If the other user wants to continue, notify the first user
       socket.to(sessionId).emit("userContinues");
     }
-  });
+  });*/
 
 
   // Whiteboard scokets
