@@ -65,7 +65,9 @@ const matchUsers = async () => {
             
             setTimeout(() => {
                 if (!matchedRequest) {
-                    findMatching(Math.max(goalScore - 0.5), 2.5)
+                    // console.log(`Score ${goalScore}`)
+                    // console.log(`Searching ${Math.max(goalScore - 0.5, 2.5)}`)
+                    findMatching(Math.max(goalScore - 0.5, 2.5))
                 }
             }, timeout / 5);
 
