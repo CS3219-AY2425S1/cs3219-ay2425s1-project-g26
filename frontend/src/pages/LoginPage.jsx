@@ -41,7 +41,7 @@ const Login = () => {
         if (response.status === 401) {
           throw new Error('Wrong email and/or password!');
         } else if (response.status === 400) {
-          throw new Error('Your account is deleted!');
+          throw new Error('Your account has been deleted, please contact support to continue.');
         } else {
           throw new Error(errorData.message || 'An error occurred, please try again.');
         }
