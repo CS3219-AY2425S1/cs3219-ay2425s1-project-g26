@@ -1,0 +1,7 @@
+backend/*/node_modules
+backend/*/.env
+backend/ai-service/TinyLlama-1.1B-Chat-v1.0
+frontend/node_modules
+node_modules
+
+.env

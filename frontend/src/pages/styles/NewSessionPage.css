@@ -1,0 +1,128 @@
+.session-container {
+    --white: #f5f5f5;
+    --secondary: #1a3042;
+    --btn-initial: #dcdfdd;
+    --btn-accent: #0097a7;
+}
+
+.back-btn {
+    cursor: pointer;
+    background-color: var(--white);
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 1rem;
+    margin: 2rem 5%;
+    width: "170px";
+    height: "50px";
+}
+
+.session-selection {
+    background-color: white;
+    margin: 2rem 20%;
+    border-radius: 1rem;
+}
+
+.session-selection > p {
+    font-size: 1.25rem;
+    padding: 1.25rem;
+    font-weight: bold;
+}
+
+.difficulty-selection > p,
+.topic-selection > p {
+    background-color: var(--secondary);
+    font-size: 1.2rem;
+    padding: 0.75rem 1.25rem;
+    color: var(--white);
+    max-width: 100%;
+}
+
+.topic-selection {
+    height: 0;
+    visibility: hidden;
+    opacity: 0;
+    transition: height 0.1s ease, opacity 0.4s ease;
+}
+
+.section-shown {
+    height: min-content;
+    opacity: 1;
+    visibility: visible;
+}
+
+.session-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.session-form input[type='radio'], 
+.session-form input[type='checkbox'] {
+    display: none;
+}
+
+.session-form .options {
+    padding: 1.25rem;
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    max-height: 30svh;
+    overflow-y: auto;
+}
+
+.options img {
+    height: 4rem;
+    margin: auto;
+}
+
+.session-form .radio-label, 
+.session-form .check-label {
+    cursor: pointer;
+    background-color: var(--btn-initial);
+    text-align: center;
+    padding: 1rem 2.5rem;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.session-form input[type='radio']:checked + label, 
+.session-form input[type='checkbox']:checked + label {
+    background-color: var(--btn-accent);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
+.session-form input[type='radio']:not(:checked) + label:hover,
+.session-form input[type='checkbox']:not(:checked) + label:hover {
+    filter: brightness(90%);
+}
+
+.session-form .start-btn {
+    cursor: pointer;
+    background-color: var(--secondary);
+    color: var(--white);
+    align-self: center;
+    width: 40%;
+    border: none;
+    border-radius: 1rem;
+    font-weight: bold;
+    height: 0;
+    padding: 0;
+    font-size: 0;
+    opacity: 0;
+    transition: all 0.1s ease;
+}
+
+.session-form .show-btn {
+    opacity: 1;
+    margin: 1rem 0 2rem 0;
+    padding: 1.5rem 3rem;
+    font-size: 1.2rem;
+    height: auto;
+    transition: all 0.1s ease, opacity 0.3s ease;
+}
+
+.session-form .start-btn:hover {
+    filter: brightness(125%);
+    transform: scale(1.02);
+}

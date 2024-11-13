@@ -1,0 +1,190 @@
+/* eslint-disable react/no-unescaped-entities */
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Toast from './styles/Toast';
+
+const Login = () => {
+  const navigate = useNavigate();
+  const { login, accessToken, userId } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (accessToken && userId) {
+      navigate('/dashboard');
+    }
+  }, [accessToken, userId, navigate]);  
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setToastMessage(null);
+    setIsLoading(true);
+
+    try {
+      const lowercaseEmail = email.toLowerCase();
+      const response = await fetch('http://localhost:8081/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: lowercaseEmail,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 401) {
+          throw new Error('Wrong email and/or password!');
+        } else if (response.status === 400) {
+          throw new Error('Your account has been deleted, please contact support to continue.');
+        } else {
+          throw new Error(errorData.message || 'An error occurred, please try again.');
+        }
+      }
+
+      const data = await response.json();
+      
+      if (data && data.data && data.data.accessToken && data.data.id) {
+        const userId = data.data.id; 
+        const accessToken = data.data.accessToken; 
+        const onlineDate = data.data.onlineDate;
+        localStorage.setItem('onlineDate', onlineDate);
+
+        const isAdmin = data.data.isAdmin;
+        localStorage.setItem('isAdmin', isAdmin);
+
+        login(accessToken, userId);
+        navigate('/dashboard'); 
+      } else {
+        throw new Error('Invalid response data');
+      }
+
+    } catch (error) {
+      setToastMessage({ message: error.message, type: 'error' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ 
+      textAlign: 'center', 
+      padding: '50px', 
+      color: '#fff', 
+      height: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      justifyContent: 'center', 
+      fontFamily: 'Figtree, sans-serif'  
+    }}>
+      <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1> 
+      <p style={{ fontSize: '1.2rem', margin: '36px 0' }}>Welcome back! Let’s get back on track.</p> 
+      
+      {toastMessage && <Toast message={toastMessage.message} type={toastMessage.type} />}
+      
+      <form 
+        onSubmit={handleSubmit} 
+        style={{ 
+          marginBottom: '20px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          fontFamily: 'Figtree, sans-serif' 
+        }}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={{
+            display: 'block',
+            margin: '10px 0',
+            marginTop: '50px',
+            padding: '10px', 
+            width: '300px',
+            border: 'none',
+            borderBottom: '2px solid #fff',
+            outline: 'none',
+            backgroundColor: 'transparent',
+            color: '#fff',
+            fontSize: '16px',
+            fontFamily: 'Figtree, sans-serif' 
+          }}
+        />
+        <div style={{ position: 'relative', width: '300px' }}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{
+              display: 'block',
+              margin: '0px 0',
+              padding: '10px',
+              width: '100%',
+              border: 'none',
+              borderBottom: '2px solid #fff',
+              outline: 'none',
+              backgroundColor: 'transparent',
+              color: '#fff',
+              fontSize: '16px',
+              fontFamily: 'Figtree, sans-serif' 
+            }}
+          />
+          <div
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: 'absolute',
+              right: '10px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              cursor: 'pointer',
+              color: '#fff',
+            }}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </div>
+        </div>
+        <p style={{ margin: '0', color: 'white', fontSize: '0.9rem', textAlign: 'right', width: '300px', fontFamily: 'Figtree, sans-serif' }}>
+          <a href="/forget-password" style={{ color: 'white', fontFamily: 'Figtree, sans-serif' }}>Forgot your password?</a> 
+        </p>
+        <button
+          type="submit"
+          style={{
+            width: '300px', 
+            height: '50px', 
+            backgroundColor: 'white',
+            color: 'black',
+            border: 'none',
+            borderRadius: '20px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontFamily: 'Figtree, sans-serif', 
+            marginTop: '20px',
+            marginBottom: '40px',
+            transition: 'background-color 0.3s', 
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e0e0e0'} 
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+      <p style={{ fontSize: '1rem', fontFamily: 'Figtree, sans-serif' }}> 
+        Don't have an account? <a href="/signup" style={{ color: 'white', fontFamily: 'Figtree, sans-serif' }}>Sign Up</a>
+      </p>
+    </div>
+  );
+};
+
+export default Login;

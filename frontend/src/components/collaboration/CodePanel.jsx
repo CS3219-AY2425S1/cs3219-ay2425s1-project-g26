@@ -1,0 +1,419 @@
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
+import axios from 'axios';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
+import { toast } from 'sonner';
+import { basicSetup } from 'codemirror';
+import TestCases from './TestCases';
+import { useAuth } from '../../AuthContext';
+
+const CodePanel = ({ question, sessionId, socket }) => {
+  const testcase = question.testcase;
+  const isTestcaseAvailable = question.testcase.isAvailable;
+  let defaultCodes;
+
+  if (isTestcaseAvailable) {
+    defaultCodes = {
+      javascript: `// JavaScript code
+const example = "raesa";
+console.log(example);`,
+  
+      python: `# Python code
+def solution(${testcase.python.params}):
+    return ""
+    `,
+
+      java: `// Java code
+class Solution {
+  public static ${testcase.java.return_type} solution(${testcase.java.params}) {
+
+  }
+}`};
+  } else {
+    defaultCodes = {
+      javascript: `// JavaScript code
+const example = "raesa";
+console.log(example);`,
+  
+      python: `# Python code
+def main():
+    example = "raesa"
+    print(example)
+
+if __name__ == "__main__":
+    main()`,
+  
+      java: `// Java code
+public class Main {
+  public static void main(String[] args) {
+    String example = "raesa";
+    System.out.println(example);
+  }
+}`
+    };
+  }
+
+
+  const [language, setLanguage] = useState('python');
+  const [code, setCode] = useState(defaultCodes[language]);
+  const [output, setOutput] = useState('');
+  const [caseResults, setCaseResults] = useState([]);
+  const [hasError, setHasError] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [username, setUsername] = useState('');
+  const { userId, accessToken } = useAuth();
+
+  // Fetch the username based on userId (for change code)
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8081/users/public`, {
+          headers: {
+              Authorization: `Bearer ${accessToken}`
+          }
+      });
+
+        const user = response.data.data.find((user) => user.id === userId);
+        if (user) {
+          setUsername(user.username);
+        } else {
+          console.error('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching username:', error);
+      }
+    };
+
+    fetchUsername();
+  }, [userId]);
+
+  const handleLoadCode = async (language, sessionId) => {
+
+    const session = await fetch(
+      `http://localhost:8084/sessions/${sessionId}`, 
+      {
+        method: "GET",
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+         },
+      }
+    ).then(response => response.json())
+    .then((data) => {
+      if (language === 'python') {
+        setCode(data.codeWindows.python);
+      } else if (language === 'java') {
+        setCode(data.codeWindows.java);
+      } else if (language === 'javascript') {
+        setCode(data.codeWindows.javascript);
+      }
+
+      if (data.partnerLeft) {
+        localStorage.setItem('partnerLeft', true);
+      } else {
+        localStorage.setItem('partnerLeft', false);
+      }
+    });
+  }
+
+  const handleUpdateSessionData = async (sessionId, data) => {
+    const updateData = {
+      sessionid: sessionId
+    }
+
+    if (data.newAttempt) {
+      updateData.newAttempt = data.newAttempt;
+    }
+    if (data.language && data.code) {
+      updateData.language = data.language;
+      updateData.code = data.code;
+    }
+
+    console.log(updateData);
+    const response = await fetch(
+      `http://localhost:8084/sessions/${sessionId}`, 
+      {
+        method: "PATCH",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+
+    if (response.ok) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  useEffect(() => {
+    handleLoadCode('python', sessionId).then(() => {
+      if (localStorage.getItem('partnerLeft') && localStorage.getItem('partnerLeft') == true) {
+        toast.info('Your partner has left the session.', { duration: Infinity });
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.emit('join', sessionId);
+    socket.on('codeUpdate', data => {
+      if (language == data.language) {
+        setCode(data.code)
+      }
+    });
+
+    socket.on('languageUpdate', (newLanguage, newCode) => {
+      setLanguage(newLanguage);
+      setCode(newCode);
+      setOutput('');
+    });
+
+    socket.on('partnerLeft', () => {
+      toast.info('Your partner has left the session.', { duration: Infinity });
+      localStorage.setItem('partnerLeft', true);
+    });
+
+    return () => {
+      socket.off('codeUpdate');
+      socket.off('languageUpdate');
+      socket.off('partnerLeft');
+    };
+  }, [sessionId]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const data = {
+        language: language,
+        code: code
+      }
+      handleUpdateSessionData(sessionId, data);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [code]);
+
+  const handleSendCodeChangeMessage = async (language) => {
+      const leaveMessage = {
+        userId: "system",
+        username: "System",
+        message: `User @${username} switched their language to ${language}.`,
+      };
+
+      try {
+        await axios.post(`http://localhost:8085/chats/${sessionId}`, leaveMessage);
+        if (socket) {
+          socket.emit("sendMessage", { sessionId, ...leaveMessage });
+        }
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    };
+
+  const handleLanguageChange = (event) => {
+    const selectedLanguage = event.target.value;
+    setLanguage(selectedLanguage);
+    handleLoadCode(selectedLanguage, sessionId);
+
+    // Re-register event
+    socket.off('codeUpdate');
+    socket.on('codeUpdate', data => {
+      if (selectedLanguage == data.language) {
+        setCode(data.code)
+      }
+    });
+    setOutput('');
+    handleSendCodeChangeMessage(selectedLanguage);
+
+    /*  Swapping language on one side should not change it on another
+    if (socket) {
+      socket.emit('languageChange', sessionId, selectedLanguage, newCode);
+    } */
+  };
+
+  const handleCodeChange = (value) => {
+    setCode(value);
+    if (socket) {
+      socket.emit('codeChange', sessionId, value, language);
+    }
+  };
+
+  const handleResetCode = async () => {
+    const newCode = defaultCodes[language];
+    handleCodeChange(newCode);
+  }
+
+  const handleRunCode = async () => {
+    setOutput('');
+    setIsButtonDisabled(true);
+
+    const requestBody = {
+      code,
+      language,     
+      testcase 
+    }; 
+
+    try {
+      const response = await fetch('http://localhost:8083/run-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) { // if http status >= 400
+        setOutput(`Error: ${result.error || 'Unknown error'}\nDetails: ${result.details || 'No additional details'}`);
+        setCaseResults([]);
+        setHasError(true);
+        setActiveTab(1);
+        return; 
+      }
+
+      setOutput(result.output);
+      setCaseResults(result.result);
+      setHasError(false);
+      setActiveTab(1);
+
+      //result.result returns a boolean array: [true, true] or [true, false]
+      console.log(result.output);
+      console.log(result.result);
+
+      // Update past attempt data
+      const dataUpdate = {
+        newAttempt: {
+          language: language,
+          content: code,
+          testCases: result.result
+        }
+      }
+      const update = handleUpdateSessionData(sessionId, dataUpdate);
+
+      return result;
+      
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    } finally {
+      setTimeout(() => setIsButtonDisabled(false), 2000);
+    }
+  };
+
+  const languageExtensions = {
+    javascript: javascript(),
+    python: python(),
+    java: java(),
+  };
+
+  return (
+    <div style={{ 
+      backgroundColor: '#fff', 
+      padding: '20px', 
+      borderRadius: '8px', 
+      boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', 
+      height: '100%', 
+      position: 'relative', 
+      overflow: 'hidden'
+    }}>
+      <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1a3042' }}>Code</h2>
+      <select style={{ 
+        position: 'absolute', 
+        top: '10px', 
+        right: '20px', 
+        padding: '5px', 
+        fontSize: '1rem', 
+        fontFamily: 'monospace' 
+      }} value={language} onChange={handleLanguageChange}>
+        <option value="python">Python</option>
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
+      </select>
+      <div style={{ height: '400px', overflow: 'hidden', position: 'relative' }}>
+
+      <CodeMirror
+        value={code}
+        height="400px"
+        extensions={[languageExtensions[language]]}
+        onChange={handleCodeChange}
+        style={{ 
+          height: '100%', 
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          whiteSpace: 'pre-wrap'
+        }} 
+      />
+      </div>
+      <div style={{ marginTop: '0px', marginRight: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginTop: '0px', display: 'flex', gap: '20px' }}>
+      <button
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: '#ccc',
+          color: 'black',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
+        onClick={handleResetCode}
+        disabled={isButtonDisabled}
+      >
+        Reset Answer
+      </button>
+
+      <button
+        style={{
+          marginTop: '20px',
+          padding: '10px 20px',
+          backgroundColor: isButtonDisabled ? '#ccc' : '#1a3042',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+          fontSize: '1rem',
+        }}
+        onClick={handleRunCode}
+        disabled={isButtonDisabled}
+      >
+        Run Code
+      </button>
+      </div>
+      </div>
+      <div style={{ 
+        marginTop: '20px', 
+        padding: '10px', 
+        backgroundColor: isTestcaseAvailable ? '#f9f9f9' : '#f0f0f0',
+        borderRadius: '4px', 
+        fontFamily: isTestcaseAvailable ? '' : 'monospace', 
+        fontSize: '1rem', 
+        whiteSpace: 'pre', 
+        border: isTestcaseAvailable ? 'none' : '1px solid #ddd',
+        maxHeight: isTestcaseAvailable ? '' : '200px',
+        overflowY: 'auto', 
+        overflowX: 'auto', 
+      }}>
+        {isTestcaseAvailable ? (
+          <TestCases 
+            testCases={testcase.python} 
+            output={output} 
+            results={caseResults} 
+            hasError={hasError} 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+        ) : (
+          <>
+            <h3>Output:</h3>
+            <pre>{output}</pre>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CodePanel;

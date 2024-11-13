@@ -1,0 +1,122 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.parent-container {
+    padding-top: 20px;
+}
+
+.table-wrapper {
+    max-height: 80svh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 95%;
+    margin: 0 auto;
+    border-radius: 12px;
+    border: 1px solid lightgray;
+}
+
+.table-custom {
+    background-color: #ffffff;
+    border-collapse: collapse;
+    width: 100%;
+    border-radius: 0;
+}
+
+.table-custom th:first-child,
+.table-custom td:first-child {
+    width: 35%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:nth-child(2),
+.table-custom td:nth-child(2) {
+    width: 35%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:nth-child(3),
+.table-custom td:nth-child(3) {
+    width: 15%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:last-child,
+.table-custom td:last-child {
+    width: 15%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th,
+.table-custom td {
+    padding: 12px;
+    border: 1px solid lightgray;
+    text-align: left;
+}
+
+.table-custom th {
+    background-color: #1a3042;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table-custom tr:first-child th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.table-custom tr:first-child th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.table-custom tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+}
+
+.table-custom tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+}
+
+.table-custom button {
+    background-color: #f0f0f0;
+    color: black;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 4px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+}
+
+.table-custom button:hover {
+    background-color: #d2dde6;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: white;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: lightgray;
+    border-radius: 10px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: gray;
+}

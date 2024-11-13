@@ -1,0 +1,99 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+
+  question-service:
+    build:
+      context: ./backend/question-service
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./.env 
+
+  user-service:
+    build:
+      context: ./backend/user-service
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./.env
+
+  matching-service:
+    build:
+      context: ./backend/matching-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - rabbitmq
+    env_file:
+      - ./.env
+
+  ai-service:
+    build:
+      context: ./backend/ai-service
+    ports:
+      - "9680:9680"
+    depends_on:
+      - ollama
+    env_file:
+      - ./.env
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    env_file:
+      - ./.env
+
+  code-execution-service:
+    build:
+      context: ./backend/code-execution-service
+    ports:
+      - "8083:8083"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    env_file:
+      - ./.env
+
+  collaboration-service:
+    build:
+      context: ./backend/collaboration-service
+    ports:
+      - "8084:8084"
+    env_file:
+      - ./.env
+
+  chat-service:
+    build:
+      context: ./backend/chat-service
+    ports:
+      - "8085:8085"
+    env_file:
+      - ./.env
+
+  ollama:
+    image: ollama/ollama:0.3.14
+    volumes:
+      - ollama:/root/.ollama
+      - ./backend/ai-service:/backend/ai-service
+    ports:
+      - "11434:11434"
+    entrypoint: ["/bin/sh", "/backend/ai-service/entrypoint.sh"]
+    env_file:
+      - ./.env
+
+volumes:
+  ollama:
