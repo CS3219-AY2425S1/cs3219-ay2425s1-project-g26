@@ -1,35 +1,46 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import { useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignUp = () => {
-  const [username, setUsername] = useState(''); 
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); 
-  const [isLoading, setIsLoading] = useState(false); 
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const showErrorToast = (message) => {
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 10000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrorMessage('');
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      setErrorMessage('Please enter a valid email address.');
+      showErrorToast('Please enter a valid email address.');
       setIsLoading(false);
       return;
     }
 
     const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
     if (!passwordPattern.test(password)) {
-      setErrorMessage('Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
+      showErrorToast('Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
       setIsLoading(false);
       return;
     }
-
 
     try {
       const response = await fetch('http://localhost:8081/users', {
@@ -37,7 +48,7 @@ const SignUp = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           username,
           email: email.toLowerCase(),
           password,
@@ -49,14 +60,21 @@ const SignUp = () => {
         throw new Error(errorData.message || 'An error occurred, please try again');
       }
 
-      const data = await response.json(); 
-      console.log(data);
-      navigate('/login');
-      
+      toast.success("Account Signup Successful! You will now be directed to the login page.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        onClose: () => navigate('/login')
+      });
+
     } catch (error) {
-      setErrorMessage(error.message); 
+      showErrorToast(error.message);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -71,10 +89,9 @@ const SignUp = () => {
       justifyContent: 'center',
       fontFamily: 'Figtree, sans-serif'
     }}>
-      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1> 
+      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1>
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Create an account to get started.</p> 
-      
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+
       <form 
         onSubmit={handleSubmit} 
         style={{ 
@@ -111,7 +128,7 @@ const SignUp = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          autoComplete="off"  
+          autoComplete="off"
           style={{
             display: 'block',
             margin: '10px 0',
@@ -158,7 +175,7 @@ const SignUp = () => {
               color: '#fff',
             }}
           >
-            {showPassword ? <FaEyeSlash /> : <FaEye />} 
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
           </div>
         </div>
         <button
@@ -187,20 +204,9 @@ const SignUp = () => {
       <p style={{ fontSize: '1rem', fontFamily: 'Figtree, sans-serif' }}> 
         Already have an account? <a href="/login" style={{ color: 'white', fontFamily: 'Figtree, sans-serif' }}>Login</a>
       </p>
+      <ToastContainer />
     </div>
   );
 };
-
-const styles = `
-  input::placeholder {
-    color: white; 
-    opacity: 0.8; 
-  }
-`;
-
-const styleSheet = document.createElement("style");
-styleSheet.type = "text/css";
-styleSheet.innerText = styles;
-document.head.appendChild(styleSheet);
 
 export default SignUp;
