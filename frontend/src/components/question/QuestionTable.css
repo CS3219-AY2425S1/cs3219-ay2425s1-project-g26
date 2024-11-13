@@ -27,8 +27,7 @@
 
 .table-custom th:first-child,
 .table-custom td:first-child {
-    max-width: 550px;
-    width: 550px;
+    width: 35%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -36,8 +35,7 @@
 
 .table-custom th:nth-child(2),
 .table-custom td:nth-child(2) {
-    max-width: 420px;
-    width: 420px;
+    width: 35%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -45,8 +43,15 @@
 
 .table-custom th:nth-child(3),
 .table-custom td:nth-child(3) {
-    max-width: 170px;
-    width: 170px;
+    width: 15%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-custom th:last-child,
+.table-custom td:last-child {
+    width: 15%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
