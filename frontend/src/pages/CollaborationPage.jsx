@@ -215,13 +215,16 @@ const CollaborationPage = () => {
         });
       })
       .then(() => {
-        if (localStorage.getItem('partnerLeft')) {
+        if (localStorage.getItem('partnerLeft') && localStorage.getItem('partnerLeft') == true) {
           try {
-            fetch(`http://localhost:8084/sessions/${sessionId}`, {
+            const response = fetch(`http://localhost:8084/sessions/${sessionId}`, {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ sessionid: sessionId }),
             });
+            if (!response.ok) {
+              console.log("Session data not found.");
+            }
           } catch (error) {
             console.log(error);
           }

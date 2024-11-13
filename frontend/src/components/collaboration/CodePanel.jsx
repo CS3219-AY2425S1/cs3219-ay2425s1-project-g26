@@ -114,6 +114,8 @@ public class Main {
 
       if (data.partnerLeft) {
         localStorage.setItem('partnerLeft', true);
+      } else {
+        localStorage.setItem('partnerLeft', false);
       }
     });
   }
@@ -149,7 +151,7 @@ public class Main {
 
   useEffect(() => {
     handleLoadCode('python', sessionId).then(() => {
-      if (localStorage.getItem('partnerLeft')) {
+      if (localStorage.getItem('partnerLeft') && localStorage.getItem('partnerLeft') == true) {
         toast.info('Your partner has left the session.', { duration: Infinity });
       }
     });
