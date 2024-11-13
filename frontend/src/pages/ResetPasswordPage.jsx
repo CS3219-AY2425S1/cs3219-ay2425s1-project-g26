@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Toast from './styles/Toast';
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -66,8 +67,9 @@ const ResetPassword = () => {
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1>
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Enter your new password.</p>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} 
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>} 
+
+      {errorMessage && <Toast message={errorMessage} type="error" />}
+      {successMessage && <Toast message={successMessage} type="success" />}
 
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <div style={{ position: 'relative', width: '300px' }}>

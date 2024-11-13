@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Toast from './styles/Toast';
 
 const SignUp = () => {
   const [username, setUsername] = useState('');
@@ -10,18 +9,15 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
   const navigate = useNavigate();
 
   const showErrorToast = (message) => {
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 10000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    setToastMessage({ message, type: 'error' });
+  };
+
+  const showSuccessToast = (message) => {
+    setToastMessage({ message, type: 'success' });
   };
 
   const handleSubmit = async (e) => {
@@ -60,16 +56,8 @@ const SignUp = () => {
         throw new Error(errorData.message || 'An error occurred, please try again');
       }
 
-      toast.success("Account Signup Successful! You will now be directed to the login page.", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        onClose: () => navigate('/login')
-      });
+      showSuccessToast("Account Signup Successful! You will now be directed to the login page.");
+      setTimeout(() => navigate('/login'), 3000);
 
     } catch (error) {
       showErrorToast(error.message);
@@ -92,6 +80,8 @@ const SignUp = () => {
       <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1>
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Create an account to get started.</p> 
 
+      {toastMessage && <Toast message={toastMessage.message} type={toastMessage.type} />}
+      
       <form 
         onSubmit={handleSubmit} 
         style={{ 
@@ -204,7 +194,6 @@ const SignUp = () => {
       <p style={{ fontSize: '1rem', fontFamily: 'Figtree, sans-serif' }}> 
         Already have an account? <a href="/login" style={{ color: 'white', fontFamily: 'Figtree, sans-serif' }}>Login</a>
       </p>
-      <ToastContainer />
     </div>
   );
 };

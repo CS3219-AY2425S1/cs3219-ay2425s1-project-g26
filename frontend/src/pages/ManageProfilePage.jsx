@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../AuthContext"; 
 import { useNavigate } from "react-router-dom"; 
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import Toast from './styles/Toast';
 import './styles/manageprofilepage.css'; 
 import withAuth from "../hoc/withAuth";
 
@@ -21,6 +20,7 @@ const ManageProfilePage = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false); 
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
   const navigate = useNavigate();
 
   const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -45,7 +45,7 @@ const ManageProfilePage = () => {
         setUsername(data.data.username);
         setEmail(data.data.email);
       } catch (err) {
-        toast.error(err.message);
+        setToastMessage({ message: err.message, type: 'error' });
       } finally {
         setLoading(false);
       }
@@ -73,11 +73,10 @@ const ManageProfilePage = () => {
 
       return true;
     } catch (err) {
-      toast.error(err.message);
+      setToastMessage({ message: err.message, type: 'error' });
       return false; 
     }
   };
-
 
   const handleSaveChanges = async (e) => {
     e.preventDefault();
@@ -98,9 +97,9 @@ const ManageProfilePage = () => {
         throw new Error("Failed to update profile.");
       }
 
-      toast.success("Profile updated successfully!");
+      setToastMessage({ message: "Profile updated successfully!", type: 'success' });
     } catch (err) {
-      toast.error(err.message);
+      setToastMessage({ message: err.message, type: 'error' });
     }
   };
 
@@ -109,12 +108,12 @@ const ManageProfilePage = () => {
 
     // Validate password
     if (!passwordPattern.test(newPassword)) {
-      toast.error('Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.');
+      setToastMessage({ message: 'Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.', type: 'error' });
       return;
     }
 
     if (newPassword && newPassword !== confirmPassword) {
-      return toast.error("New password and confirmation do not match.");
+      return setToastMessage({ message: "New password and confirmation do not match.", type: 'error' });
     }
 
     const isVerified = await handleVerifyPassword();
@@ -138,12 +137,12 @@ const ManageProfilePage = () => {
         throw new Error("Failed to update password.");
       }
 
-      toast.success("Password changed successfully!");
+      setToastMessage({ message: "Password changed successfully!", type: 'success' });
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      toast.error(err.message);
+      setToastMessage({ message: err.message, type: 'error' });
     }
   };
 
@@ -166,13 +165,13 @@ const ManageProfilePage = () => {
         throw new Error("Failed to delete account.");
       }
 
-      toast.success("Account deleted successfully!");
+      setToastMessage({ message: "Account deleted successfully!", type: 'success' });
       logout();
       localStorage.clear();
       sessionStorage.clear();
       navigate("/login");
     } catch (err) {
-      toast.error(err.message);
+      setToastMessage({ message: err.message, type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -186,7 +185,8 @@ const ManageProfilePage = () => {
 
   return (
     <div className="container">
-      <ToastContainer /> 
+      {toastMessage && <Toast message={toastMessage.message} type={toastMessage.type} />}
+      
       <button
         className="button-back"
         onClick={handleBack}
@@ -235,9 +235,6 @@ const ManageProfilePage = () => {
           Save Changes
         </button>
 
-        {/* <div className="form-group">
-          <h3 className="sub-title">Change Password</h3>
-        </div> */}
         <div className="title"> Change Password</div>
 
         <div className="form-group">
@@ -275,7 +272,7 @@ const ManageProfilePage = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="confirmPassword" className="label">Confirm Password</label>
+          <label htmlFor="confirmPassword" className="label">Confirm New Password</label>
           <div style={{ position: "relative" }}>
             <input
               type={showConfirmPassword ? 'text' : 'password'}
@@ -296,15 +293,17 @@ const ManageProfilePage = () => {
           className="button-submit"
           onMouseEnter={() => setIsHoveredSave(true)}
           onMouseLeave={() => setIsHoveredSave(false)}
+          style={{ marginBottom: '150px' }}
         >
           Change Password
         </button>
 
         <button
-          className="button-delete"
           onClick={handleDeleteAccount}
+          className="button-delete"
           onMouseEnter={() => setIsHoveredDelete(true)}
           onMouseLeave={() => setIsHoveredDelete(false)}
+          style={{ marginBottom: '50px' }}
         >
           Delete Account
         </button>

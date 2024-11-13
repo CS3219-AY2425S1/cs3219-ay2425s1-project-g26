@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'; 
+import axios from 'axios';
+import Toast from './styles/Toast';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
 
     try {
       const response = await axios.post('http://localhost:8081/users/forgot-password', { email });
 
       if (response.status === 200) {
-        alert("Check your email for the token."); 
-        navigate('/confirm-token', { state: { email } }); 
+        setSuccessMessage("Check your email for the token.");
+        setTimeout(() => navigate('/confirm-token', { state: { email } }), 3000);
       }
     } catch (error) {
       if (error.response && error.response.data) {
@@ -26,21 +30,24 @@ const ForgetPassword = () => {
         setErrorMessage('An error occurred, please try again');
       }
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
   return (
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1> 
+      <h1 style={{ fontSize: '4rem', marginBottom: '20px' }}>PeerPrep</h1>
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Reset your password.</p>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Error message */}
+
+      {errorMessage && <Toast message={errorMessage} type="error" />}
+      {successMessage && <Toast message={successMessage} type="success" />}
+
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value.toLowerCase() )}
+          onChange={(e) => setEmail(e.target.value.toLowerCase())}
           required
           style={{
             display: 'block',
@@ -85,15 +92,13 @@ const ForgetPassword = () => {
   );
 };
 
-
 const styles = `
   input::placeholder {
-    color: white; 
-    opacity: 0.8; 
+    color: white;
+    opacity: 0.8;
   }
 `;
 
-// Append styles to the head
 const styleSheet = document.createElement("style");
 styleSheet.type = "text/css";
 styleSheet.innerText = styles;
