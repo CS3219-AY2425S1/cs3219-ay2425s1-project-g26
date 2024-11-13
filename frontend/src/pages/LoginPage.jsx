@@ -1,7 +1,9 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import Toast from './styles/Toast';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,7 +11,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -20,7 +22,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
+    setToastMessage(null);
     setIsLoading(true);
 
     try {
@@ -53,10 +55,10 @@ const Login = () => {
         const userId = data.data.id; 
         const accessToken = data.data.accessToken; 
         const onlineDate = data.data.onlineDate;
-        localStorage.setItem('onlineDate', onlineDate)
+        localStorage.setItem('onlineDate', onlineDate);
 
         const isAdmin = data.data.isAdmin;
-        localStorage.setItem('isAdmin', isAdmin)
+        localStorage.setItem('isAdmin', isAdmin);
 
         login(accessToken, userId);
         navigate('/dashboard'); 
@@ -65,7 +67,7 @@ const Login = () => {
       }
 
     } catch (error) {
-      setErrorMessage(error.message);
+      setToastMessage({ message: error.message, type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +87,7 @@ const Login = () => {
       <h1 style={{ fontSize: '4rem' }}>PeerPrep</h1> 
       <p style={{ fontSize: '1.2rem', margin: '36px 0' }}>Welcome back! Let’s get back on track.</p> 
       
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+      {toastMessage && <Toast message={toastMessage.message} type={toastMessage.type} />}
       
       <form 
         onSubmit={handleSubmit} 

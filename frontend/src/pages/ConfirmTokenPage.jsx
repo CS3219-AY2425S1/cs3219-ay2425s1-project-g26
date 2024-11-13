@@ -2,35 +2,34 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import Toast from './styles/Toast';
 
 const ConfirmToken = () => {
   const location = useLocation();
-  const email = location.state?.email; 
+  const email = location.state?.email;
   const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isResending, setIsResending] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    console.log("Submitting token:", token); 
+    setErrorMessage('');
+    setSuccessMessage('');
 
     try {
       const response = await axios.post('http://localhost:8081/users/confirm-token', { token });
 
-      console.log("Response:", response); 
-
       if (response.status === 200) {
-        alert("Token confirmed! You can now reset your password.");
-        navigate('/reset-password', { state: { token } });
+        setSuccessMessage("Token confirmed! You can now reset your password.");
+        setTimeout(() => navigate('/reset-password', { state: { token } }), 3000);
       }
     } catch (error) {
-      console.error("Error confirming token:", error);
       if (error.response && error.response.data) {
-        setErrorMessage(error.response.data.message); 
+        setErrorMessage(error.response.data.message);
       } else {
         setErrorMessage('An error occurred, please try again.');
       }
@@ -41,15 +40,17 @@ const ConfirmToken = () => {
 
   const handleResend = async () => {
     setIsResending(true);
+    setErrorMessage('');
+    setSuccessMessage('');
 
     try {
       const response = await axios.post('http://localhost:8081/users/forgot-password', { email });
 
       if (response.status === 200) {
-        alert("Token resent to your email.");
+        setSuccessMessage("Token resent to your email.");
       }
     } catch (error) {
-      alert('Failed to resend token. Please try again.');
+      setErrorMessage('Failed to resend token. Please try again.');
     } finally {
       setIsResending(false);
     }
@@ -59,7 +60,10 @@ const ConfirmToken = () => {
     <div style={{ textAlign: 'center', padding: '50px', color: '#fff', height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <h1 style={{ fontSize: '4rem', marginBottom: '20px'}}>PeerPrep</h1>
       <p style={{ fontSize: '1.2rem', margin: '10px 0' }}>Enter your token to confirm.</p>
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Error message */}
+
+      {errorMessage && <Toast message={errorMessage} type="error" />}
+      {successMessage && <Toast message={successMessage} type="success" />}
+
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <input
           type="text"
